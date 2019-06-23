@@ -1,0 +1,30 @@
+{
+  "name": "react-vsk",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "express": "^4.16.4",
+    "react-scripts": "2.1.1",
+    "ssl-express-www": "^3.0.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node index.js",
+    "heroku-postbuild": "cd client/ && npm install && npm install --only=dev --no-shrinkwrap && npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ferno92/react-vsk.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Ferno92/react-vsk/issues"
+  },
+  "homepage": "https://react-vsk.herokuapp.com",
+  "engines": {
+    "node": "10.x"
+  }
+}

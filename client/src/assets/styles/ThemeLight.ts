@@ -10,18 +10,22 @@ export enum Colors {
   SilverGray50 = '#ECECEC',
   DirtyWhite = '#F3F3F3',
   BrightWhite = '#FFFFFF',
-  Malibu = '#43AAE0',
-  Malibu75 = '#43AAE0',
   Cherry = '#D6001A',
   Fern = '#55B454',
   SunYellow = '#FFE01E',
-  Transparent = 'transparent'
+  Transparent = 'transparent',
+  DndRed = '#c62b29',
+  DndRedLight = '#d15553',
+  DndRedDark = '#8a1e1c',
+  DndBlack = '#212121',
+  DndBlackLight = '#4d4d4d',
+  DndBlackDark = '#171717',
 }
 
 const palette: Palette = createPalette({
   background: {
-    default: Colors.BrightWhite,
-    paper: Colors.BrightWhite
+    default: Colors.DndRed,
+    paper: Colors.DirtyWhite
   },
   backgroundSecondary: {
     default: Colors.DirtyWhite,
@@ -31,16 +35,18 @@ const palette: Palette = createPalette({
     primary: Colors.Black,
     secondary: Colors.Black50
   },
-  primary: {
-    main: Colors.Malibu,
-    contrastText: Colors.BrightWhite,
-    light: Colors.Malibu75
-  },
-  secondary: {
-    main: Colors.Black,
-    contrastText: Colors.BrightWhite,
-    light: Colors.Black75
-  },
+    primary: {
+      light: Colors.DndRedLight,
+      main: Colors.DndRed,
+      dark: Colors.DndRedDark,
+      contrastText: Colors.BrightWhite,
+    },
+    secondary: {
+      light: Colors.DndBlackLight,
+      main: Colors.DndBlack,
+      dark: Colors.DndBlackDark,
+      contrastText: Colors.BrightWhite,
+    },
   success: {
     main: Colors.Fern,
     light: Colors.Fern,
