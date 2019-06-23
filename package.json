@@ -9,7 +9,8 @@
     "react-scripts": "2.1.1",
     "ssl-express-www": "^3.0.3",
     "babel-jest": "^24.8.0",
-    "babel-loader": "8.0.5"
+    "babel-loader": "8.0.5",
+    "eslint": "^5.16.0"
   },
   "devDependencies": {},
   "scripts": {
@@ -18,15 +19,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Ferno92/react-vsk.git"
+    "url": "git+https://github.com/Ferno92/dnd-sheet.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Ferno92/react-vsk/issues"
+    "url": "https://github.com/Ferno92/dnd-sheet/issues"
   },
-  "homepage": "https://react-vsk.herokuapp.com",
+  "homepage": "https://schedadnd.herokuapp.com",
   "engines": {
     "node": "10.x"
   }
