@@ -15,7 +15,8 @@
     "react-scripts": "3.0.1",
     "react-swipeable-views": "^0.13.3",
     "typescript": "3.5.2",
-    "babel-eslint": "10.0.1"
+    "babel-eslint": "10.0.1",
+    "babel-jest": "^24.8.0"
   },
   "scripts": {
     "start": "react-scripts start",
