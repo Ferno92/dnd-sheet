@@ -85,6 +85,13 @@ function registerValidSW(swUrl: string, config?: Config) {
               // Execute callback
               if (config && config.onUpdate) {
                 config.onUpdate(registration);
+              }else{
+                var isOK = window.confirm(
+                  "E' disponibile un aggiornamento! L'applicazione verrà ricaricata, vuoi farlo ora?"
+                );
+                if (isOK) {
+                  window.location.reload();
+                }
               }
             } else {
               // At this point, everything has been precached.
