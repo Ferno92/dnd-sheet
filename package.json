@@ -10,7 +10,8 @@
     "ssl-express-www": "^3.0.3",
     "babel-jest": "^24.8.0",
     "babel-loader": "8.0.5",
-    "eslint": "^5.16.0"
+    "eslint": "^5.16.0",
+    "jest": "24.7.1"
   },
   "devDependencies": {},
   "scripts": {
