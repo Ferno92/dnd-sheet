@@ -5,12 +5,14 @@ import {
   withStyles,
   BottomNavigation,
   BottomNavigationAction,
-  WithTheme
+  WithTheme,
+  Fab
 } from "@material-ui/core";
 import { ReactComponent as FightIcon } from "assets/images/swords.svg";
 import { ReactComponent as ProfileIcon } from "assets/images/viking.svg";
 import { ReactComponent as BackpackIcon } from "assets/images/backpack.svg";
 import { ReactComponent as BookIcon } from "assets/images/spellbook.svg";
+import { Edit, Done} from "@material-ui/icons";
 import SwipeableViews from "react-swipeable-views";
 import StatsView from "pages/stats/StatsView";
 
@@ -18,6 +20,7 @@ interface DashboardProps {}
 
 interface DashboardState {
   pageIndex: number;
+  onEdit: boolean;
 }
 
 class Dashboard extends Component<
@@ -30,7 +33,8 @@ class Dashboard extends Component<
     super(props);
 
     this.state = {
-      pageIndex: 0
+      pageIndex: 0,
+      onEdit: false
     };
   }
 
@@ -42,11 +46,19 @@ class Dashboard extends Component<
     this.setState({ pageIndex: index });
   };
 
+  onChangeEditMode = () => {
+    const {onEdit} = this.state
+    this.setState({ onEdit: !onEdit });
+  };
+
   render() {
     const { classes, theme } = this.props;
-    const { pageIndex } = this.state;
+    const { pageIndex, onEdit } = this.state;
     return (
       <React.Fragment>
+          <Fab color={onEdit ? 'primary' : 'secondary'} aria-label="Add" size="medium" onClick={this.onChangeEditMode} className={classes.fab}>
+            { onEdit ? <Done/> : <Edit />}
+          </Fab>
         <SwipeableViews
           axis={theme.direction === "rtl" ? "x-reverse" : "x"}
           index={pageIndex}
@@ -55,17 +67,11 @@ class Dashboard extends Component<
         >
           <div>
             {/* slide n°1 */}
-            <StatsView/>
+            <StatsView onEdit={onEdit} />
           </div>
-          <div>
-            {/* slide n°2 */}
-          </div>
-          <div>
-            {/* slide n°3 */}
-          </div>
-          <div>
-            {/* slide n°4 */}
-          </div>
+          <div>{/* slide n°2 */}</div>
+          <div>{/* slide n°3 */}</div>
+          <div>{/* slide n°4 */}</div>
         </SwipeableViews>
 
         <BottomNavigation

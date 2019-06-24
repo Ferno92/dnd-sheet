@@ -19,17 +19,12 @@ const DashboardStyles = (theme: Theme) =>
     navigationIcon: {
       marginTop: 10
     },
-    slide: {
-      height: '100%'
-    },
-    slide1:{
-      background: 'red'
-    },
-    slide2:{
-      background: 'blue'
-    },
-    slide3:{
-      background: 'green'
+    fab: {
+      position: "absolute",
+      top: 0,
+      right: 0,
+      margin: 10,
+      zIndex: 10
     }
   });
 
