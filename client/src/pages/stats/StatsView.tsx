@@ -95,22 +95,31 @@ class StatsView extends Component<
             fullWidth
             disabled={!onEdit}
           />
-          <Grid container spacing={3}>
-            {stats.map((stat, index) => {
-              return (
-                <Grid item xs={4} key={stat.type} className={classes.gridItem}>
-                  <TextFieldNumber
-                    label={stat.type}
-                    value={stat.value}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                      this.onEditStats(event.target.value, index);
-                    }}
-                    disabled={!onEdit}
-                  />
-                </Grid>
-              );
-            })}
-          </Grid>
+          <div className={classes.gridContainer}>
+            <Grid container spacing={3}>
+              {stats.map((stat, index) => {
+                return (
+                  <Grid
+                    item
+                    xs={4}
+                    key={stat.type}
+                    className={classes.gridItem}
+                  >
+                    <TextFieldNumber
+                      label={stat.type}
+                      value={stat.value}
+                      onChange={(
+                        event: React.ChangeEvent<HTMLInputElement>
+                      ) => {
+                        this.onEditStats(event.target.value, index);
+                      }}
+                      disabled={!onEdit}
+                    />
+                  </Grid>
+                );
+              })}
+            </Grid>
+          </div>
         </div>
         {/* {!onEdit && (
           <React.Fragment>

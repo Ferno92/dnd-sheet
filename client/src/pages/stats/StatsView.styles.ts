@@ -8,6 +8,10 @@ const StatsViewStyles = (theme: Theme) => createStyles({
     inputContainer: {
         padding: 10
     },
+    gridContainer: {
+        width: 'calc(100% - 4px)',
+        marginLeft: 2
+    },
     gridItem: {
         paddingBottom: '0 !important'
     }
