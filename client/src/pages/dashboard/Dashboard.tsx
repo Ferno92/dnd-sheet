@@ -67,7 +67,7 @@ class Dashboard extends Component<
         >
           <div>
             {/* slide n°1 */}
-            <StatsView onEdit={onEdit} />
+            <StatsView onEdit={onEdit} id={1} />
           </div>
           <div>{/* slide n°2 */}</div>
           <div>{/* slide n°3 */}</div>

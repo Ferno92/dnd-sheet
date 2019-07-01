@@ -5,6 +5,7 @@ import TextFieldStringStyles from "./TextFieldString.styles";
 
 interface TextFieldStringProps {
     label: string
+    name: string
     value: string
     onChange: (value: string , property: string)  => void
     disabled: boolean;
@@ -26,13 +27,13 @@ TextFieldStringState
   }
 
   render() {
-    const { classes, value, label, onChange, disabled } = this.props;
+    const { classes, value, label, onChange, disabled, name } = this.props;
     return (
         <TextField
               variant="outlined"
               label={label}
               value={value}
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) => onChange.bind(event.target.value, "name")}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => onChange(event.target.value, name)}
               fullWidth
               className={classes.textField}
               margin="dense"
