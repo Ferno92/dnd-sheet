@@ -1,7 +1,8 @@
 import React from 'react';
 import { MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
-import Dashboard from './pages/dashboard/Dashboard';
+import Sheet from './pages/sheet/Sheet';
+import Dashboard from 'pages/dashboard/Dashboard'
 import ThemeLight from './assets/styles/ThemeLight'
 
 const App: React.FC = () => {
@@ -17,6 +18,7 @@ const App: React.FC = () => {
       <BrowserRouter>
         <Switch>
           <Route exact path="/" component={Dashboard} />
+          <Route exact path="/sheet/:id" component={Sheet} />
         </Switch>
       </BrowserRouter>
     </MuiThemeProvider>

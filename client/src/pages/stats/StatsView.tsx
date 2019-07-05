@@ -1,20 +1,18 @@
 import React, { Component } from "react"
 import { WithStyles } from "@material-ui/styles"
-import { withStyles, Typography, TextField, Grid } from "@material-ui/core"
+import { withStyles, Grid } from "@material-ui/core"
 import StatsViewStyles from "./StatsView.styles"
 import TextFieldString from "components/text-field-string/TextFieldString"
 import TextFieldNumber from "components/text-field-number/TextFieldNumber"
 import Dexie from 'dexie'
-import PG from "./models/PG";
-import Stats from "./models/Stats";
+import PG from "./models/PG"
 
 interface StatsViewProps {
   onEdit: boolean;
-  id: number
+  id: string
 }
 
 interface StatsViewState extends PG{
-  stats: Stats[]
   exist: boolean
 }
 
@@ -23,7 +21,7 @@ class StatsView extends Component<
   StatsViewState
   > {
 
-  pg: Dexie.Table<PG, number> | undefined
+  pg: Dexie.Table<PG, string> | undefined
   db: Dexie
 
   constructor(props: StatsViewProps & WithStyles<typeof StatsViewStyles>) {
@@ -48,7 +46,7 @@ class StatsView extends Component<
 
     this.db = new Dexie('pg01_database')
     this.db.version(1).stores({
-      pg: '++id,name,race,pgClass, level'
+      pg: 'id,name,race,pgClass,level,stats'
     })
     this.db.open().then(() => {
       console.log('DONE')
@@ -82,15 +80,15 @@ class StatsView extends Component<
   componentWillReceiveProps(newProps: StatsViewProps) {
 
     if (!newProps.onEdit) {
-      const { name, pgClass, race, level, exist } = this.state
+      const { name, pgClass, race, level, exist, stats } = this.state
       const { id } = this.props
 
       if (this.pg) {
         console.log('onedit false, update with', { name, pgClass, race, level })
         if(exist){
-          this.pg.update(id, { name, pgClass, race }).then(() => console.log('update done')).catch((err) => console.log('err: ', err))
+          this.pg.update(id, { name, pgClass, race, level, stats }).then(() => console.log('update done')).catch((err) => console.log('err: ', err))
         }else{
-          this.pg.put({ id, name, pgClass, race, level }).then(() => console.log('create done')).catch((err) => console.log('err: ', err))
+          this.pg.put({ id, name, pgClass, race, level, stats }).then(() => console.log('create done')).catch((err) => console.log('err: ', err))
         }
       }
     }

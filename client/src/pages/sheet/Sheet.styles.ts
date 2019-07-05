@@ -1,7 +1,7 @@
 import { createStyles } from "@material-ui/core";
 import Theme from "assets/styles/Theme";
 
-const DashboardStyles = (theme: Theme) =>
+const SheetStyles = (theme: Theme) =>
   createStyles({
     container: {
       background: theme.palette.backgroundSecondary.default
@@ -28,4 +28,4 @@ const DashboardStyles = (theme: Theme) =>
     }
   });
 
-export default DashboardStyles;
+export default SheetStyles;
