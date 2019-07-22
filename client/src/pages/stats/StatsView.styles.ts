@@ -14,6 +14,13 @@ const StatsViewStyles = (theme: Theme) => createStyles({
     },
     gridItem: {
         paddingBottom: '0 !important'
+    },
+    divider:{
+        margin: '20px 0 10px 0'
+    },
+    title: {
+        textAlign: 'center',
+        marginBottom: 10
     }
 });
 

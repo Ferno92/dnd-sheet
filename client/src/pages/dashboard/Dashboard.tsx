@@ -45,9 +45,9 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
 
     return (
         <div>
-            <Typography variant='h5'>
+            <Typography variant='h5' className={classes.title}>
                 PG creati
-        </Typography>
+            </Typography>
             {pgs.map((pg) => (
                 <MenuItem key={pg.id} onClick={() => props.history.push(`/sheet/${pg.id}`)}>
                     <Avatar className={classes.avatar}>{getFirstLetters(pg.name)}</Avatar>{pg.name}

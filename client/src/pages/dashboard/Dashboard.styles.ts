@@ -3,6 +3,9 @@ import Theme from "assets/styles/Theme";
 import { makeStyles } from "@material-ui/styles";
 
 const DashboardStyles = makeStyles((theme: Theme) => ({
+  title:{
+    textAlign: 'center'
+  },
   avatar: {
     height: 50,
     width: 50,
@@ -10,8 +13,8 @@ const DashboardStyles = makeStyles((theme: Theme) => ({
   },
   fab: {
       position: 'fixed',
-      bottom: 10,
-      right: 10
+      bottom: 20,
+      right: 20
   }
 }));
 

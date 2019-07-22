@@ -1,6 +1,6 @@
 import React, { Component } from "react"
 import { WithStyles } from "@material-ui/styles"
-import { withStyles, Grid } from "@material-ui/core"
+import { withStyles, Grid, Typography, Divider } from "@material-ui/core"
 import StatsViewStyles from "./StatsView.styles"
 import TextFieldString from "components/text-field-string/TextFieldString"
 import TextFieldNumber from "components/text-field-number/TextFieldNumber"
@@ -12,7 +12,7 @@ interface StatsViewProps {
   id: number
 }
 
-interface StatsViewState extends PG{
+interface StatsViewState extends PG {
   exist: boolean
 }
 
@@ -26,7 +26,7 @@ class StatsView extends Component<
 
   constructor(props: StatsViewProps & WithStyles<typeof StatsViewStyles>) {
     super(props);
-    
+
     this.state = {
       id: props.id,
       name: "",
@@ -56,7 +56,7 @@ class StatsView extends Component<
       // })
       this.db.table('pg').each((pg: PG) => {
         console.log(pg);
-        if(pg.id === props.id){
+        if (pg.id === props.id) {
           this.setState({ ...this.state, ...pg, exist: true })
         }
       })
@@ -78,16 +78,16 @@ class StatsView extends Component<
   }
 
   componentWillReceiveProps(newProps: StatsViewProps) {
-    const {onEdit} = this.props
+    const { onEdit } = this.props
     if (!newProps.onEdit && newProps.onEdit !== onEdit) {
       const { name, pgClass, race, level, exist, stats } = this.state
       const { id } = this.props
 
       if (this.pg) {
         console.log('onedit false, update with', { name, pgClass, race, level })
-        if(exist){
+        if (exist) {
           this.pg.update(id, { name, pgClass, race, level, stats }).then(() => console.log('update done')).catch((err) => console.log('err: ', err))
-        }else{
+        } else {
           this.pg.put({ id, name, pgClass, race, level, stats }).then(() => console.log('create done')).catch((err) => console.log('err: ', err))
         }
       }
@@ -109,6 +109,11 @@ class StatsView extends Component<
     tempStats[prop].value = parseInt(value);
     this.setState({ stats: tempStats });
   };
+
+  getStatModifier = (stat: number) => {
+    const value = (stat - 10) / 2
+    return -Math.round(-value)
+  }
 
   render() {
     const { name, race, pgClass, level, stats } = this.state;
@@ -147,6 +152,7 @@ class StatsView extends Component<
           <div className={classes.gridContainer}>
             <Grid container spacing={3}>
               {stats.map((stat, index) => {
+                //TODO https://material-ui.com/components/text-fields/#customized-inputs for temp stat change
                 return (
                   <Grid
                     item
@@ -169,14 +175,35 @@ class StatsView extends Component<
               })}
             </Grid>
           </div>
+          <Divider className={classes.divider} />
+          <Typography variant='h6' className={classes.title}>Tiri Salvezza</Typography>
+          <div className={classes.gridContainer}>
+            <Grid container spacing={3}>
+              {stats.map((stat, index) => {
+                return (
+                  <Grid
+                    item
+                    xs={4}
+                    key={stat.type}
+                    className={classes.gridItem}
+                  >
+                    <TextFieldNumber
+                      label={`TS ${stat.type}`}
+                      value={this.getStatModifier(stat.value)}
+                      onChange={(
+                        event: React.ChangeEvent<HTMLInputElement>
+                      ) => {
+                        // this.onEditStats(event.target.value, index);
+                      }}
+                      disabled={!onEdit}
+                    />
+                  </Grid>
+                );
+              })}
+            </Grid>
+          </div>
+
         </div>
-        {/* {!onEdit && (
-          <React.Fragment>
-            <Typography>{name}</Typography>
-            <div>{race}</div>
-            <div>{`${pgClass} LV.${level}`}</div>
-          </React.Fragment>
-        )} */}
       </div>
     );
   }
