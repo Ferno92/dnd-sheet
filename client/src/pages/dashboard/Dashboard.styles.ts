@@ -4,7 +4,7 @@ import { makeStyles } from "@material-ui/styles";
 
 const DashboardStyles = makeStyles((theme: Theme) => ({
   title:{
-    textAlign: 'center'
+    textAlign: 'center' 
   },
   avatar: {
     height: 50,
