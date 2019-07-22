@@ -6,21 +6,23 @@ import {
   BottomNavigation,
   BottomNavigationAction,
   WithTheme,
-  Fab
+  Fab,
+  Tooltip
 } from "@material-ui/core"
 import { ReactComponent as FightIcon } from "assets/images/swords.svg"
 import { ReactComponent as ProfileIcon } from "assets/images/viking.svg"
 import { ReactComponent as BackpackIcon } from "assets/images/backpack.svg"
 import { ReactComponent as BookIcon } from "assets/images/spellbook.svg"
-import { Edit, Done, ArrowBack} from "@material-ui/icons"
+import { Edit, Done, ArrowBack, Settings, Close } from "@material-ui/icons"
 import SwipeableViews from "react-swipeable-views"
 import StatsView from "pages/stats/StatsView"
 import SpeedDial from '@material-ui/lab/SpeedDial'
 import SpeedDialIcon from '@material-ui/lab/SpeedDialIcon'
 import SpeedDialAction from '@material-ui/lab/SpeedDialAction'
+import { RouteComponentProps, withRouter } from "react-router-dom";
 
 interface SheetProps {
-  sheetId: string
+  id: number
 }
 
 interface SheetState {
@@ -28,26 +30,39 @@ interface SheetState {
   onEdit: boolean
   direction: 'down'
   open: boolean
+  sheetId: number
 }
 
 class Sheet extends Component<
-SheetProps & WithStyles<typeof SheetStyles> & WithTheme,
-SheetState
-> {
+  SheetProps & RouteComponentProps<{ id: string }> & WithStyles<typeof SheetStyles> & WithTheme,
+  SheetState
+  > {
   actions = [
-    { icon: <ArrowBack />, name: 'Back' },
-    // { icon: <SaveIcon />, name: 'Save' }
+    {
+      icon: <ArrowBack />, name: 'Back', onClick: () => {
+        //go back
+        this.props.history.goBack();
+      }
+    },
+    {
+      icon: <Edit />, name: 'Edit', onClick: () => {
+        this.onChangeEditMode()
+      }
+    }
   ]
   constructor(
-    props: SheetProps & WithStyles<typeof SheetStyles> & WithTheme
+    props: SheetProps & RouteComponentProps<{ id: string }> & WithStyles<typeof SheetStyles> & WithTheme
   ) {
     super(props);
 
+    console.log('props', props)
+    const { id } = props.match.params
     this.state = {
       pageIndex: 0,
       onEdit: false,
       direction: 'down',
-      open: false
+      open: false,
+      sheetId: parseInt(id)
     };
   }
 
@@ -60,13 +75,13 @@ SheetState
   };
 
   onChangeEditMode = () => {
-    const {onEdit} = this.state
+    const { onEdit } = this.state
     this.setState({ onEdit: !onEdit });
   };
 
   handleClick = () => {
-    const {open} = this.state
-    this.setState({open: !open});
+    const { open } = this.state
+    this.setState({ open: !open });
   };
 
   handleClose = () => {
@@ -78,34 +93,41 @@ SheetState
   };
 
   render() {
-    const { classes, theme, sheetId } = this.props;
-    const { pageIndex, onEdit, open, direction } = this.state;
+    const { classes, theme } = this.props;
+    const { pageIndex, onEdit, open, direction, sheetId } = this.state;
+    console.log('sheetId', sheetId)
     return (
       <React.Fragment>
-          {/* <Fab color={onEdit ? 'primary' : 'secondary'} aria-label="Add" size="medium" onClick={this.onChangeEditMode} className={classes.fab}>
-            { onEdit ? <Done/> : <Edit />}
-          </Fab> */}
-          <SpeedDial 
-            ariaLabel="Options"
-            icon={<SpeedDialIcon />}
-            onBlur={this.handleClose}
-            onClick={this.handleClick}
-            onClose={this.handleClose}
-            onFocus={this.handleOpen}
-            onMouseEnter={this.handleOpen}
-            onMouseLeave={this.handleClose}
-            open={open}
-            direction={direction}
-            className={classes.fab}>
-            {this.actions.map(action => (
-              <SpeedDialAction
-                key={action.name}
-                icon={action.icon}
-                tooltipTitle={action.name}
-                onClick={this.handleClick}
-              />
-            ))}
-          </SpeedDial>
+        {
+          onEdit ? (
+            <Tooltip title="Save" aria-label="Save">
+              <Fab color="primary" aria-label="Done" size="large" onClick={this.onChangeEditMode} className={classes.fab}>
+                <Done />
+              </Fab>
+            </Tooltip>) :
+            (<SpeedDial
+              ariaLabel="Options"
+              icon={<SpeedDialIcon className={classes.speedDial} openIcon={<Close />} icon={<Settings />} />}
+              onBlur={this.handleClose}
+              onClick={this.handleClick}
+              onClose={this.handleClose}
+              onFocus={this.handleOpen}
+              onMouseEnter={this.handleOpen}
+              onMouseLeave={this.handleClose}
+              open={open}
+              direction={direction}
+              className={classes.fab}>
+              {this.actions.map(action => (
+                <SpeedDialAction
+                  key={action.name}
+                  icon={action.icon}
+                  tooltipTitle={action.name}
+                  onClick={action.onClick}
+                />
+              ))}
+            </SpeedDial>
+            )
+        }
         <SwipeableViews
           axis={theme.direction === "rtl" ? "x-reverse" : "x"}
           index={pageIndex}
@@ -148,4 +170,4 @@ SheetState
   }
 }
 
-export default withStyles(SheetStyles, { withTheme: true })(Sheet);
+export default withRouter(withStyles(SheetStyles, { withTheme: true })(Sheet));

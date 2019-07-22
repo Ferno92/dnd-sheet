@@ -9,7 +9,7 @@ import PG from "./models/PG"
 
 interface StatsViewProps {
   onEdit: boolean;
-  id: string
+  id: number
 }
 
 interface StatsViewState extends PG{
@@ -21,12 +21,12 @@ class StatsView extends Component<
   StatsViewState
   > {
 
-  pg: Dexie.Table<PG, string> | undefined
+  pg: Dexie.Table<PG, number> | undefined
   db: Dexie
 
   constructor(props: StatsViewProps & WithStyles<typeof StatsViewStyles>) {
     super(props);
-
+    
     this.state = {
       id: props.id,
       name: "",
@@ -49,7 +49,7 @@ class StatsView extends Component<
       pg: 'id,name,race,pgClass,level,stats'
     })
     this.db.open().then(() => {
-      console.log('DONE')
+      console.log('DONE', props.id)
       this.pg = this.db.table('pg')
       // this.pg.put({ name: 'Torendal DueLame', race: 'Nano' }).then(() => {
       //   return db.table('pg').get('Torendal DueLame')
@@ -78,8 +78,8 @@ class StatsView extends Component<
   }
 
   componentWillReceiveProps(newProps: StatsViewProps) {
-
-    if (!newProps.onEdit) {
+    const {onEdit} = this.props
+    if (!newProps.onEdit && newProps.onEdit !== onEdit) {
       const { name, pgClass, race, level, exist, stats } = this.state
       const { id } = this.props
 

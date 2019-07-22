@@ -25,6 +25,9 @@ const SheetStyles = (theme: Theme) =>
       right: 0,
       margin: 10,
       zIndex: 10
+    },
+    speedDial: {
+      marginTop: 6
     }
   });
 

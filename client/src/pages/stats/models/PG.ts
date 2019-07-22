@@ -1,7 +1,7 @@
 import Stats from "./Stats";
 
 interface PG {
-  id: string
+  id: number
   name: string
   race: string
   pgClass: string
