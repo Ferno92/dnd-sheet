@@ -6,7 +6,8 @@ interface PG {
   race: string
   pgClass: string
   level: number
-  stats: Stats[]
+  stats: Stats[],
+  proficiency: number
 }
 
 export default PG;

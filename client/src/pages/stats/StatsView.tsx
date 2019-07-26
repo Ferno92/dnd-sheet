@@ -6,6 +6,7 @@ import TextFieldString from "components/text-field-string/TextFieldString"
 import TextFieldNumber from "components/text-field-number/TextFieldNumber"
 import Dexie from 'dexie'
 import PG from "./models/PG"
+import MixedInput, { InputPosition } from "components/mixed-input/MixedInput";
 
 interface StatsViewProps {
   onEdit: boolean;
@@ -41,6 +42,7 @@ class StatsView extends Component<
         { type: "Sag", value: 10 },
         { type: "Car", value: 10 }
       ],
+      proficiency: 0,
       exist: false
     };
 
@@ -80,15 +82,15 @@ class StatsView extends Component<
   componentWillReceiveProps(newProps: StatsViewProps) {
     const { onEdit } = this.props
     if (!newProps.onEdit && newProps.onEdit !== onEdit) {
-      const { name, pgClass, race, level, exist, stats } = this.state
+      const { name, pgClass, race, level, exist, stats, proficiency } = this.state
       const { id } = this.props
 
       if (this.pg) {
         console.log('onedit false, update with', { name, pgClass, race, level })
         if (exist) {
-          this.pg.update(id, { name, pgClass, race, level, stats }).then(() => console.log('update done')).catch((err) => console.log('err: ', err))
+          this.pg.update(id, { name, pgClass, race, level, stats, proficiency }).then(() => console.log('update done')).catch((err) => console.log('err: ', err))
         } else {
-          this.pg.put({ id, name, pgClass, race, level, stats }).then(() => console.log('create done')).catch((err) => console.log('err: ', err))
+          this.pg.put({ id, name, pgClass, race, level, stats, proficiency }).then(() => console.log('create done')).catch((err) => console.log('err: ', err))
         }
       }
     }
@@ -110,13 +112,28 @@ class StatsView extends Component<
     this.setState({ stats: tempStats });
   };
 
+  onEditProficiency = (proficiency: string) => {
+    this.setState({ proficiency: parseInt(proficiency) })
+  }
+
   getStatModifier = (stat: number) => {
     const value = (stat - 10) / 2
     return -Math.round(-value)
   }
 
+  getStatModifierFromName = (name: string): number => {
+    const { stats } = this.state
+    let modifier = 0
+    stats.forEach(stat => {
+      if (stat.type.toLowerCase() === name.toLowerCase()) {
+        modifier = this.getStatModifier(stat.value)
+      }
+    })
+    return modifier
+  }
+
   render() {
-    const { name, race, pgClass, level, stats } = this.state;
+    const { name, race, pgClass, level, stats, proficiency } = this.state;
     const { classes, onEdit } = this.props;
     return (
       <div className={classes.container}>
@@ -160,15 +177,90 @@ class StatsView extends Component<
                     key={stat.type}
                     className={classes.gridItem}
                   >
-                    <TextFieldNumber
-                      label={stat.type}
-                      value={stat.value}
+                    <div className={classes.stat}>
+                      <TextFieldNumber
+                        label={stat.type}
+                        value={stat.value}
+                        onChange={(
+                          event: React.ChangeEvent<HTMLInputElement>
+                        ) => {
+                          this.onEditStats(event.target.value, index);
+                        }}
+                        disabled={!onEdit}
+                      />
+                      <div className={classes.modifier}>
+                        {`${this.getStatModifier(stat.value) === 0 ? '' :
+                          (this.getStatModifier(stat.value) > 0 ? '+' : '-')}${Math.abs(this.getStatModifier(stat.value))}`}
+                      </div>
+                    </div>
+                  </Grid>
+                );
+              })}
+            </Grid>
+          </div>
+          <div className={classes.gridContainer}>
+            <Grid container spacing={3}>
+              <Grid
+                item
+                xs={6}
+                className={classes.gridItem}
+              >
+                <TextFieldNumber
+                  label="Competenza"
+                  value={proficiency}
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => this.onEditProficiency(event.target.value)}
+                  disabled={!onEdit}
+                  fullWidth
+                />
+              </Grid>
+              <Grid
+                item
+                xs={6}
+                className={classes.gridItem}
+              >
+                <TextFieldNumber
+                  label="Perc passiva"
+                  value={this.getStatModifierFromName('sag')}
+                  onChange={() => { }}
+                  disabled={!onEdit}
+                  fullWidth
+                />
+              </Grid>
+            </Grid>
+          </div>
+
+          <Divider className={classes.divider} />
+          <Typography variant='h6' className={classes.title}>Tiri Salvezza</Typography>
+          <div className={classes.gridContainer}>
+            <Grid container spacing={3}>
+              {stats.map((stat, index) => {
+                return (
+                  <Grid
+                    item
+                    xs={12}
+                    key={stat.type}
+                    className={classes.gridItem}
+                  >
+                    {/* <TextFieldNumber
+                      label={`TS ${stat.type}`}
+                      value={this.getStatModifier(stat.value)}
                       onChange={(
                         event: React.ChangeEvent<HTMLInputElement>
                       ) => {
-                        this.onEditStats(event.target.value, index);
+                        // this.onEditStats(event.target.value, index);
                       }}
                       disabled={!onEdit}
+                    /> */}
+                    <MixedInput
+                      inputInfo={{ type: 'Temp', value: 0 }}
+                      inputPos={InputPosition.End}
+                      modifiers={[
+                        { type: 'Comp', value: 0 },
+                        { type: 'Mod', value: this.getStatModifier(stat.value) }
+                      ]}
+                      onChange={() => { }}
+                      onEdit={onEdit}
+                      label={stat.type}
                     />
                   </Grid>
                 );
@@ -176,9 +268,9 @@ class StatsView extends Component<
             </Grid>
           </div>
           <Divider className={classes.divider} />
-          <Typography variant='h6' className={classes.title}>Tiri Salvezza</Typography>
+          <Typography variant='h6' className={classes.title}>Abilità</Typography>
           <div className={classes.gridContainer}>
-            <Grid container spacing={3}>
+            {/* <Grid container spacing={3}>
               {stats.map((stat, index) => {
                 return (
                   <Grid
@@ -200,9 +292,8 @@ class StatsView extends Component<
                   </Grid>
                 );
               })}
-            </Grid>
+            </Grid> */}
           </div>
-
         </div>
       </div>
     );

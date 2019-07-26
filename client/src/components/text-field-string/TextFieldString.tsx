@@ -38,6 +38,9 @@ TextFieldStringState
               className={classes.textField}
               margin="dense"
               disabled={disabled}
+              onFocus={event => {
+                event.target.select()
+              }}
             />
     );
   }

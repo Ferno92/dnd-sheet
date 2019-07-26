@@ -11,12 +11,12 @@ interface TextFieldNumberProps {
   fullWidth?: boolean;
 }
 
-interface TextFieldNumberState {}
+interface TextFieldNumberState { }
 
 class TextFieldNumber extends Component<
   TextFieldNumberProps & WithStyles<typeof TextFieldNumberStyles>,
   TextFieldNumberState
-> {
+  > {
   constructor(
     props: TextFieldNumberProps & WithStyles<typeof TextFieldNumberStyles>
   ) {
@@ -39,6 +39,9 @@ class TextFieldNumber extends Component<
         type="number"
         inputProps={{ min: "1", max: "20", step: "1" }}
         disabled={disabled}
+        onFocus={event => {
+          event.target.select()
+        }}
       />
     );
   }

@@ -10,7 +10,8 @@ const StatsViewStyles = (theme: Theme) => createStyles({
     },
     gridContainer: {
         width: 'calc(100% - 4px)',
-        marginLeft: 2
+        marginLeft: 2,
+        marginBottom: 15
     },
     gridItem: {
         paddingBottom: '0 !important'
@@ -21,6 +22,23 @@ const StatsViewStyles = (theme: Theme) => createStyles({
     title: {
         textAlign: 'center',
         marginBottom: 10
+    },
+    modifier: {
+        border: 'solid',
+        borderRadius: '50%',
+        borderWidth: 1,
+        height: 30,
+        width: 30,
+        marginLeft: -10,
+        textAlign: 'center',
+        lineHeight: '30px',
+        backgroundColor: '#fff',
+        zIndex: 1
+    },
+    stat: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center'
     }
 });
 
