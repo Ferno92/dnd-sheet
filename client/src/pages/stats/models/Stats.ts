@@ -1,5 +1,7 @@
+import StatsType from "data/StatsEnum";
+
 interface Stats {
-    type: string
+    type: StatsType
     value: number
   }
 

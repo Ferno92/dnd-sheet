@@ -39,6 +39,15 @@ const StatsViewStyles = (theme: Theme) => createStyles({
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center'
+    },
+    raceInputField: {
+        marginBottom: 10,
+        '& .MuiSelect-root': {
+            height: 56
+        },
+        '& .MuiSelect-selectMenu': {
+            height: 20
+        }
     }
 });
 

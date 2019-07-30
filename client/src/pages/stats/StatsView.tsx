@@ -1,12 +1,18 @@
-import React, { Component } from "react"
+import React, { Component, createRef } from "react"
 import { WithStyles } from "@material-ui/styles"
-import { withStyles, Grid, Typography, Divider } from "@material-ui/core"
+import { withStyles, Grid, Typography, Divider, FormControl, InputLabel, Select, OutlinedInput, MenuItem } from "@material-ui/core"
 import StatsViewStyles from "./StatsView.styles"
 import TextFieldString from "components/text-field-string/TextFieldString"
 import TextFieldNumber from "components/text-field-number/TextFieldNumber"
 import Dexie from 'dexie'
 import PG from "./models/PG"
 import MixedInput, { InputPosition } from "components/mixed-input/MixedInput";
+import StatsType from "data/StatsEnum";
+import TextUtils from "utils/TextUtils";
+import { default as racesJSON } from 'data/RacesJSON'
+import Stats from "./models/Stats";
+import { Races } from "data/Races";
+import DataUtils from "data/DataUtils";
 
 interface StatsViewProps {
   onEdit: boolean;
@@ -14,7 +20,8 @@ interface StatsViewProps {
 }
 
 interface StatsViewState extends PG {
-  exist: boolean
+  exist: boolean,
+  raceLabelWidth: number
 }
 
 class StatsView extends Component<
@@ -24,6 +31,8 @@ class StatsView extends Component<
 
   pg: Dexie.Table<PG, number> | undefined
   db: Dexie
+  inputLabel = createRef<any>()
+  racesData = DataUtils.RaceMapper(racesJSON as any)
 
   constructor(props: StatsViewProps & WithStyles<typeof StatsViewStyles>) {
     super(props);
@@ -31,19 +40,20 @@ class StatsView extends Component<
     this.state = {
       id: props.id,
       name: "",
-      race: "",
+      race: Races.Umano,
       pgClass: "",
       level: 1,
       stats: [
-        { type: "For", value: 10 },
-        { type: "Des", value: 10 },
-        { type: "Cos", value: 10 },
-        { type: "Int", value: 10 },
-        { type: "Sag", value: 10 },
-        { type: "Car", value: 10 }
+        { type: StatsType.Forza, value: 10 },
+        { type: StatsType.Destrezza, value: 10 },
+        { type: StatsType.Costituzione, value: 10 },
+        { type: StatsType.Intelligenza, value: 10 },
+        { type: StatsType.Saggezza, value: 10 },
+        { type: StatsType.Carisma, value: 10 }
       ],
       proficiency: 0,
-      exist: false
+      exist: false,
+      raceLabelWidth: 0
     };
 
     this.db = new Dexie('pg01_database')
@@ -77,6 +87,15 @@ class StatsView extends Component<
       //   console.error(err.stack || err);
     })
 
+  }
+
+  componentDidMount() {
+    if (this.inputLabel) {
+      const current: any = this.inputLabel.current
+      if (current) {
+        this.setState({ raceLabelWidth: current.offsetWidth })
+      }
+    }
   }
 
   componentWillReceiveProps(newProps: StatsViewProps) {
@@ -116,24 +135,47 @@ class StatsView extends Component<
     this.setState({ proficiency: parseInt(proficiency) })
   }
 
-  getStatModifier = (stat: number) => {
-    const value = (stat - 10) / 2
+  onChangeRace = (event: React.ChangeEvent<{
+    name?: string | undefined;
+    value: unknown;
+  }>) => {
+    const value = event.target.value as Races
+    this.setState({ race: value })
+  }
+
+  getStatModifier = (stat: Stats) => {
+    const value = (this.getStatValue(stat) - 10) / 2
     return -Math.round(-value)
   }
 
-  getStatModifierFromName = (name: string): number => {
+  getStatModifierFromName = (type: StatsType): number => {
     const { stats } = this.state
     let modifier = 0
     stats.forEach(stat => {
-      if (stat.type.toLowerCase() === name.toLowerCase()) {
-        modifier = this.getStatModifier(stat.value)
+      if (stat.type === type) {
+        modifier = this.getStatModifier(stat)
       }
     })
     return modifier
   }
 
+  getStatValue = (stat:Stats): number=>{
+    const {race} = this.state
+    const raceJSON = this.racesData.filter(raceJson => raceJson.type === race)
+    let add = 0
+    if(raceJSON.length > 0){
+      raceJSON[0].stats.forEach(raceStat =>{
+        if(raceStat.type === stat.type){
+          add = raceStat.value
+        }
+      })
+    }
+
+    return stat.value + add
+  }
+
   render() {
-    const { name, race, pgClass, level, stats, proficiency } = this.state;
+    const { name, race, pgClass, level, stats, proficiency, raceLabelWidth } = this.state;
     const { classes, onEdit } = this.props;
     return (
       <div className={classes.container}>
@@ -145,13 +187,21 @@ class StatsView extends Component<
             disabled={!onEdit}
             name={'name'}
           />
-          <TextFieldString
-            label="Razza"
-            value={race}
-            onChange={this.onEditInfo}
-            disabled={!onEdit}
-            name={'race'}
-          />
+          <FormControl variant="outlined" className={classes.raceInputField} fullWidth>
+            <InputLabel htmlFor="outlined-race-simple" ref={this.inputLabel}>
+              Razza
+            </InputLabel>
+            <Select
+              value={race}
+              onChange={this.onChangeRace}
+              input={<OutlinedInput labelWidth={raceLabelWidth} name="race" id="outlined-race-simple" disabled={!onEdit}/>}
+              disabled={!onEdit}
+            >
+              {this.racesData.map(race => {
+                return <MenuItem key={race.type} value={race.type}>{race.name}</MenuItem>
+              })}
+            </Select>
+          </FormControl>
           <TextFieldString
             label="Classe"
             value={pgClass}
@@ -179,8 +229,8 @@ class StatsView extends Component<
                   >
                     <div className={classes.stat}>
                       <TextFieldNumber
-                        label={stat.type}
-                        value={stat.value}
+                        label={TextUtils.getSmallStatsType(stat.type)}
+                        value={this.getStatValue(stat)}
                         onChange={(
                           event: React.ChangeEvent<HTMLInputElement>
                         ) => {
@@ -189,8 +239,8 @@ class StatsView extends Component<
                         disabled={!onEdit}
                       />
                       <div className={classes.modifier}>
-                        {`${this.getStatModifier(stat.value) === 0 ? '' :
-                          (this.getStatModifier(stat.value) > 0 ? '+' : '-')}${Math.abs(this.getStatModifier(stat.value))}`}
+                        {`${this.getStatModifier(stat) === 0 ? '' :
+                          (this.getStatModifier(stat) > 0 ? '+' : '-')}${Math.abs(this.getStatModifier(stat))}`}
                       </div>
                     </div>
                   </Grid>
@@ -220,7 +270,7 @@ class StatsView extends Component<
               >
                 <TextFieldNumber
                   label="Perc passiva"
-                  value={this.getStatModifierFromName('sag')}
+                  value={this.getStatModifierFromName(StatsType.Saggezza)}
                   onChange={() => { }}
                   disabled={!onEdit}
                   fullWidth
@@ -256,11 +306,11 @@ class StatsView extends Component<
                       inputPos={InputPosition.End}
                       modifiers={[
                         { type: 'Comp', value: 0 },
-                        { type: 'Mod', value: this.getStatModifier(stat.value) }
+                        { type: 'Mod', value: this.getStatModifier(stat) }
                       ]}
                       onChange={() => { }}
                       onEdit={onEdit}
-                      label={stat.type}
+                      label={TextUtils.getSmallStatsType(stat.type)}
                     />
                   </Grid>
                 );

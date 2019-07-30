@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { WithStyles } from "@material-ui/styles";
-import { withStyles, Typography, TextField, Grid } from "@material-ui/core";
+import { withStyles, TextField } from "@material-ui/core";
 import TextFieldNumberStyles from "./TextFieldNumber.styles";
 
 interface TextFieldNumberProps {
