@@ -1,6 +1,6 @@
 import React, { Component, createRef } from "react"
 import { WithStyles } from "@material-ui/styles"
-import { withStyles, Grid, Typography, Divider, FormControl, InputLabel, Select, OutlinedInput, MenuItem } from "@material-ui/core"
+import { withStyles, Grid, Typography, Divider } from "@material-ui/core"
 import StatsViewStyles from "./StatsView.styles"
 import TextFieldString from "components/text-field-string/TextFieldString"
 import TextFieldNumber from "components/text-field-number/TextFieldNumber"
@@ -11,10 +11,12 @@ import StatsType from "data/types/StatsEnum";
 import TextUtils from "utils/TextUtils";
 import { default as racesJSON } from 'data/json/RacesJSON'
 import { default as subRacesJSON } from 'data/json/SubRacesJSON'
+import { default as jobsJSON } from 'data/json/JobsJSON'
 import Stats from "./models/Stats";
-import { RacesEnum, SubRacesEnum } from "data/types/Races";
+import { RacesEnum, SubRacesEnum } from "data/types/RacesEnum";
 import DataUtils from "data/DataUtils";
 import SimpleSelect from "components/simple-select/SimpleSelect";
+import { JobsEnum } from "data/types/JobsEnum";
 
 interface StatsViewProps {
   onEdit: boolean;
@@ -35,7 +37,7 @@ class StatsView extends Component<
   inputLabel = createRef<any>()
   racesData = DataUtils.RaceMapper(racesJSON as any)
   subRacesData = DataUtils.RaceMapper(subRacesJSON as any)
-
+  jobsData = DataUtils.JobMapper(jobsJSON as any)
 
   constructor(props: StatsViewProps & WithStyles<typeof StatsViewStyles>) {
     super(props);
@@ -44,7 +46,6 @@ class StatsView extends Component<
       id: props.id,
       name: "",
       race: RacesEnum.Umano,
-      pgClass: "",
       level: 1,
       stats: [
         { type: StatsType.Forza, value: 10 },
@@ -54,7 +55,6 @@ class StatsView extends Component<
         { type: StatsType.Saggezza, value: 10 },
         { type: StatsType.Carisma, value: 10 }
       ],
-      proficiency: 0,
       exist: false
     };
 
@@ -94,15 +94,15 @@ class StatsView extends Component<
   componentWillReceiveProps(newProps: StatsViewProps) {
     const { onEdit } = this.props
     if (!newProps.onEdit && newProps.onEdit !== onEdit) {
-      const { name, pgClass, race, subRace, level, exist, stats, proficiency } = this.state
+      const { name, pgClass, race, subRace, level, exist, stats } = this.state
       const { id } = this.props
 
       if (this.pg) {
         console.log('onedit false, update with', { name, pgClass, race, level })
         if (exist) {
-          this.pg.update(id, { name, pgClass, race, subRace, level, stats, proficiency }).then(() => console.log('update done')).catch((err) => console.log('err: ', err))
+          this.pg.update(id, { name, pgClass, race, subRace, level, stats }).then(() => console.log('update done')).catch((err) => console.log('err: ', err))
         } else {
-          this.pg.put({ id, name, pgClass, race, subRace, level, stats, proficiency }).then(() => console.log('create done')).catch((err) => console.log('err: ', err))
+          this.pg.put({ id, name, pgClass, race, subRace, level, stats }).then(() => console.log('create done')).catch((err) => console.log('err: ', err))
         }
       }
     }
@@ -124,10 +124,6 @@ class StatsView extends Component<
     this.setState({ stats: tempStats });
   };
 
-  onEditProficiency = (proficiency: string) => {
-    this.setState({ proficiency: parseInt(proficiency) })
-  }
-
   onChangeRace = (event: React.ChangeEvent<{
     name?: string | undefined;
     value: unknown;
@@ -142,6 +138,14 @@ class StatsView extends Component<
   }>) => {
     const value = event.target.value as SubRacesEnum
     this.setState({ subRace: value })
+  }
+
+  onChangeJob = (event: React.ChangeEvent<{
+    name?: string | undefined;
+    value: unknown;
+  }>) => {
+    const value = event.target.value as JobsEnum    
+    this.setState({ pgClass: value })
   }
 
   getStatModifier = (stat: Stats) => {
@@ -196,8 +200,38 @@ class StatsView extends Component<
     }
   }
 
+  getProficiency = () =>{
+    const {level, pgClass} = this.state
+    let proficiency = 0
+    if(pgClass){
+      this.jobsData.forEach(job =>{
+        if(job.type === pgClass){
+          job.levels.forEach(levelData =>{
+            if(levelData.id === level){
+              proficiency = levelData.proficiency
+            }
+          })
+        }
+      })
+    }
+    return proficiency
+  }
+
+  getTSProficiency = (type: StatsType)=>{
+    const {pgClass} = this.state
+    let hasProficiency = false
+    if(pgClass){
+      this.jobsData.forEach(job =>{
+        if(job.type === pgClass){
+          hasProficiency = job.ts.filter(ts => ts === type).length > 0
+        }
+      })
+    }
+    return hasProficiency ? this.getProficiency() : 0
+  }
+
   render() {
-    const { name, race, pgClass, level, stats, proficiency, subRace } = this.state;
+    const { name, race, pgClass, level, stats, subRace } = this.state;
     const { classes, onEdit } = this.props;
     const currentRaceObj = this.getCurrentRace(race)
     return (
@@ -214,13 +248,7 @@ class StatsView extends Component<
           {currentRaceObj && currentRaceObj.subraces.length > 0 && (
             <SimpleSelect<SubRacesEnum> label={'Sotto-razza'} item={subRace} data={this.subRacesData} onEdit={onEdit} onChange={this.onChangeSubRace} />
           )}
-          <TextFieldString
-            label="Classe"
-            value={pgClass}
-            onChange={this.onEditInfo}
-            disabled={!onEdit}
-            name={'pgClass'}
-          />
+          <SimpleSelect<JobsEnum> label={'Classe'} item={pgClass} data={this.jobsData} onEdit={onEdit} onChange={this.onChangeJob} />
           <TextFieldNumber
             label="Livello"
             value={level}
@@ -269,9 +297,9 @@ class StatsView extends Component<
               >
                 <TextFieldNumber
                   label="Competenza"
-                  value={proficiency}
-                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => this.onEditProficiency(event.target.value)}
-                  disabled={!onEdit}
+                  value={this.getProficiency()}
+                  onChange={()=>{}}
+                  disabled={true}
                   fullWidth
                 />
               </Grid>
@@ -284,7 +312,7 @@ class StatsView extends Component<
                   label="Perc passiva"
                   value={this.getStatModifierFromName(StatsType.Saggezza)}
                   onChange={() => { }}
-                  disabled={!onEdit}
+                  disabled={true}
                   fullWidth
                 />
               </Grid>
@@ -303,21 +331,11 @@ class StatsView extends Component<
                     key={stat.type}
                     className={classes.gridItem}
                   >
-                    {/* <TextFieldNumber
-                      label={`TS ${stat.type}`}
-                      value={this.getStatModifier(stat.value)}
-                      onChange={(
-                        event: React.ChangeEvent<HTMLInputElement>
-                      ) => {
-                        // this.onEditStats(event.target.value, index);
-                      }}
-                      disabled={!onEdit}
-                    /> */}
                     <MixedInput
                       inputInfo={{ type: 'Temp', value: 0 }}
                       inputPos={InputPosition.End}
                       modifiers={[
-                        { type: 'Comp', value: 0 },
+                        { type: 'Comp', value: this.getTSProficiency(stat.type) },
                         { type: 'Mod', value: this.getStatModifier(stat) }
                       ]}
                       onChange={() => { }}
