@@ -7,12 +7,14 @@ import TextFieldNumber from "components/text-field-number/TextFieldNumber"
 import Dexie from 'dexie'
 import PG from "./models/PG"
 import MixedInput, { InputPosition } from "components/mixed-input/MixedInput";
-import StatsType from "data/StatsEnum";
+import StatsType from "data/types/StatsEnum";
 import TextUtils from "utils/TextUtils";
-import { default as racesJSON } from 'data/RacesJSON'
+import { default as racesJSON } from 'data/json/RacesJSON'
+import { default as subRacesJSON } from 'data/json/SubRacesJSON'
 import Stats from "./models/Stats";
-import { Races } from "data/Races";
+import { RacesEnum, SubRacesEnum } from "data/types/Races";
 import DataUtils from "data/DataUtils";
+import SimpleSelect from "components/simple-select/SimpleSelect";
 
 interface StatsViewProps {
   onEdit: boolean;
@@ -20,8 +22,7 @@ interface StatsViewProps {
 }
 
 interface StatsViewState extends PG {
-  exist: boolean,
-  raceLabelWidth: number
+  exist: boolean
 }
 
 class StatsView extends Component<
@@ -33,6 +34,8 @@ class StatsView extends Component<
   db: Dexie
   inputLabel = createRef<any>()
   racesData = DataUtils.RaceMapper(racesJSON as any)
+  subRacesData = DataUtils.RaceMapper(subRacesJSON as any)
+
 
   constructor(props: StatsViewProps & WithStyles<typeof StatsViewStyles>) {
     super(props);
@@ -40,7 +43,7 @@ class StatsView extends Component<
     this.state = {
       id: props.id,
       name: "",
-      race: Races.Umano,
+      race: RacesEnum.Umano,
       pgClass: "",
       level: 1,
       stats: [
@@ -52,8 +55,7 @@ class StatsView extends Component<
         { type: StatsType.Carisma, value: 10 }
       ],
       proficiency: 0,
-      exist: false,
-      raceLabelWidth: 0
+      exist: false
     };
 
     this.db = new Dexie('pg01_database')
@@ -89,27 +91,18 @@ class StatsView extends Component<
 
   }
 
-  componentDidMount() {
-    if (this.inputLabel) {
-      const current: any = this.inputLabel.current
-      if (current) {
-        this.setState({ raceLabelWidth: current.offsetWidth })
-      }
-    }
-  }
-
   componentWillReceiveProps(newProps: StatsViewProps) {
     const { onEdit } = this.props
     if (!newProps.onEdit && newProps.onEdit !== onEdit) {
-      const { name, pgClass, race, level, exist, stats, proficiency } = this.state
+      const { name, pgClass, race, subRace, level, exist, stats, proficiency } = this.state
       const { id } = this.props
 
       if (this.pg) {
         console.log('onedit false, update with', { name, pgClass, race, level })
         if (exist) {
-          this.pg.update(id, { name, pgClass, race, level, stats, proficiency }).then(() => console.log('update done')).catch((err) => console.log('err: ', err))
+          this.pg.update(id, { name, pgClass, race, subRace, level, stats, proficiency }).then(() => console.log('update done')).catch((err) => console.log('err: ', err))
         } else {
-          this.pg.put({ id, name, pgClass, race, level, stats, proficiency }).then(() => console.log('create done')).catch((err) => console.log('err: ', err))
+          this.pg.put({ id, name, pgClass, race, subRace, level, stats, proficiency }).then(() => console.log('create done')).catch((err) => console.log('err: ', err))
         }
       }
     }
@@ -139,8 +132,16 @@ class StatsView extends Component<
     name?: string | undefined;
     value: unknown;
   }>) => {
-    const value = event.target.value as Races
-    this.setState({ race: value })
+    const value = event.target.value as RacesEnum
+    this.setState({ race: value, subRace: undefined })
+  }
+
+  onChangeSubRace = (event: React.ChangeEvent<{
+    name?: string | undefined;
+    value: unknown;
+  }>) => {
+    const value = event.target.value as SubRacesEnum
+    this.setState({ subRace: value })
   }
 
   getStatModifier = (stat: Stats) => {
@@ -159,24 +160,46 @@ class StatsView extends Component<
     return modifier
   }
 
-  getStatValue = (stat:Stats): number=>{
-    const {race} = this.state
-    const raceJSON = this.racesData.filter(raceJson => raceJson.type === race)
+  getStatValue = (stat: Stats): number => {
+    const { race, subRace } = this.state
+    const currentRaceObj = this.getCurrentRace(race)
     let add = 0
-    if(raceJSON.length > 0){
-      raceJSON[0].stats.forEach(raceStat =>{
-        if(raceStat.type === stat.type){
+    let subRaceAdd = 0
+    if (currentRaceObj) {
+      currentRaceObj.stats.forEach(raceStat => {
+        if (raceStat.type === stat.type) {
           add = raceStat.value
         }
       })
+      if (subRace) {
+        this.subRacesData.forEach(subRaceData => {
+          if (subRaceData.type === subRace) {
+            subRaceData.stats.forEach(subRaceStat => {
+              if (subRaceStat.type === stat.type) {
+                subRaceAdd = subRaceStat.value
+              }
+            })
+          }
+        })
+      }
     }
 
-    return stat.value + add
+    return stat.value + add + subRaceAdd
+  }
+
+  getCurrentRace = (race: RacesEnum) => {
+    const data = this.racesData.filter(raceJson => raceJson.type === race.toString())
+    if (data.length > 0) {
+      return data[0]
+    } else {
+      return null
+    }
   }
 
   render() {
-    const { name, race, pgClass, level, stats, proficiency, raceLabelWidth } = this.state;
+    const { name, race, pgClass, level, stats, proficiency, subRace } = this.state;
     const { classes, onEdit } = this.props;
+    const currentRaceObj = this.getCurrentRace(race)
     return (
       <div className={classes.container}>
         <div className={classes.inputContainer}>
@@ -187,21 +210,10 @@ class StatsView extends Component<
             disabled={!onEdit}
             name={'name'}
           />
-          <FormControl variant="outlined" className={classes.raceInputField} fullWidth>
-            <InputLabel htmlFor="outlined-race-simple" ref={this.inputLabel}>
-              Razza
-            </InputLabel>
-            <Select
-              value={race}
-              onChange={this.onChangeRace}
-              input={<OutlinedInput labelWidth={raceLabelWidth} name="race" id="outlined-race-simple" disabled={!onEdit}/>}
-              disabled={!onEdit}
-            >
-              {this.racesData.map(race => {
-                return <MenuItem key={race.type} value={race.type}>{race.name}</MenuItem>
-              })}
-            </Select>
-          </FormControl>
+          <SimpleSelect<RacesEnum> label={'Razza'} item={race} data={this.racesData} onEdit={onEdit} onChange={this.onChangeRace} />
+          {currentRaceObj && currentRaceObj.subraces.length > 0 && (
+            <SimpleSelect<SubRacesEnum> label={'Sotto-razza'} item={subRace} data={this.subRacesData} onEdit={onEdit} onChange={this.onChangeSubRace} />
+          )}
           <TextFieldString
             label="Classe"
             value={pgClass}

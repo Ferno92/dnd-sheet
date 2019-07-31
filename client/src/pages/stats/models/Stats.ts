@@ -1,4 +1,4 @@
-import StatsType from "data/StatsEnum";
+import StatsType from "data/types/StatsEnum";
 
 interface Stats {
     type: StatsType

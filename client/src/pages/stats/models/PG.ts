@@ -1,10 +1,11 @@
 import Stats from "./Stats";
-import { Races } from "data/Races";
+import { RacesEnum, SubRacesEnum } from "data/types/Races";
 
 interface PG {
   id: number
   name: string
-  race: Races
+  race: RacesEnum
+  subRace?: SubRacesEnum
   pgClass: string
   level: number
   stats: Stats[],

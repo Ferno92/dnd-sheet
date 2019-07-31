@@ -1,6 +1,6 @@
-import Race from "./Race";
+import Race from "./types/Race";
 import Stats from "pages/stats/models/Stats";
-import StatsType from "./StatsEnum";
+import StatsType from "./types/StatsEnum";
 
 class DataUtils {
   static RaceMapper(json: any): Race[] {
@@ -15,7 +15,8 @@ class DataUtils {
         })
       races.push({
         type: child.type,
-        name: child.name,
+        value: child.name,
+        subraces: child.subraces || [],
         stats: stats,
         abilities: [],
         special: [],

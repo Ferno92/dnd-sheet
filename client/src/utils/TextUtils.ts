@@ -1,4 +1,4 @@
-import StatsType from "data/StatsEnum";
+import StatsType from "data/types/StatsEnum";
 
 class TextUtils{
     static getSmallStatsType = (type: StatsType):string =>{
