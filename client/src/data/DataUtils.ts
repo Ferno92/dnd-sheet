@@ -2,6 +2,7 @@ import Race from "./types/Race";
 import Stats from "pages/stats/models/Stats";
 import StatsType from "./types/StatsEnum";
 import Job from "./types/Job";
+import Ability from "./types/Ability";
 
 class DataUtils {
   static RaceMapper(json: any): Race[] {
@@ -39,6 +40,17 @@ class DataUtils {
       });
     });
     return jobs;
+  }
+
+  static AbilityMapper(json: any): Ability[] {
+    let abilities: Ability[] = [];
+    json.forEach((child: any) => {
+      abilities.push({
+        type: child.type,
+        stat: child.stat
+      });
+    });
+    return abilities;
   }
 }
 

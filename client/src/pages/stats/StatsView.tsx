@@ -1,6 +1,6 @@
 import React, { Component, createRef } from "react"
 import { WithStyles } from "@material-ui/styles"
-import { withStyles, Grid, Typography, Divider } from "@material-ui/core"
+import { withStyles, Grid, Typography, Divider, Checkbox } from "@material-ui/core"
 import StatsViewStyles from "./StatsView.styles"
 import TextFieldString from "components/text-field-string/TextFieldString"
 import TextFieldNumber from "components/text-field-number/TextFieldNumber"
@@ -12,11 +12,15 @@ import TextUtils from "utils/TextUtils";
 import { default as racesJSON } from 'data/json/RacesJSON'
 import { default as subRacesJSON } from 'data/json/SubRacesJSON'
 import { default as jobsJSON } from 'data/json/JobsJSON'
+import { default as abilitiesJSON } from 'data/json/AbilitiesJSON'
 import Stats from "./models/Stats";
 import { RacesEnum, SubRacesEnum } from "data/types/RacesEnum";
 import DataUtils from "data/DataUtils";
 import SimpleSelect from "components/simple-select/SimpleSelect";
 import { JobsEnum } from "data/types/JobsEnum";
+import AbilitiesEnum from "data/types/AbilitiesEnum";
+import Ability from "data/types/Ability";
+import PGAbility from "./models/PGAbility";
 
 interface StatsViewProps {
   onEdit: boolean;
@@ -38,6 +42,7 @@ class StatsView extends Component<
   racesData = DataUtils.RaceMapper(racesJSON as any)
   subRacesData = DataUtils.RaceMapper(subRacesJSON as any)
   jobsData = DataUtils.JobMapper(jobsJSON as any)
+  abilitiesData = DataUtils.AbilityMapper(abilitiesJSON as any)
 
   constructor(props: StatsViewProps & WithStyles<typeof StatsViewStyles>) {
     super(props);
@@ -55,7 +60,8 @@ class StatsView extends Component<
         { type: StatsType.Saggezza, value: 10 },
         { type: StatsType.Carisma, value: 10 }
       ],
-      exist: false
+      exist: false,
+      abilities: []
     };
 
     this.db = new Dexie('pg01_database')
@@ -94,15 +100,15 @@ class StatsView extends Component<
   componentWillReceiveProps(newProps: StatsViewProps) {
     const { onEdit } = this.props
     if (!newProps.onEdit && newProps.onEdit !== onEdit) {
-      const { name, pgClass, race, subRace, level, exist, stats } = this.state
+      const { name, pgClass, race, subRace, level, exist, stats, abilities } = this.state
       const { id } = this.props
 
       if (this.pg) {
         console.log('onedit false, update with', { name, pgClass, race, level })
         if (exist) {
-          this.pg.update(id, { name, pgClass, race, subRace, level, stats }).then(() => console.log('update done')).catch((err) => console.log('err: ', err))
+          this.pg.update(id, { name, pgClass, race, subRace, level, stats, abilities }).then(() => console.log('update done')).catch((err) => console.log('err: ', err))
         } else {
-          this.pg.put({ id, name, pgClass, race, subRace, level, stats }).then(() => console.log('create done')).catch((err) => console.log('err: ', err))
+          this.pg.put({ id, name, pgClass, race, subRace, level, stats, abilities }).then(() => console.log('create done')).catch((err) => console.log('err: ', err))
         }
       }
     }
@@ -144,7 +150,7 @@ class StatsView extends Component<
     name?: string | undefined;
     value: unknown;
   }>) => {
-    const value = event.target.value as JobsEnum    
+    const value = event.target.value as JobsEnum
     this.setState({ pgClass: value })
   }
 
@@ -200,14 +206,14 @@ class StatsView extends Component<
     }
   }
 
-  getProficiency = () =>{
-    const {level, pgClass} = this.state
+  getProficiency = () => {
+    const { level, pgClass } = this.state
     let proficiency = 0
-    if(pgClass){
-      this.jobsData.forEach(job =>{
-        if(job.type === pgClass){
-          job.levels.forEach(levelData =>{
-            if(levelData.id === level){
+    if (pgClass) {
+      this.jobsData.forEach(job => {
+        if (job.type === pgClass) {
+          job.levels.forEach(levelData => {
+            if (levelData.id === level) {
               proficiency = levelData.proficiency
             }
           })
@@ -217,12 +223,12 @@ class StatsView extends Component<
     return proficiency
   }
 
-  getTSProficiency = (type: StatsType)=>{
-    const {pgClass} = this.state
+  getTSProficiency = (type: StatsType) => {
+    const { pgClass } = this.state
     let hasProficiency = false
-    if(pgClass){
-      this.jobsData.forEach(job =>{
-        if(job.type === pgClass){
+    if (pgClass) {
+      this.jobsData.forEach(job => {
+        if (job.type === pgClass) {
           hasProficiency = job.ts.filter(ts => ts === type).length > 0
         }
       })
@@ -230,10 +236,65 @@ class StatsView extends Component<
     return hasProficiency ? this.getProficiency() : 0
   }
 
+  hasProficiency = (type: AbilitiesEnum): boolean => {
+    const { abilities } = this.state
+    const filteredAbilities = abilities.filter(ability => ability.type === type)
+    return filteredAbilities.length > 0 ? filteredAbilities[0].hasProficiency : false
+  }
+
+  onChangeAbilityCheck = (type: AbilitiesEnum, checked: boolean) => {
+    let { abilities } = this.state
+    let index = -1
+    abilities.forEach((ability: PGAbility, i: number) => {
+      if (ability.type === type) {
+        index = i
+      }
+    })
+    if (index >= 0) {
+      if (checked || abilities[index].points > 0) {
+        abilities[index].hasProficiency = checked
+      } else if (abilities[index].points <= 0) {
+        abilities.splice(index, 1)
+      }
+    }else{
+      abilities.push({
+        hasProficiency: checked,
+        points: 0,
+        type: type
+      })
+    }
+    this.setState({ abilities })
+  }
+
+  onChangeAbilityPoints = (type: AbilitiesEnum, value: number)=>{
+    let { abilities } = this.state
+    let index = -1
+    abilities.forEach((ability: PGAbility, i: number) => {
+      if (ability.type === type) {
+        index = i
+      }
+    })
+    if (index >= 0) {
+      if(abilities[index].hasProficiency || value > 0){
+        abilities[index].points = value
+      }else if (value <= 0) {
+        abilities.splice(index, 1)
+      }
+    }else{
+      abilities.push({
+        hasProficiency: false,
+        points: value,
+        type: type
+      })
+    }
+    this.setState({ abilities })
+  }
+
   render() {
     const { name, race, pgClass, level, stats, subRace } = this.state;
     const { classes, onEdit } = this.props;
     const currentRaceObj = this.getCurrentRace(race)
+
     return (
       <div className={classes.container}>
         <div className={classes.inputContainer}>
@@ -298,7 +359,7 @@ class StatsView extends Component<
                 <TextFieldNumber
                   label="Competenza"
                   value={this.getProficiency()}
-                  onChange={()=>{}}
+                  onChange={() => { }}
                   disabled={true}
                   fullWidth
                 />
@@ -350,30 +411,45 @@ class StatsView extends Component<
           <Divider className={classes.divider} />
           <Typography variant='h6' className={classes.title}>Abilità</Typography>
           <div className={classes.gridContainer}>
-            {/* <Grid container spacing={3}>
-              {stats.map((stat, index) => {
+            <Grid container spacing={3}>
+              {this.abilitiesData.map((ability, index) => {
                 return (
                   <Grid
                     item
-                    xs={4}
-                    key={stat.type}
+                    xs={12}
+                    key={ability.type}
                     className={classes.gridItem}
                   >
-                    <TextFieldNumber
-                      label={`TS ${stat.type}`}
-                      value={this.getStatModifier(stat.value)}
-                      onChange={(
-                        event: React.ChangeEvent<HTMLInputElement>
-                      ) => {
-                        // this.onEditStats(event.target.value, index);
-                      }}
-                      disabled={!onEdit}
-                    />
+                    <div style={{ display: 'flex' }}>
+                      {onEdit && (
+                        <Checkbox
+                          checked={this.hasProficiency(ability.type)}
+                          onChange={(event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => this.onChangeAbilityCheck.bind(this, ability.type, checked)}
+                          disabled={!onEdit}
+                        />
+                      )}
+                      <MixedInput
+                        inputInfo={{ type: 'Punti', value: 0 }}
+                        inputPos={InputPosition.End}
+                        modifiers={[
+                          {
+                            type: `${TextUtils.getSmallStatsType(ability.stat)}${this.hasProficiency(ability.type) ? '+ Comp' : ''}`,
+                            value: this.getStatModifierFromName(ability.stat) + (this.hasProficiency(ability.type) ? this.getProficiency() : 0)
+                          }
+                        ]}
+                        onChange={(value: number) => { this.onChangeAbilityPoints(ability.type, value) }}
+                        onEdit={onEdit}
+                        label={ability.type}
+                        labelOnTop
+                      />
+                    </div>
+
                   </Grid>
                 );
               })}
-            </Grid> */}
+            </Grid>
           </div>
+          <Divider className={classes.divider} />
         </div>
       </div>
     );

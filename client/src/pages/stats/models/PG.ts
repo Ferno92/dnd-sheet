@@ -1,6 +1,7 @@
 import Stats from "./Stats";
 import { RacesEnum, SubRacesEnum } from "data/types/RacesEnum";
 import { JobsEnum } from "data/types/JobsEnum";
+import PGAbility from "./PGAbility";
 
 interface PG {
   id: number
@@ -10,6 +11,7 @@ interface PG {
   pgClass?: JobsEnum
   level: number
   stats: Stats[]
+  abilities: PGAbility[]
 }
 
 export default PG;
