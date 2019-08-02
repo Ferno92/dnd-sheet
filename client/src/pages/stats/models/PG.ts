@@ -11,7 +11,8 @@ interface PG {
   pgClass?: JobsEnum
   level: number
   stats: Stats[]
-  abilities: PGAbility[]
+  abilities: PGAbility[],
+  ispiration: boolean
 }
 
 export default PG;

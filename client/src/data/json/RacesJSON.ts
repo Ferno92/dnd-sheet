@@ -1,3 +1,5 @@
+import SizeEnum from "data/types/SizeEnum";
+
 export default [
   {
     "type": "Umano",
@@ -6,7 +8,8 @@ export default [
     "stats": [],
     "abilities": [],
     "special": [],
-    "languages": []
+    "languages": [],
+    "size": SizeEnum.Media
   },
   {
     "type": "Nano",
@@ -15,6 +18,7 @@ export default [
     "stats": [{ "Cos": 2 }],
     "abilities": [],
     "special": [],
-    "languages": []
+    "languages": [],
+    "size": SizeEnum.Media
   }
 ]

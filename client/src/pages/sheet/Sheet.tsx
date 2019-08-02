@@ -20,6 +20,7 @@ import SpeedDial from '@material-ui/lab/SpeedDial'
 import SpeedDialIcon from '@material-ui/lab/SpeedDialIcon'
 import SpeedDialAction from '@material-ui/lab/SpeedDialAction'
 import { RouteComponentProps, withRouter } from "react-router-dom";
+import BattleView from "pages/battle/BattleView";
 
 interface SheetProps {
   id: number
@@ -138,7 +139,10 @@ class Sheet extends Component<
             {/* slide n°1 */}
             <StatsView onEdit={onEdit} id={sheetId} />
           </div>
-          <div>{/* slide n°2 */}</div>
+          <div>
+            {/* slide n°2 */}
+            <BattleView onEdit={onEdit} id={sheetId} />
+          </div>
           <div>{/* slide n°3 */}</div>
           <div>{/* slide n°4 */}</div>
         </SwipeableViews>

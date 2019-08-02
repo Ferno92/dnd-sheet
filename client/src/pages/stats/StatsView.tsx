@@ -22,6 +22,7 @@ import AbilitiesEnum from "data/types/AbilitiesEnum";
 import PGAbility from "./models/PGAbility";
 import { Info } from "@material-ui/icons";
 import InfoDialog from "components/info-dialog/InfoDialog";
+import SizeEnum from "data/types/SizeEnum";
 
 interface StatsViewProps {
   onEdit: boolean;
@@ -64,7 +65,8 @@ class StatsView extends Component<
       ],
       exist: false,
       abilities: [],
-      dialogInfoAbilitiesOpen: false
+      dialogInfoAbilitiesOpen: false,
+      ispiration: false
     };
 
     this.db = new Dexie('pg01_database')
@@ -103,15 +105,15 @@ class StatsView extends Component<
   componentWillReceiveProps(newProps: StatsViewProps) {
     const { onEdit } = this.props
     if (!newProps.onEdit && newProps.onEdit !== onEdit) {
-      const { name, pgClass, race, subRace, level, exist, stats, abilities } = this.state
+      const { name, pgClass, race, subRace, level, exist, stats, abilities, ispiration } = this.state
       const { id } = this.props
 
       if (this.pg) {
         console.log('onedit false, update with', { name, pgClass, race, level })
         if (exist) {
-          this.pg.update(id, { name, pgClass, race, subRace, level, stats, abilities }).then(() => console.log('update done')).catch((err) => console.log('err: ', err))
+          this.pg.update(id, { name, pgClass, race, subRace, level, stats, abilities, ispiration }).then(() => console.log('update done')).catch((err) => console.log('err: ', err))
         } else {
-          this.pg.put({ id, name, pgClass, race, subRace, level, stats, abilities }).then(() => console.log('create done')).catch((err) => console.log('err: ', err))
+          this.pg.put({ id, name, pgClass, race, subRace, level, stats, abilities, ispiration }).then(() => console.log('create done')).catch((err) => console.log('err: ', err))
         }
       }
     }
@@ -309,7 +311,7 @@ class StatsView extends Component<
     this.setState({ dialogInfoAbilitiesOpen: true })
   }
 
-  closeInfoAbilitiesDialog = ():void => {
+  closeInfoAbilitiesDialog = (): void => {
     this.setState({ dialogInfoAbilitiesOpen: false })
   }
 
@@ -339,8 +341,25 @@ class StatsView extends Component<
     return count
   }
 
+  getRaceSize = (): SizeEnum => {
+    const { race } = this.state
+    let size = SizeEnum.Media
+    if (race) {
+      this.racesData.forEach(raceData => {
+        if (race.toString() === raceData.type) {
+          size = raceData.size
+        }
+      })
+    }
+    return size
+  }
+
+  onChangeIspiration = (checked: boolean) => {
+    this.setState({ ispiration: checked })
+  }
+
   render() {
-    const { name, race, pgClass, level, stats, subRace, dialogInfoAbilitiesOpen } = this.state;
+    const { name, race, pgClass, level, stats, subRace, dialogInfoAbilitiesOpen, ispiration } = this.state;
     const { classes, onEdit } = this.props;
     const currentRaceObj = this.getCurrentRace(race)
 
@@ -366,6 +385,54 @@ class StatsView extends Component<
             fullWidth
             disabled={!onEdit}
           />
+
+          <div className={classes.gridContainer}>
+            <Grid container spacing={3}>
+              <Grid
+                item
+                xs={6}
+                className={classes.gridItem}
+              >
+                <TextFieldNumber
+                  label="Competenza"
+                  value={this.getProficiency()}
+                  onChange={() => { }}
+                  disabled={true}
+                  fullWidth
+                />
+              </Grid>
+              <Grid
+                item
+                xs={6}
+                className={classes.gridItem}
+              >
+                <TextFieldNumber
+                  label="Perc passiva"
+                  value={this.getStatModifierFromName(StatsType.Saggezza)}
+                  onChange={() => { }}
+                  disabled={true}
+                  fullWidth
+                />
+              </Grid>
+            </Grid>
+          </div>
+
+          <div className={classes.stat}>
+            <div className={classes.subTitle}>{`Taglia: ${this.getRaceSize()}`}</div>
+            <div className={classes.ispiration}>
+              <div>Ispirazione</div>
+              <div>
+
+                <Checkbox
+                  checked={ispiration}
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => this.onChangeIspiration(checked)}
+                  disabled={!onEdit}
+                />
+              </div>
+            </div>
+          </div>
+          <Divider className={classes.divider} />
+          <Typography variant='h6' className={classes.title}>Caratteristiche</Typography>
           <div className={classes.gridContainer}>
             <Grid container spacing={3}>
               {stats.map((stat, index) => {
@@ -398,37 +465,6 @@ class StatsView extends Component<
               })}
             </Grid>
           </div>
-          <div className={classes.gridContainer}>
-            <Grid container spacing={3}>
-              <Grid
-                item
-                xs={6}
-                className={classes.gridItem}
-              >
-                <TextFieldNumber
-                  label="Competenza"
-                  value={this.getProficiency()}
-                  onChange={() => { }}
-                  disabled={true}
-                  fullWidth
-                />
-              </Grid>
-              <Grid
-                item
-                xs={6}
-                className={classes.gridItem}
-              >
-                <TextFieldNumber
-                  label="Perc passiva"
-                  value={this.getStatModifierFromName(StatsType.Saggezza)}
-                  onChange={() => { }}
-                  disabled={true}
-                  fullWidth
-                />
-              </Grid>
-            </Grid>
-          </div>
-
           <Divider className={classes.divider} />
           <Typography variant='h6' className={classes.title}>Tiri Salvezza</Typography>
           <div className={classes.gridContainer}>

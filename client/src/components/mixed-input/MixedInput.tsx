@@ -21,11 +21,12 @@ interface MixedInputProps {
     onEdit: boolean,
     label: string
     labelOnTop?: boolean
+    sign?:boolean
 }
 
 function MixedInput(props: MixedInputProps) {
     const classes = MixedInputStyles()
-    const { modifiers, inputPos, inputInfo, onChange, onEdit, label, labelOnTop } = props
+    const { modifiers, inputPos, inputInfo, onChange, onEdit, label, labelOnTop, sign = true } = props
 
     const getTotal = () => {
         let count = 0
@@ -36,7 +37,7 @@ function MixedInput(props: MixedInputProps) {
             count += inputInfo.value
         }
 
-        return `${count === 0 ? '' : (count > 0 ? '+' : '-')}${Math.abs(count)}`
+        return `${count === 0 ? '' : (sign ? (count > 0 ? '+' : '-') : '')}${Math.abs(count)}`
     }
 
 

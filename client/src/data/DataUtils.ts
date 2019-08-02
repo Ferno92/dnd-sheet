@@ -22,7 +22,8 @@ class DataUtils {
         stats: stats,
         abilities: [],
         special: [],
-        languages: []
+        languages: [],
+        size: child.size
       });
     });
     return races;
