@@ -1,6 +1,6 @@
 import React, { Component, createRef } from "react"
 import { WithStyles } from "@material-ui/styles"
-import { withStyles, Grid, Typography, Divider, Checkbox } from "@material-ui/core"
+import { withStyles, Grid, Typography, Divider, Checkbox, IconButton } from "@material-ui/core"
 import StatsViewStyles from "./StatsView.styles"
 import TextFieldString from "components/text-field-string/TextFieldString"
 import TextFieldNumber from "components/text-field-number/TextFieldNumber"
@@ -19,8 +19,9 @@ import DataUtils from "data/DataUtils";
 import SimpleSelect from "components/simple-select/SimpleSelect";
 import { JobsEnum } from "data/types/JobsEnum";
 import AbilitiesEnum from "data/types/AbilitiesEnum";
-import Ability from "data/types/Ability";
 import PGAbility from "./models/PGAbility";
+import { Info } from "@material-ui/icons";
+import InfoDialog from "components/info-dialog/InfoDialog";
 
 interface StatsViewProps {
   onEdit: boolean;
@@ -29,6 +30,7 @@ interface StatsViewProps {
 
 interface StatsViewState extends PG {
   exist: boolean
+  dialogInfoAbilitiesOpen: boolean
 }
 
 class StatsView extends Component<
@@ -61,7 +63,8 @@ class StatsView extends Component<
         { type: StatsType.Carisma, value: 10 }
       ],
       exist: false,
-      abilities: []
+      abilities: [],
+      dialogInfoAbilitiesOpen: false
     };
 
     this.db = new Dexie('pg01_database')
@@ -256,7 +259,7 @@ class StatsView extends Component<
       } else if (abilities[index].points <= 0) {
         abilities.splice(index, 1)
       }
-    }else{
+    } else {
       abilities.push({
         hasProficiency: checked,
         points: 0,
@@ -266,7 +269,7 @@ class StatsView extends Component<
     this.setState({ abilities })
   }
 
-  onChangeAbilityPoints = (type: AbilitiesEnum, value: number)=>{
+  onChangeAbilityPoints = (type: AbilitiesEnum, value: number) => {
     let { abilities } = this.state
     let index = -1
     abilities.forEach((ability: PGAbility, i: number) => {
@@ -275,23 +278,69 @@ class StatsView extends Component<
       }
     })
     if (index >= 0) {
-      if(abilities[index].hasProficiency || value > 0){
+      if (abilities[index].hasProficiency || value > 0) {
         abilities[index].points = value
-      }else if (value <= 0) {
+      } else if (value <= 0) {
         abilities.splice(index, 1)
       }
-    }else{
+    } else {
       abilities.push({
         hasProficiency: false,
         points: value,
         type: type
       })
     }
+
     this.setState({ abilities })
   }
 
+  getAbilityPoints = (type: AbilitiesEnum): number => {
+    const { abilities } = this.state
+    let points = 0
+    abilities.forEach(ability => {
+      if (ability.type === type) {
+        points += ability.points
+      }
+    })
+    return points
+  }
+
+  showAbilityInfo = () => {
+    this.setState({ dialogInfoAbilitiesOpen: true })
+  }
+
+  closeInfoAbilitiesDialog = ():void => {
+    this.setState({ dialogInfoAbilitiesOpen: false })
+  }
+
+  getAbilitiesListFromClass = (): AbilitiesEnum[] => {
+    const { pgClass } = this.state
+    let abilitiesList: AbilitiesEnum[] = []
+    if (pgClass) {
+      this.jobsData.forEach(job => {
+        if (job.type === pgClass) {
+          abilitiesList = job.abilities
+        }
+      })
+    }
+    return abilitiesList
+  }
+
+  getAbilitiesCountFromClass = (): number => {
+    const { pgClass } = this.state
+    let count = 0
+    if (pgClass) {
+      this.jobsData.forEach(job => {
+        if (job.type === pgClass) {
+          count = job.abilitiesCount
+        }
+      })
+    }
+    return count
+  }
+
   render() {
-    const { name, race, pgClass, level, stats, subRace } = this.state;
+    const { name, race, pgClass, level, stats, subRace, dialogInfoAbilitiesOpen } = this.state;
     const { classes, onEdit } = this.props;
     const currentRaceObj = this.getCurrentRace(race)
 
@@ -409,7 +458,12 @@ class StatsView extends Component<
             </Grid>
           </div>
           <Divider className={classes.divider} />
-          <Typography variant='h6' className={classes.title}>Abilità</Typography>
+          <div className={classes.abilitiesHeader}>
+            <Typography variant='h6' className={classes.title}>Abilità</Typography>
+            {pgClass && (
+              <IconButton className={classes.abilityInfo} onClick={this.showAbilityInfo}><Info /></IconButton>
+            )}
+          </div>
           <div className={classes.gridContainer}>
             <Grid container spacing={3}>
               {this.abilitiesData.map((ability, index) => {
@@ -420,16 +474,16 @@ class StatsView extends Component<
                     key={ability.type}
                     className={classes.gridItem}
                   >
-                    <div style={{ display: 'flex' }}>
+                    <div className={classes.abilityContainer}>
                       {onEdit && (
                         <Checkbox
                           checked={this.hasProficiency(ability.type)}
-                          onChange={(event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => this.onChangeAbilityCheck.bind(this, ability.type, checked)}
+                          onChange={(event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => this.onChangeAbilityCheck(ability.type, checked)}
                           disabled={!onEdit}
                         />
                       )}
                       <MixedInput
-                        inputInfo={{ type: 'Punti', value: 0 }}
+                        inputInfo={{ type: 'Punti', value: this.getAbilityPoints(ability.type) }}
                         inputPos={InputPosition.End}
                         modifiers={[
                           {
@@ -451,6 +505,17 @@ class StatsView extends Component<
           </div>
           <Divider className={classes.divider} />
         </div>
+        {
+          pgClass && (
+            <InfoDialog
+              open={dialogInfoAbilitiesOpen}
+              title={'Abilità disponibili'}
+              description={`Questa è la lista delle abilità disponibili dalla tua classe, puoi sceglierne un massimo di ${this.getAbilitiesCountFromClass()}`}
+              items={this.getAbilitiesListFromClass()}
+              onClose={this.closeInfoAbilitiesDialog}
+            />
+          )
+        }
       </div>
     );
   }

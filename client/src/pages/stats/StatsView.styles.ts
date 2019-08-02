@@ -21,7 +21,8 @@ const StatsViewStyles = (theme: Theme) => createStyles({
     },
     title: {
         textAlign: 'center',
-        marginBottom: 10
+        marginBottom: 10,
+        flex: 1
     },
     modifier: {
         border: 'solid',
@@ -39,6 +40,17 @@ const StatsViewStyles = (theme: Theme) => createStyles({
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center'
+    },
+    abilitiesHeader: {
+        display: 'flex',
+    },
+    abilityContainer: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    abilityInfo: {
+        
     }
 });
 

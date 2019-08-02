@@ -9,6 +9,8 @@ interface TextFieldNumberProps {
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   disabled: boolean;
   fullWidth?: boolean;
+  min?: number
+  max?: number
 }
 
 interface TextFieldNumberState { }
@@ -17,6 +19,11 @@ class TextFieldNumber extends Component<
   TextFieldNumberProps & WithStyles<typeof TextFieldNumberStyles>,
   TextFieldNumberState
   > {
+    static defaultProps = {
+      min: 1,
+      max: 20
+    }
+
   constructor(
     props: TextFieldNumberProps & WithStyles<typeof TextFieldNumberStyles>
   ) {
@@ -26,7 +33,7 @@ class TextFieldNumber extends Component<
   }
 
   render() {
-    const { classes, value, label, onChange, fullWidth, disabled } = this.props;
+    const { classes, value, label, onChange, fullWidth, disabled, min, max } = this.props;
     return (
       <TextField
         variant="outlined"
@@ -37,7 +44,7 @@ class TextFieldNumber extends Component<
         className={classes.textField}
         margin="dense"
         type="number"
-        inputProps={{ min: "1", max: "20", step: "1" }}
+        inputProps={{ min: min, max: max, step: "1" }}
         disabled={disabled}
         onFocus={event => {
           event.target.select()

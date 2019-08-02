@@ -36,7 +36,9 @@ class DataUtils {
         value: child.name,
         levels: child.levels,
         ts: child.ts,
-        dice: child.dice
+        dice: child.dice,
+        abilitiesCount: child.abilitiesCount,
+        abilities: child.abilities
       });
     });
     return jobs;

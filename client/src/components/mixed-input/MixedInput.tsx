@@ -57,6 +57,8 @@ function MixedInput(props: MixedInputProps) {
                                     onChange(parseInt(event.target.value))
                                 }}
                                 disabled={!onEdit}
+                                min={0}
+                                max={100}
                             />
                         </div>
                     )}
