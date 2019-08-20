@@ -3,6 +3,7 @@ import BattleViewStyles from './BattleView.styles';
 import { Typography } from '@material-ui/core';
 import MixedInput, { InputPosition } from 'components/mixed-input/MixedInput';
 import StatsType from 'data/types/StatsEnum';
+import MixedInputGrid from 'components/mixed-input-grid/MixedInputGrid';
 
 interface BattleViewProps {
     onEdit: boolean
@@ -14,15 +15,15 @@ function BattleView(props: BattleViewProps) {
     const classes = BattleViewStyles()
 
     const caModifiers = [
-        { type: 'Armature', value: 0 },
-        { type: StatsType.Destrezza, value: 2 },
         { type: 'Base', value: 10 },
+        { type: StatsType.Destrezza, value: 2 },
+        { type: 'Armature', value: 0 },
     ]
     //if taglia != da media +1/-1
     return (
         <div className={classes.container}>
             <Typography variant='h6' className={classes.title}>Classe Armatura</Typography>
-            <MixedInput
+            <MixedInputGrid
                 inputInfo={{ type: 'Altro', value: 0 }}
                 inputPos={InputPosition.End}
                 modifiers={caModifiers}
