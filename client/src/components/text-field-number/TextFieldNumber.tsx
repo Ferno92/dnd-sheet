@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { WithStyles } from "@material-ui/styles";
 import { withStyles, TextField } from "@material-ui/core";
 import TextFieldNumberStyles from "./TextFieldNumber.styles";
+import clsx from 'clsx';
 
 interface TextFieldNumberProps {
   label: string;
@@ -11,6 +12,7 @@ interface TextFieldNumberProps {
   fullWidth?: boolean;
   min?: number
   max?: number
+  root?: string
 }
 
 interface TextFieldNumberState { }
@@ -19,10 +21,10 @@ class TextFieldNumber extends Component<
   TextFieldNumberProps & WithStyles<typeof TextFieldNumberStyles>,
   TextFieldNumberState
   > {
-    static defaultProps = {
-      min: 1,
-      max: 20
-    }
+  static defaultProps = {
+    min: 1,
+    max: 20
+  }
 
   constructor(
     props: TextFieldNumberProps & WithStyles<typeof TextFieldNumberStyles>
@@ -33,7 +35,7 @@ class TextFieldNumber extends Component<
   }
 
   render() {
-    const { classes, value, label, onChange, fullWidth, disabled, min, max } = this.props;
+    const { classes, value, label, onChange, fullWidth, disabled, min, max, root } = this.props;
     return (
       <TextField
         variant="outlined"
@@ -41,7 +43,7 @@ class TextFieldNumber extends Component<
         value={value}
         onChange={onChange}
         fullWidth={fullWidth}
-        className={classes.textField}
+        className={clsx(classes.textField, root)}
         margin="dense"
         type="number"
         inputProps={{ min: min, max: max, step: "1" }}

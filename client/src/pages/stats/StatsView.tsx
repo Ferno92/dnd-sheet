@@ -27,10 +27,29 @@ import SizeEnum from "data/types/SizeEnum";
 interface StatsViewProps {
   onEdit: boolean;
   id: number
+  pg: PG
+  exist: boolean
+  onEditInfo: (value: string, property: string) => void
+  onEditLevel: (event: React.ChangeEvent<HTMLInputElement>) => void
+  onEditStats: (value: string, prop: number) => void
+  onChangeRace: (event: React.ChangeEvent<{
+    name?: string | undefined;
+    value: unknown;
+  }>) => void
+  onChangeSubRace: (event: React.ChangeEvent<{
+    name?: string | undefined;
+    value: unknown;
+  }>) => void
+  onChangeJob: (event: React.ChangeEvent<{
+    name?: string | undefined;
+    value: unknown;
+  }>) => void
+  onChangeAbilityCheck: (type: AbilitiesEnum, checked: boolean) => void
+  onChangeAbilityPoints: (type: AbilitiesEnum, value: number) => void
+  onChangeIspiration: (checked: boolean) => void
 }
 
-interface StatsViewState extends PG {
-  exist: boolean
+interface StatsViewState {
   dialogInfoAbilitiesOpen: boolean
 }
 
@@ -39,8 +58,6 @@ class StatsView extends Component<
   StatsViewState
   > {
 
-  pg: Dexie.Table<PG, number> | undefined
-  db: Dexie
   inputLabel = createRef<any>()
   racesData = DataUtils.RaceMapper(racesJSON as any)
   subRacesData = DataUtils.RaceMapper(subRacesJSON as any)
@@ -51,112 +68,10 @@ class StatsView extends Component<
     super(props);
 
     this.state = {
-      id: props.id,
-      name: "",
-      race: RacesEnum.Umano,
-      level: 1,
-      stats: [
-        { type: StatsType.Forza, value: 10 },
-        { type: StatsType.Destrezza, value: 10 },
-        { type: StatsType.Costituzione, value: 10 },
-        { type: StatsType.Intelligenza, value: 10 },
-        { type: StatsType.Saggezza, value: 10 },
-        { type: StatsType.Carisma, value: 10 }
-      ],
-      exist: false,
-      abilities: [],
-      dialogInfoAbilitiesOpen: false,
-      ispiration: false
+      dialogInfoAbilitiesOpen: false
     };
 
-    this.db = new Dexie('pg01_database')
-    this.db.version(1).stores({
-      pg: 'id,name,race,pgClass,level,stats'
-    })
-    this.db.open().then(() => {
-      console.log('DONE', props.id)
-      this.pg = this.db.table('pg')
-      // this.pg.put({ name: 'Torendal DueLame', race: 'Nano' }).then(() => {
-      //   return db.table('pg').get('Torendal DueLame')
-      // })
-      this.db.table('pg').each((pg: PG) => {
-        console.log(pg);
-        if (pg.id === props.id) {
-          this.setState({ ...this.state, ...pg, exist: true })
-        }
-      })
-      //   .then((pg: any) => {
-      //     console.log(pg.name);
 
-      //   }).catch((error: any) => {
-      //     //
-      //     // Finally don't forget to catch any error
-      //     // that could have happened anywhere in the
-      //     // code blocks above.
-      //     //
-      //     console.log("Ooops: " + error);
-      //   });
-      // }).catch((err) => {
-      //   console.error(err.stack || err);
-    })
-
-  }
-
-  componentWillReceiveProps(newProps: StatsViewProps) {
-    const { onEdit } = this.props
-    if (!newProps.onEdit && newProps.onEdit !== onEdit) {
-      const { name, pgClass, race, subRace, level, exist, stats, abilities, ispiration } = this.state
-      const { id } = this.props
-
-      if (this.pg) {
-        console.log('onedit false, update with', { name, pgClass, race, level })
-        if (exist) {
-          this.pg.update(id, { name, pgClass, race, subRace, level, stats, abilities, ispiration }).then(() => console.log('update done')).catch((err) => console.log('err: ', err))
-        } else {
-          this.pg.put({ id, name, pgClass, race, subRace, level, stats, abilities, ispiration }).then(() => console.log('create done')).catch((err) => console.log('err: ', err))
-        }
-      }
-    }
-  }
-
-  onEditInfo = (value: string, property: string) => {
-    console.log(property, value)
-    this.setState<never>({ [property]: value })
-  };
-
-  onEditLevel = (event: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState({ level: parseInt(event.target.value) });
-  };
-
-  onEditStats = (value: string, prop: number) => {
-    const { stats } = this.state;
-    const tempStats = stats.slice();
-    tempStats[prop].value = parseInt(value);
-    this.setState({ stats: tempStats });
-  };
-
-  onChangeRace = (event: React.ChangeEvent<{
-    name?: string | undefined;
-    value: unknown;
-  }>) => {
-    const value = event.target.value as RacesEnum
-    this.setState({ race: value, subRace: undefined })
-  }
-
-  onChangeSubRace = (event: React.ChangeEvent<{
-    name?: string | undefined;
-    value: unknown;
-  }>) => {
-    const value = event.target.value as SubRacesEnum
-    this.setState({ subRace: value })
-  }
-
-  onChangeJob = (event: React.ChangeEvent<{
-    name?: string | undefined;
-    value: unknown;
-  }>) => {
-    const value = event.target.value as JobsEnum
-    this.setState({ pgClass: value })
   }
 
   getStatModifier = (stat: Stats) => {
@@ -165,7 +80,7 @@ class StatsView extends Component<
   }
 
   getStatModifierFromName = (type: StatsType): number => {
-    const { stats } = this.state
+    const { stats } = this.props.pg
     let modifier = 0
     stats.forEach(stat => {
       if (stat.type === type) {
@@ -176,7 +91,7 @@ class StatsView extends Component<
   }
 
   getStatValue = (stat: Stats): number => {
-    const { race, subRace } = this.state
+    const { race, subRace } = this.props.pg
     const currentRaceObj = this.getCurrentRace(race)
     let add = 0
     let subRaceAdd = 0
@@ -212,7 +127,7 @@ class StatsView extends Component<
   }
 
   getProficiency = () => {
-    const { level, pgClass } = this.state
+    const { level, pgClass } = this.props.pg
     let proficiency = 0
     if (pgClass) {
       this.jobsData.forEach(job => {
@@ -229,7 +144,7 @@ class StatsView extends Component<
   }
 
   getTSProficiency = (type: StatsType) => {
-    const { pgClass } = this.state
+    const { pgClass } = this.props.pg
     let hasProficiency = false
     if (pgClass) {
       this.jobsData.forEach(job => {
@@ -242,62 +157,13 @@ class StatsView extends Component<
   }
 
   hasProficiency = (type: AbilitiesEnum): boolean => {
-    const { abilities } = this.state
+    const { abilities } = this.props.pg
     const filteredAbilities = abilities.filter(ability => ability.type === type)
     return filteredAbilities.length > 0 ? filteredAbilities[0].hasProficiency : false
   }
 
-  onChangeAbilityCheck = (type: AbilitiesEnum, checked: boolean) => {
-    let { abilities } = this.state
-    let index = -1
-    abilities.forEach((ability: PGAbility, i: number) => {
-      if (ability.type === type) {
-        index = i
-      }
-    })
-    if (index >= 0) {
-      if (checked || abilities[index].points > 0) {
-        abilities[index].hasProficiency = checked
-      } else if (abilities[index].points <= 0) {
-        abilities.splice(index, 1)
-      }
-    } else {
-      abilities.push({
-        hasProficiency: checked,
-        points: 0,
-        type: type
-      })
-    }
-    this.setState({ abilities })
-  }
-
-  onChangeAbilityPoints = (type: AbilitiesEnum, value: number) => {
-    let { abilities } = this.state
-    let index = -1
-    abilities.forEach((ability: PGAbility, i: number) => {
-      if (ability.type === type) {
-        index = i
-      }
-    })
-    if (index >= 0) {
-      if (abilities[index].hasProficiency || value > 0) {
-        abilities[index].points = value
-      } else if (value <= 0) {
-        abilities.splice(index, 1)
-      }
-    } else {
-      abilities.push({
-        hasProficiency: false,
-        points: value,
-        type: type
-      })
-    }
-
-    this.setState({ abilities })
-  }
-
   getAbilityPoints = (type: AbilitiesEnum): number => {
-    const { abilities } = this.state
+    const { abilities } = this.props.pg
     let points = 0
     abilities.forEach(ability => {
       if (ability.type === type) {
@@ -316,7 +182,7 @@ class StatsView extends Component<
   }
 
   getAbilitiesListFromClass = (): AbilitiesEnum[] => {
-    const { pgClass } = this.state
+    const { pgClass } = this.props.pg
     let abilitiesList: AbilitiesEnum[] = []
     if (pgClass) {
       this.jobsData.forEach(job => {
@@ -329,7 +195,7 @@ class StatsView extends Component<
   }
 
   getAbilitiesCountFromClass = (): number => {
-    const { pgClass } = this.state
+    const { pgClass } = this.props.pg
     let count = 0
     if (pgClass) {
       this.jobsData.forEach(job => {
@@ -342,7 +208,7 @@ class StatsView extends Component<
   }
 
   getRaceSize = (): SizeEnum => {
-    const { race } = this.state
+    const { race } = this.props.pg
     let size = SizeEnum.Media
     if (race) {
       this.racesData.forEach(raceData => {
@@ -354,13 +220,10 @@ class StatsView extends Component<
     return size
   }
 
-  onChangeIspiration = (checked: boolean) => {
-    this.setState({ ispiration: checked })
-  }
-
   render() {
-    const { name, race, pgClass, level, stats, subRace, dialogInfoAbilitiesOpen, ispiration } = this.state;
-    const { classes, onEdit } = this.props;
+    const { name, race, pgClass, level, stats, subRace, ispiration } = this.props.pg;
+    const { classes, onEdit, onChangeAbilityCheck, onChangeAbilityPoints, onChangeIspiration, onChangeJob, onChangeRace, onChangeSubRace, onEditInfo, onEditLevel, onEditStats } = this.props;
+    const { dialogInfoAbilitiesOpen } = this.state
     const currentRaceObj = this.getCurrentRace(race)
 
     return (
@@ -369,19 +232,19 @@ class StatsView extends Component<
           <TextFieldString
             label="Nome Personaggio"
             value={name}
-            onChange={this.onEditInfo}
+            onChange={onEditInfo}
             disabled={!onEdit}
             name={'name'}
           />
-          <SimpleSelect<RacesEnum> label={'Razza'} item={race} data={this.racesData} onEdit={onEdit} onChange={this.onChangeRace} />
+          <SimpleSelect<RacesEnum> label={'Razza'} item={race} data={this.racesData} onEdit={onEdit} onChange={onChangeRace} />
           {currentRaceObj && currentRaceObj.subraces.length > 0 && (
-            <SimpleSelect<SubRacesEnum> label={'Sotto-razza'} item={subRace} data={this.subRacesData} onEdit={onEdit} onChange={this.onChangeSubRace} />
+            <SimpleSelect<SubRacesEnum> label={'Sotto-razza'} item={subRace} data={this.subRacesData} onEdit={onEdit} onChange={onChangeSubRace} />
           )}
-          <SimpleSelect<JobsEnum> label={'Classe'} item={pgClass} data={this.jobsData} onEdit={onEdit} onChange={this.onChangeJob} />
+          <SimpleSelect<JobsEnum> label={'Classe'} item={pgClass} data={this.jobsData} onEdit={onEdit} onChange={onChangeJob} />
           <TextFieldNumber
             label="Livello"
             value={level}
-            onChange={this.onEditLevel}
+            onChange={onEditLevel}
             fullWidth
             disabled={!onEdit}
           />
@@ -425,7 +288,7 @@ class StatsView extends Component<
 
                 <Checkbox
                   checked={ispiration}
-                  onChange={(event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => this.onChangeIspiration(checked)}
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => onChangeIspiration(checked)}
                   disabled={!onEdit}
                 />
               </div>
@@ -451,7 +314,7 @@ class StatsView extends Component<
                         onChange={(
                           event: React.ChangeEvent<HTMLInputElement>
                         ) => {
-                          this.onEditStats(event.target.value, index);
+                          onEditStats(event.target.value, index);
                         }}
                         disabled={!onEdit}
                       />
@@ -514,7 +377,7 @@ class StatsView extends Component<
                       {onEdit && (
                         <Checkbox
                           checked={this.hasProficiency(ability.type)}
-                          onChange={(event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => this.onChangeAbilityCheck(ability.type, checked)}
+                          onChange={(event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => onChangeAbilityCheck(ability.type, checked)}
                           disabled={!onEdit}
                         />
                       )}
@@ -527,7 +390,7 @@ class StatsView extends Component<
                             value: this.getStatModifierFromName(ability.stat) + (this.hasProficiency(ability.type) ? this.getProficiency() : 0)
                           }
                         ]}
-                        onChange={(value: number) => { this.onChangeAbilityPoints(ability.type, value) }}
+                        onChange={(value: number) => { onChangeAbilityPoints(ability.type, value) }}
                         onEdit={onEdit}
                         label={ability.type}
                         labelOnTop
