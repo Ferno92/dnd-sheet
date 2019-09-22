@@ -19,7 +19,6 @@ import { JobsEnum } from "data/types/JobsEnum";
 import AbilitiesEnum from "data/types/AbilitiesEnum";
 import { Info } from "@material-ui/icons";
 import InfoDialog from "components/info-dialog/InfoDialog";
-import SizeEnum from "data/types/SizeEnum";
 import StatsUtils from "utils/StatsUtils"
 
 interface StatsViewProps {
@@ -27,7 +26,7 @@ interface StatsViewProps {
   id: number
   pg: PG
   exist: boolean
-  onEditInfo: (value: string, property: string) => void
+  onEditName: (value: string) => void
   onEditLevel: (event: React.ChangeEvent<HTMLInputElement>) => void
   onEditStats: (value: string, prop: number) => void
   onChangeRace: (event: React.ChangeEvent<{
@@ -68,10 +67,7 @@ class StatsView extends Component<
     this.state = {
       dialogInfoAbilitiesOpen: false
     };
-
-
   }
-
 
   getStatModifierFromName = (type: StatsType): number => {
     const { stats } = this.props.pg
@@ -173,17 +169,16 @@ class StatsView extends Component<
 
   render() {
     const { name, race, pgClass, level, stats, subRace, ispiration } = this.props.pg;
-    const { classes, onEdit, onChangeAbilityCheck, onChangeAbilityPoints, onChangeIspiration, onChangeJob, onChangeRace, onChangeSubRace, onEditInfo, onEditLevel, onEditStats } = this.props;
+    const { classes, onEdit, onChangeAbilityCheck, onChangeAbilityPoints, onChangeIspiration, onChangeJob, onChangeRace, onChangeSubRace, onEditName, onEditLevel, onEditStats } = this.props;
     const { dialogInfoAbilitiesOpen } = this.state
     const currentRaceObj = StatsUtils.getCurrentRace(race)
-
     return (
       <div className={classes.container}>
         <div className={classes.inputContainer}>
           <TextFieldString
             label="Nome Personaggio"
             value={name}
-            onChange={onEditInfo}
+            onChange={onEditName}
             disabled={!onEdit}
             name={'name'}
           />
@@ -333,7 +328,7 @@ class StatsView extends Component<
                         />
                       )}
                       <MixedInput
-                        inputInfo={{ type: 'Punti', value: this.getAbilityPoints(ability.type) }}
+                        inputInfo={{ type: 'Extra', value: this.getAbilityPoints(ability.type) }}
                         inputPos={InputPosition.End}
                         modifiers={[
                           {

@@ -17,6 +17,7 @@ interface PG {
   caModifiers: Modifier[];
   speed: string;
   pf: number;
+  tsMorte: boolean[]
 }
 
 export default PG;

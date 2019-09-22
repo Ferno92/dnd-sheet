@@ -1,6 +1,5 @@
 import PG from "pages/stats/models/PG";
 import { RacesEnum } from "data/types/RacesEnum";
-import Race from "data/types/Race";
 import StatsType from "data/types/StatsEnum";
 import { default as racesJSON } from "data/json/RacesJSON";
 import { default as subRacesJSON } from "data/json/SubRacesJSON";
@@ -85,8 +84,6 @@ class StatsUtils {
     const { race, subRace } = pg;
     const subRacesData = DataUtils.RaceMapper(subRacesJSON as any);
     const currentRaceObj = StatsUtils.getCurrentRace(race);
-    let add = 0;
-    let subRaceAdd = 0;
     if (currentRaceObj) {
       pg.stats.forEach(stat => {
         currentRaceObj.stats.forEach(raceStat => {

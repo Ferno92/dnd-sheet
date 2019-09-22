@@ -6,7 +6,7 @@ import clsx from 'clsx';
 
 interface TextFieldStringProps {
   label: string
-  name: string
+  name?: string
   value: string
   onChange: (value: string, property: string) => void
   disabled: boolean;
@@ -35,7 +35,7 @@ class TextFieldString extends Component<
         variant="outlined"
         label={label}
         value={value}
-        onChange={(event: React.ChangeEvent<HTMLInputElement>) => onChange(event.target.value, name)}
+        onChange={(event: React.ChangeEvent<HTMLInputElement>) => onChange(event.target.value, name ? name : '')}
         fullWidth
         className={clsx(classes.textField, root)}
         margin="dense"

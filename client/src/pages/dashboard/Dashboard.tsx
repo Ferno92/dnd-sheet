@@ -14,7 +14,6 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
     // Declare a new state variable, which we'll call "count"
     const [pgs, setPGIds] = useState<PG[]>([]);
     const classes = DashboardStyles()
-    console.log('DASHBOARD')
 
     useEffect(() => {
         //load only once
@@ -28,7 +27,6 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
             pgTable.each((pg: PG) => {
                 pgList.push(pg)
             }).then(() => {
-                console.log(pgList);
                 setPGIds(pgList)
             })
         })

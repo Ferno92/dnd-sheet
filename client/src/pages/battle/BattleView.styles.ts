@@ -68,6 +68,36 @@ const BattleViewStyles = makeStyles((theme: Theme) => ({
     "& .MuiInputBase-input": {
       width: 70
     }
+  },
+  flexRow: {
+    display: 'flex',
+    width: '100%',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    '&:first-child': {
+      marginBottom: 4
+    }
+  },
+  tsContainer: {
+    border: 'solid 1px #000000',
+    width: 'calc(100% - 16px)',
+    borderRadius: 3,
+    padding: '0 8px'
+  },
+  checkboxContainer: {
+    display: 'flex',
+    width: '100%',
+    justifyContent: 'space-around'
+  },
+  tslabel: {
+    margin: '0 8px'  
+  },
+  checkbox: {
+    padding: 0,
+    height: 25,
+    '& svg': {
+      width: 25
+    }
   }
 }));
 

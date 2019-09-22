@@ -21,13 +21,13 @@ function SimpleSelect<T>(props: SimpleSelectProps<T>) {
     const { item, data, onEdit, onChange, label } = props
     const inputLabelRef = createRef<any>()
     const classes = SimpleSelectStyles()
-    const [raceLabelWidth, setRaceLabelWidth] = useState(0)
+    const [labelWidth, setLabelWidth] = useState(0)
     useEffect(() => {
         const current: any = inputLabelRef.current
         if (current) {
-            setRaceLabelWidth(current.offsetWidth)
+            setLabelWidth(current.offsetWidth)
         }
-    });
+    }, [inputLabelRef]);
 
     return <FormControl variant="outlined" className={classes.raceInputField} fullWidth>
         <InputLabel htmlFor="outlined-select-simple" ref={inputLabelRef}>
@@ -36,7 +36,7 @@ function SimpleSelect<T>(props: SimpleSelectProps<T>) {
         <Select
             value={item !== undefined ? item : ''}
             onChange={onChange}
-            input={<OutlinedInput labelWidth={raceLabelWidth} name="race" id="outlined-select-simple" disabled={!onEdit} />}
+            input={<OutlinedInput labelWidth={labelWidth} name="race" id="outlined-select-simple" disabled={!onEdit} />}
             disabled={!onEdit}
         >
             {data.map(race => {
