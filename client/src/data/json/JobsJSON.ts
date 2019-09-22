@@ -10,7 +10,8 @@ export default [
       { id: 2, proficiency: 2 },
       { id: 3, proficiency: 2 },
       { id: 4, proficiency: 2 },
-      { id: 5, proficiency: 3 }
+      { id: 5, proficiency: 3 },
+      { id: 6, proficiency: 3 }
     ],
     ts: [StatsType.Forza, StatsType.Costituzione],
     dice: 12,

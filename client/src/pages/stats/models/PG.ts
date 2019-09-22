@@ -15,6 +15,8 @@ interface PG {
   abilities: PGAbility[];
   ispiration: boolean;
   caModifiers: Modifier[];
+  speed: string;
+  pf: number;
 }
 
 export default PG;

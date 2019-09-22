@@ -13,7 +13,8 @@ const BattleViewStyles = makeStyles((theme: Theme) => ({
   },
   caContainer: {
     display: "block",
-    height: "auto"
+    height: "auto",
+    margin: "0 auto"
   },
   caTitle: {
     fontSize: 12,
@@ -56,6 +57,17 @@ const BattleViewStyles = makeStyles((theme: Theme) => ({
   },
   modifierType: {
     flex: 3
+  },
+  gridItem: {
+    alignSelf: "center",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center"
+  },
+  speed: {
+    "& .MuiInputBase-input": {
+      width: 70
+    }
   }
 }));
 

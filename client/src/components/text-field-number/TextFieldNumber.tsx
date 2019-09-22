@@ -13,6 +13,7 @@ interface TextFieldNumberProps {
   min?: number
   max?: number
   root?: string
+  step?: string
 }
 
 interface TextFieldNumberState { }
@@ -23,7 +24,8 @@ class TextFieldNumber extends Component<
   > {
   static defaultProps = {
     min: 1,
-    max: 20
+    max: 20,
+    step: '1'
   }
 
   constructor(
@@ -35,18 +37,18 @@ class TextFieldNumber extends Component<
   }
 
   render() {
-    const { classes, value, label, onChange, fullWidth, disabled, min, max, root } = this.props;
+    const { classes, value, label, onChange, fullWidth, disabled, min, max, root, step } = this.props;
     return (
       <TextField
         variant="outlined"
         label={label}
-        value={value}
+        value={value === undefined || value.toString() === 'NaN' ? undefined : value}
         onChange={onChange}
         fullWidth={fullWidth}
         className={clsx(classes.textField, root)}
         margin="dense"
         type="number"
-        inputProps={{ min: min, max: max, step: "1" }}
+        inputProps={{ min: min, max: max, step: step }}
         disabled={disabled}
         onFocus={event => {
           event.target.select()

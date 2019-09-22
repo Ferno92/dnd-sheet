@@ -28,6 +28,7 @@ import Dexie from "dexie";
 import { JobsEnum } from "data/types/JobsEnum";
 import AbilitiesEnum from "data/types/AbilitiesEnum";
 import PGAbility from "pages/stats/models/PGAbility";
+import StatsUtils from "utils/StatsUtils";
 
 interface SheetProps {
   id: number;
@@ -78,7 +79,6 @@ class Sheet extends Component<
   ) {
     super(props);
 
-    console.log("props", props);
     const { id } = props.match.params;
     const sheetId = parseInt(id)
     this.state = {
@@ -102,7 +102,9 @@ class Sheet extends Component<
         ],
         abilities: [],
         ispiration: false,
-        caModifiers: []
+        caModifiers: [],
+        speed: '9',
+        pf: 0
       },
       exist: false
     };
@@ -111,13 +113,11 @@ class Sheet extends Component<
       pg: 'id,name,race,pgClass,level,stats'
     })
     this.db.open().then(() => {
-      console.log('DONE', sheetId)
       this.pg = this.db.table('pg')
       // this.pg.put({ name: 'Torendal DueLame', race: 'Nano' }).then(() => {
       //   return db.table('pg').get('Torendal DueLame')
       // })
       this.db.table('pg').each((pg: PG) => {
-        console.log(pg);
         if (pg.id === sheetId) {
           this.setState({ pg: pg, exist: true })
         }
@@ -141,16 +141,14 @@ class Sheet extends Component<
   componentDidUpdate(prevProps: SheetProps, prevState: SheetState) {
     const { onEdit, exist, sheetId } = this.state
     const id = sheetId
-    console.log(onEdit, exist, prevState.onEdit, this.pg)
     if (!onEdit && onEdit !== prevState.onEdit) {
-      const { name, pgClass, race, subRace, level, stats, abilities, ispiration, caModifiers } = this.state.pg
+      const { name, pgClass, race, subRace, level, stats, abilities, ispiration, caModifiers, speed, pf } = this.state.pg
 
       if (this.pg) {
-        console.log('onedit false, update with', id, caModifiers)
         if (exist) {
-          this.pg.update(id, { name, pgClass, race, subRace, level, stats, abilities, ispiration, caModifiers }).then(() => console.log('update done')).catch((err) => console.log('err: ', err))
+          this.pg.update(id, { name, pgClass, race, subRace, level, stats, abilities, ispiration, caModifiers, speed, pf }).then(() => console.log('update done')).catch((err) => console.log('err: ', err))
         } else {
-          this.pg.put({ id, name, pgClass, race, subRace, level, stats, abilities, ispiration, caModifiers }).then(() => console.log('create done')).catch((err) => console.log('err: ', err))
+          this.pg.put({ id, name, pgClass, race, subRace, level, stats, abilities, ispiration, caModifiers, speed, pf }).then(() => console.log('create done')).catch((err) => console.log('err: ', err))
         }
       }
     }
@@ -205,8 +203,9 @@ class Sheet extends Component<
     name?: string | undefined;
     value: unknown;
   }>) => {
-    const { pg } = this.state;
+    let { pg } = this.state;
     const value = event.target.value as RacesEnum
+    pg = StatsUtils.removeRaceStatModifiers(pg)
     this.setState({ pg: { ...pg, race: value, subRace: undefined } })
   }
 
@@ -214,9 +213,17 @@ class Sheet extends Component<
     name?: string | undefined;
     value: unknown;
   }>) => {
-    const { pg } = this.state;
+    let { pg } = this.state;
     const value = event.target.value as SubRacesEnum
-    this.setState({ pg: { ...pg, subRace: value } })
+    if (pg.subRace) {
+      pg = StatsUtils.removeRaceStatModifiers(pg)
+    }
+    pg = { ...pg, subRace: value }
+    console.log('pg zero', pg.stats)
+    const stats = StatsUtils.getStatsFromRace(pg)
+    pg = { ...pg, stats: stats }
+    console.log('pg new stat', pg.stats)
+    this.setState({ pg })
   }
 
   onChangeJob = (event: React.ChangeEvent<{
@@ -291,10 +298,19 @@ class Sheet extends Component<
     this.setState({ pg: { ...pg, caModifiers: finalModifiers } })
   }
 
+  onChangeSpeed = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { pg } = this.state
+    this.setState({ pg: { ...pg, speed: event.currentTarget.value } })
+  }
+
+  onChangePF = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { pg } = this.state
+    this.setState({ pg: { ...pg, pf: parseInt(event.currentTarget.value) } })
+  }
+
   render() {
     const { classes, theme } = this.props;
     const { pageIndex, onEdit, open, direction, sheetId, pg, exist } = this.state;
-    console.log("sheetId", sheetId);
     return (
       <React.Fragment>
         {onEdit ? (
@@ -364,7 +380,7 @@ class Sheet extends Component<
           </div>
           <div>
             {/* slide n°2 */}
-            <BattleView onEdit={onEdit} id={sheetId} onSaveModifiers={this.onSaveModifiers} pg={pg} />
+            <BattleView onEdit={onEdit} id={sheetId} onSaveModifiers={this.onSaveModifiers} pg={pg} onChangeSpeed={this.onChangeSpeed} onChangePF={this.onChangePF} />
           </div>
           <div>{/* slide n°3 */}</div>
           <div>{/* slide n°4 */}</div>

@@ -11,7 +11,7 @@ import {
   List,
   IconButton,
   DialogActions,
-  TextField
+  Grid
 } from "@material-ui/core";
 import StatsType from "data/types/StatsEnum";
 import { useTheme } from "@material-ui/core/styles";
@@ -19,6 +19,9 @@ import { Close } from "@material-ui/icons";
 import TextFieldNumber from "components/text-field-number/TextFieldNumber";
 import TextFieldString from "components/text-field-string/TextFieldString";
 import PG from "pages/stats/models/PG";
+import SizeEnum from "data/types/SizeEnum";
+import StatsUtils from "utils/StatsUtils";
+import clsx from "clsx";
 
 export interface Modifier {
   type: string
@@ -31,18 +34,25 @@ interface BattleViewProps {
   id: number;
   pg: PG
   onSaveModifiers: (modifiers: Modifier[]) => void
+  onChangeSpeed: (event: React.ChangeEvent<HTMLInputElement>) => void
+  onChangePF: (event: React.ChangeEvent<HTMLInputElement>) => void
 }
 
 function BattleView(props: BattleViewProps) {
-  const { onEdit, onSaveModifiers, pg } = props;
+  const { onEdit, onSaveModifiers, pg, onChangeSpeed, onChangePF } = props;
   const classes = BattleViewStyles();
   const [caModifiersOpen, setCaModifiersOpen] = useState(false);
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
-  const [caModifiers, setCaModifiers] = useState<Modifier[]>([
+  let defaultModifiers = [
     { type: "Base", value: 10, canDelete: false },
-    { type: StatsType.Destrezza, value: 2, canDelete: false }
-  ]);
+    { type: StatsType.Destrezza, value: StatsUtils.getStatValue(StatsType.Destrezza, pg), canDelete: false }
+  ]
+
+  if (StatsUtils.getRaceSize(pg) === SizeEnum.Piccola) {
+    defaultModifiers.push({ type: 'Taglia', value: 1, canDelete: false })
+  }
+  const [caModifiers, setCaModifiers] = useState<Modifier[]>(defaultModifiers);
 
   const getCA = useCallback(() => {
     let count = 0;
@@ -80,43 +90,68 @@ function BattleView(props: BattleViewProps) {
 
   useEffect(() => {
     const modifiers = [...caModifiers]
-    console.log('pg', pg)
     if (pg && pg.caModifiers) {
       pg.caModifiers.forEach(modifier => {
         if (!caModifiers.find(ca => ca.type === modifier.type && ca.value === modifier.value)) {
           modifiers.push(modifier)
         }
       })
-      if (modifiers.length >= pg.caModifiers.length + 2 && modifiers.length > caModifiers.length) {
+      if (modifiers.length >= pg.caModifiers.length + defaultModifiers.length && modifiers.length > caModifiers.length) {
         setCaModifiers(modifiers)
       }
     }
-  }, [pg.caModifiers, caModifiers])
+  }, [pg, pg.caModifiers, caModifiers, defaultModifiers.length])
 
-  //TODO if taglia != da media +1/-1
   return (
     <div className={classes.container}>
-      <Typography variant="h6" className={classes.title}>
-        Classe Armatura
-      </Typography>
-      {/* <MixedInputGrid
-                inputInfo={{ type: 'Altro', value: 0 }}
-                inputPos={InputPosition.End}
-                modifiers={caModifiers}
-                onChange={() => { }}
-                onEdit={onEdit}
-                label={'CA'}
-                sign={false}
-            /> */}
-      <Button
-        disabled={!onEdit}
-        variant="outlined"
-        className={classes.caContainer}
-        onClick={() => (onEdit ? showCAmodifiers() : undefined)}
+      <Typography variant='h6' className={classes.title}>Combattimento</Typography>
+      <Grid container spacing={3}>
+        <Grid
+          item
+          xs={4}
+          className={classes.gridItem}
+        >
+          <Button
+            disabled={!onEdit}
+            variant="outlined"
+            className={classes.caContainer}
+            onClick={() => (onEdit ? showCAmodifiers() : undefined)}
+          >
+            <div className={classes.caTitle}>CA</div>
+            <div className={classes.caValue}>{getCA()}</div>
+          </Button>
+
+        </Grid>
+        <Grid
+          item
+          xs={4}
+          className={classes.gridItem}
+        >
+          <TextFieldNumber disabled label={'Iniziativa'} value={StatsUtils.getStatValue(StatsType.Destrezza, pg)} onChange={() => { }} />
+        </Grid>
+
+        <Grid
+          item
+          xs={4}
+          className={clsx(classes.gridItem, classes.speed)}
+        >
+          <TextFieldNumber
+            disabled={!onEdit}
+            label={'Velocità(m)'}
+            value={pg.speed && pg.speed !== '' ? parseFloat(pg.speed) : 0}
+            onChange={onChangeSpeed}
+            min={0} max={150} step={'1.5'} />
+        </Grid>
+      </Grid>
+
+      <Grid
+        item
+        xs={4}
+        className={classes.gridItem}
       >
-        <div className={classes.caTitle}>CA</div>
-        <div className={classes.caValue}>{getCA()}</div>
-      </Button>
+        <TextFieldNumber disabled={!onEdit} label={'PF'} value={pg.pf} onChange={onChangePF} min={0} max={999} />
+      </Grid>
+      {/* ________________ CA dialog _____________ */}
       <Dialog
         fullScreen={fullScreen}
         open={caModifiersOpen}

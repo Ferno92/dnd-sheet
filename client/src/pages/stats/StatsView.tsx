@@ -4,7 +4,6 @@ import { withStyles, Grid, Typography, Divider, Checkbox, IconButton } from "@ma
 import StatsViewStyles from "./StatsView.styles"
 import TextFieldString from "components/text-field-string/TextFieldString"
 import TextFieldNumber from "components/text-field-number/TextFieldNumber"
-import Dexie from 'dexie'
 import PG from "./models/PG"
 import MixedInput, { InputPosition } from "components/mixed-input/MixedInput";
 import StatsType from "data/types/StatsEnum";
@@ -13,16 +12,15 @@ import { default as racesJSON } from 'data/json/RacesJSON'
 import { default as subRacesJSON } from 'data/json/SubRacesJSON'
 import { default as jobsJSON } from 'data/json/JobsJSON'
 import { default as abilitiesJSON } from 'data/json/AbilitiesJSON'
-import Stats from "./models/Stats";
 import { RacesEnum, SubRacesEnum } from "data/types/RacesEnum";
 import DataUtils from "data/DataUtils";
 import SimpleSelect from "components/simple-select/SimpleSelect";
 import { JobsEnum } from "data/types/JobsEnum";
 import AbilitiesEnum from "data/types/AbilitiesEnum";
-import PGAbility from "./models/PGAbility";
 import { Info } from "@material-ui/icons";
 import InfoDialog from "components/info-dialog/InfoDialog";
 import SizeEnum from "data/types/SizeEnum";
+import StatsUtils from "utils/StatsUtils"
 
 interface StatsViewProps {
   onEdit: boolean;
@@ -74,56 +72,16 @@ class StatsView extends Component<
 
   }
 
-  getStatModifier = (stat: Stats) => {
-    const value = (this.getStatValue(stat) - 10) / 2
-    return -Math.round(-value)
-  }
 
   getStatModifierFromName = (type: StatsType): number => {
     const { stats } = this.props.pg
     let modifier = 0
     stats.forEach(stat => {
       if (stat.type === type) {
-        modifier = this.getStatModifier(stat)
+        modifier = StatsUtils.getStatModifier(stat, this.props.pg)
       }
     })
     return modifier
-  }
-
-  getStatValue = (stat: Stats): number => {
-    const { race, subRace } = this.props.pg
-    const currentRaceObj = this.getCurrentRace(race)
-    let add = 0
-    let subRaceAdd = 0
-    if (currentRaceObj) {
-      currentRaceObj.stats.forEach(raceStat => {
-        if (raceStat.type === stat.type) {
-          add = raceStat.value
-        }
-      })
-      if (subRace) {
-        this.subRacesData.forEach(subRaceData => {
-          if (subRaceData.type === subRace) {
-            subRaceData.stats.forEach(subRaceStat => {
-              if (subRaceStat.type === stat.type) {
-                subRaceAdd = subRaceStat.value
-              }
-            })
-          }
-        })
-      }
-    }
-
-    return stat.value + add + subRaceAdd
-  }
-
-  getCurrentRace = (race: RacesEnum) => {
-    const data = this.racesData.filter(raceJson => raceJson.type === race.toString())
-    if (data.length > 0) {
-      return data[0]
-    } else {
-      return null
-    }
   }
 
   getProficiency = () => {
@@ -207,24 +165,17 @@ class StatsView extends Component<
     return count
   }
 
-  getRaceSize = (): SizeEnum => {
+  getSubRacesData = () => {
     const { race } = this.props.pg
-    let size = SizeEnum.Media
-    if (race) {
-      this.racesData.forEach(raceData => {
-        if (race.toString() === raceData.type) {
-          size = raceData.size
-        }
-      })
-    }
-    return size
+    const filtered = this.subRacesData.filter(subRace => subRace.type.indexOf(race.toString().toLowerCase()) >= 0)
+    return filtered
   }
 
   render() {
     const { name, race, pgClass, level, stats, subRace, ispiration } = this.props.pg;
     const { classes, onEdit, onChangeAbilityCheck, onChangeAbilityPoints, onChangeIspiration, onChangeJob, onChangeRace, onChangeSubRace, onEditInfo, onEditLevel, onEditStats } = this.props;
     const { dialogInfoAbilitiesOpen } = this.state
-    const currentRaceObj = this.getCurrentRace(race)
+    const currentRaceObj = StatsUtils.getCurrentRace(race)
 
     return (
       <div className={classes.container}>
@@ -238,7 +189,7 @@ class StatsView extends Component<
           />
           <SimpleSelect<RacesEnum> label={'Razza'} item={race} data={this.racesData} onEdit={onEdit} onChange={onChangeRace} />
           {currentRaceObj && currentRaceObj.subraces.length > 0 && (
-            <SimpleSelect<SubRacesEnum> label={'Sotto-razza'} item={subRace} data={this.subRacesData} onEdit={onEdit} onChange={onChangeSubRace} />
+            <SimpleSelect<SubRacesEnum> label={'Sotto-razza'} item={subRace} data={this.getSubRacesData()} onEdit={onEdit} onChange={onChangeSubRace} />
           )}
           <SimpleSelect<JobsEnum> label={'Classe'} item={pgClass} data={this.jobsData} onEdit={onEdit} onChange={onChangeJob} />
           <TextFieldNumber
@@ -281,7 +232,7 @@ class StatsView extends Component<
           </div>
 
           <div className={classes.stat}>
-            <div className={classes.subTitle}>{`Taglia: ${this.getRaceSize()}`}</div>
+            <div className={classes.subTitle}>{`Taglia: ${StatsUtils.getRaceSize(this.props.pg)}`}</div>
             <div className={classes.ispiration}>
               <div>Ispirazione</div>
               <div>
@@ -310,7 +261,7 @@ class StatsView extends Component<
                     <div className={classes.stat}>
                       <TextFieldNumber
                         label={TextUtils.getSmallStatsType(stat.type)}
-                        value={this.getStatValue(stat)}
+                        value={stat.value}
                         onChange={(
                           event: React.ChangeEvent<HTMLInputElement>
                         ) => {
@@ -319,8 +270,8 @@ class StatsView extends Component<
                         disabled={!onEdit}
                       />
                       <div className={classes.modifier}>
-                        {`${this.getStatModifier(stat) === 0 ? '' :
-                          (this.getStatModifier(stat) > 0 ? '+' : '-')}${Math.abs(this.getStatModifier(stat))}`}
+                        {`${StatsUtils.getStatModifier(stat, this.props.pg) === 0 ? '' :
+                          (StatsUtils.getStatModifier(stat, this.props.pg) > 0 ? '+' : '-')}${Math.abs(StatsUtils.getStatModifier(stat, this.props.pg))}`}
                       </div>
                     </div>
                   </Grid>
@@ -345,7 +296,7 @@ class StatsView extends Component<
                       inputPos={InputPosition.End}
                       modifiers={[
                         { type: 'Comp', value: this.getTSProficiency(stat.type) },
-                        { type: 'Mod', value: this.getStatModifier(stat) }
+                        { type: 'Mod', value: StatsUtils.getStatModifier(stat, this.props.pg) }
                       ]}
                       onChange={() => { }}
                       onEdit={onEdit}
