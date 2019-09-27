@@ -16,8 +16,9 @@ interface PG {
   ispiration: boolean;
   caModifiers: Modifier[];
   speed: string;
-  pf: number;
-  tsMorte: boolean[]
+  pfTot: number;
+  currentPF: number;
+  tsMorte: boolean[];
 }
 
 export default PG;

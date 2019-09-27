@@ -104,7 +104,8 @@ class Sheet extends Component<
         ispiration: false,
         caModifiers: [],
         speed: "9",
-        pf: 0,
+        pfTot: 0,
+        currentPF: 0,
         tsMorte: [false, false, false, false, false, false]
       },
       exist: false
@@ -122,7 +123,7 @@ class Sheet extends Component<
         if (pg.id === sheetId) {
           const mergedPG = Object.assign(this.state.pg, pg);
           this.setState({ pg: mergedPG, exist: true });
-          console.log('tsMorte', mergedPG.tsMorte, pg.tsMorte)
+          console.log("tsMorte", mergedPG.tsMorte, pg.tsMorte);
         }
       });
       //   .then((pg: any) => {
@@ -162,7 +163,8 @@ class Sheet extends Component<
       ispiration,
       caModifiers,
       speed,
-      pf,
+      pfTot,
+      currentPF,
       tsMorte
     } = this.state.pg;
 
@@ -180,7 +182,8 @@ class Sheet extends Component<
             ispiration,
             caModifiers,
             speed,
-            pf,
+            pfTot,
+            currentPF,
             tsMorte
           })
           .then(() => console.log("update done"))
@@ -199,7 +202,8 @@ class Sheet extends Component<
             ispiration,
             caModifiers,
             speed,
-            pf,
+            pfTot,
+            currentPF,
             tsMorte
           })
           .then(() => console.log("create done"))
@@ -361,17 +365,26 @@ class Sheet extends Component<
 
   onChangePF = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { pg } = this.state;
-    this.setState({ pg: { ...pg, pf: parseInt(event.currentTarget.value) } });
+    this.setState({
+      pg: { ...pg, pfTot: parseInt(event.currentTarget.value) }
+    });
   };
 
   onChangeTsMorte = (index: number) => {
     let { pg } = this.state;
     pg.tsMorte[index] = !pg.tsMorte[index];
     this.setState({ pg }, () => {
-      const {onEdit} = this.state
-      if(!onEdit){
+      const { onEdit } = this.state;
+      if (!onEdit) {
         this.updateDB();
       }
+    });
+  };
+
+  onChangeCurrentPf = (add: number) => {
+    const { pg } = this.state;
+    this.setState({ pg: { ...pg, currentPF: pg.currentPF + add } }, () => {
+      this.updateDB();
     });
   };
 
@@ -464,6 +477,7 @@ class Sheet extends Component<
               onChangeSpeed={this.onChangeSpeed}
               onChangePF={this.onChangePF}
               onChangeTsMorte={this.onChangeTsMorte}
+              onChangeCurrentPf={this.onChangeCurrentPf}
             />
           </div>
           <div>{/* slide n°3 */}</div>

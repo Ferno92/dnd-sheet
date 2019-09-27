@@ -16,7 +16,7 @@ import {
 } from "@material-ui/core";
 import StatsType from "data/types/StatsEnum";
 import { useTheme } from "@material-ui/core/styles";
-import { Close, Check } from "@material-ui/icons";
+import { Close, Check, Remove, Add } from "@material-ui/icons";
 import TextFieldNumber from "components/text-field-number/TextFieldNumber";
 import TextFieldString from "components/text-field-string/TextFieldString";
 import PG from "pages/stats/models/PG";
@@ -38,11 +38,20 @@ interface BattleViewProps {
   onSaveModifiers: (modifiers: Modifier[]) => void;
   onChangeSpeed: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onChangePF: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  onChangeTsMorte: (index: number) => void
+  onChangeTsMorte: (index: number) => void;
+  onChangeCurrentPf: (add: number) => void;
 }
 
 function BattleView(props: BattleViewProps) {
-  const { onEdit, onSaveModifiers, pg, onChangeSpeed, onChangePF, onChangeTsMorte } = props;
+  const {
+    onEdit,
+    onSaveModifiers,
+    pg,
+    onChangeSpeed,
+    onChangePF,
+    onChangeTsMorte,
+    onChangeCurrentPf
+  } = props;
   const classes = BattleViewStyles();
   const [caModifiersOpen, setCaModifiersOpen] = useState(false);
   const [dv, setDV] = useState(0);
@@ -104,6 +113,23 @@ function BattleView(props: BattleViewProps) {
     },
     [caModifiers]
   );
+
+  const getPFColorClass = useCallback(() => {
+    let className = "";
+    if (pg.currentPF > pg.pfTot) {
+      className = "blue";
+    } else if (pg.currentPF !== pg.pfTot) {
+      if (pg.currentPF >= pg.pfTot / 2) {
+        className = "green";
+      } else if (pg.currentPF >= pg.pfTot / 4) {
+        className = "yellow";
+      } else if (pg.currentPF < pg.pfTot / 4) {
+        className = "red";
+      }
+    }
+
+    return className;
+  }, [pg]);
 
   useEffect(() => {
     const modifiers = [...caModifiers];
@@ -170,8 +196,8 @@ function BattleView(props: BattleViewProps) {
         <Grid item xs={4} className={classes.gridItem}>
           <TextFieldNumber
             disabled={!onEdit}
-            label={"PF"}
-            value={pg.pf}
+            label={"PF Tot"}
+            value={pg.pfTot}
             onChange={onChangePF}
             min={0}
             max={999}
@@ -198,18 +224,21 @@ function BattleView(props: BattleViewProps) {
                   checkedIcon={<Check />}
                   checked={pg.tsMorte[0]}
                   onChange={() => onChangeTsMorte(0)}
+                  disabled={onEdit}
                 />
                 <Checkbox
                   className={classes.checkbox}
                   checkedIcon={<Check />}
                   checked={pg.tsMorte[1]}
                   onChange={() => onChangeTsMorte(1)}
+                  disabled={onEdit}
                 />
                 <Checkbox
                   className={classes.checkbox}
                   checkedIcon={<Check />}
                   checked={pg.tsMorte[2]}
                   onChange={() => onChangeTsMorte(2)}
+                  disabled={onEdit}
                 />
               </div>
             </div>
@@ -221,21 +250,42 @@ function BattleView(props: BattleViewProps) {
                   checkedIcon={<Close />}
                   checked={pg.tsMorte[3]}
                   onChange={() => onChangeTsMorte(3)}
+                  disabled={onEdit}
                 />
                 <Checkbox
                   className={classes.checkbox}
                   checkedIcon={<Close />}
                   checked={pg.tsMorte[4]}
                   onChange={() => onChangeTsMorte(4)}
+                  disabled={onEdit}
                 />
                 <Checkbox
                   className={classes.checkbox}
                   checkedIcon={<Close />}
                   checked={pg.tsMorte[5]}
                   onChange={() => onChangeTsMorte(5)}
+                  disabled={onEdit}
                 />
               </div>
             </div>
+          </div>
+        </Grid>
+
+        <Grid item xs={12} className={classes.gridItem}>
+          <Typography variant="subtitle2">PF Attuali</Typography>
+          <div className={classes.pfContainer}>
+            <IconButton disabled={onEdit} onClick={() => onChangeCurrentPf(-1)}>
+              <Remove />
+            </IconButton>
+            <div className={classes.pf}>
+              <span className={clsx(classes.currentPf, getPFColorClass())}>
+                {pg.currentPF}
+              </span>
+              <span>{`/${pg.pfTot}`}</span>
+            </div>
+            <IconButton disabled={onEdit} onClick={() => onChangeCurrentPf(1)}>
+              <Add />
+            </IconButton>
           </div>
         </Grid>
       </Grid>
