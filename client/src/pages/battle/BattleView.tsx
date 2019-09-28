@@ -24,6 +24,7 @@ import SizeEnum from "data/types/SizeEnum";
 import StatsUtils from "utils/StatsUtils";
 import clsx from "clsx";
 import BattleUtils from "utils/BattleUtils";
+import WeaponDialog from "components/weapon-dialog/WeaponDialog";
 
 export interface Modifier {
   type: string;
@@ -55,6 +56,7 @@ function BattleView(props: BattleViewProps) {
   const classes = BattleViewStyles();
   const [caModifiersOpen, setCaModifiersOpen] = useState(false);
   const [dv, setDV] = useState(0);
+  const [weaponDialogOpen, setWeaponDialogOpen] = useState(false);
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
   let defaultModifiers = [
@@ -289,6 +291,22 @@ function BattleView(props: BattleViewProps) {
           </div>
         </Grid>
       </Grid>
+
+      <Typography variant="subtitle2">Armi</Typography>
+      <Button
+        className={classes.dialogActionButton}
+        onClick={() => setWeaponDialogOpen(!weaponDialogOpen)}
+      >
+        <Add /> Aggiungi arma
+      </Button>
+
+      {/* ________________ CA dialog _____________ */}
+      <WeaponDialog
+        open={weaponDialogOpen}
+        fullScreen={fullScreen}
+        onClose={() => setWeaponDialogOpen(false)}
+        onEdit={onEdit}
+      />
 
       {/* ________________ CA dialog _____________ */}
       <Dialog
