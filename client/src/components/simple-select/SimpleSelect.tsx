@@ -1,39 +1,39 @@
-import React from "react";
+import React from "react"
 import {
   FormControl,
   InputLabel,
   Select,
   OutlinedInput,
   MenuItem
-} from "@material-ui/core";
-import { createRef, useState, useEffect } from "react";
-import SimpleSelectStyles from "./SimpleSelect.styles";
-import SimpleSelectItem from "data/types/SimpleSelectItem";
+} from "@material-ui/core"
+import { createRef, useState, useEffect } from "react"
+import SimpleSelectStyles from "./SimpleSelect.styles"
+import SimpleSelectItem from "data/types/SimpleSelectItem"
 
 interface SimpleSelectProps<T> {
-  item?: T;
-  data: SimpleSelectItem[];
-  label: string;
-  onEdit: boolean;
+  item?: T
+  data: SimpleSelectItem[]
+  label: string
+  onEdit: boolean
   onChange(
     event: React.ChangeEvent<{
-      name?: string | undefined;
-      value: unknown;
+      name?: string | undefined
+      value: unknown
     }>
-  ): void;
+  ): void
 }
 
 function SimpleSelect<T>(props: SimpleSelectProps<T>) {
-  const { item, data, onEdit, onChange, label } = props;
-  const inputLabelRef = createRef<any>();
-  const classes = SimpleSelectStyles();
-  const [labelWidth, setLabelWidth] = useState(0);
+  const { item, data: dataList, onEdit, onChange, label } = props
+  const inputLabelRef = createRef<any>()
+  const classes = SimpleSelectStyles()
+  const [labelWidth, setLabelWidth] = useState(0)
   useEffect(() => {
-    const current: any = inputLabelRef.current;
+    const current: any = inputLabelRef.current
     if (current) {
-      setLabelWidth(current.offsetWidth);
+      setLabelWidth(current.offsetWidth)
     }
-  }, [inputLabelRef]);
+  }, [inputLabelRef])
 
   return (
     <FormControl
@@ -57,15 +57,15 @@ function SimpleSelect<T>(props: SimpleSelectProps<T>) {
         }
         disabled={!onEdit}
       >
-        {data.map(race => {
+        {dataList.map(data => {
           return (
-            <MenuItem key={race.type} value={race.type}>
-              {race.value}
+            <MenuItem key={data.type} value={data.type}>
+              {`${data.value}${data.extra ? ` (${data.extra})` : ""}`}
             </MenuItem>
-          );
+          )
         })}
       </Select>
     </FormControl>
-  );
+  )
 }
-export default SimpleSelect;
+export default SimpleSelect

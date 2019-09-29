@@ -1,5 +1,5 @@
-import React, { useState, useCallback, useEffect } from "react";
-import BattleViewStyles from "./BattleView.styles";
+import React, { useState, useCallback, useEffect } from 'react'
+import BattleViewStyles from './BattleView.styles'
 import {
   Typography,
   Button,
@@ -13,34 +13,37 @@ import {
   DialogActions,
   Grid,
   Checkbox
-} from "@material-ui/core";
-import StatsType from "data/types/StatsEnum";
-import { useTheme } from "@material-ui/core/styles";
-import { Close, Check, Remove, Add } from "@material-ui/icons";
-import TextFieldNumber from "components/text-field-number/TextFieldNumber";
-import TextFieldString from "components/text-field-string/TextFieldString";
-import PG from "pages/stats/models/PG";
-import SizeEnum from "data/types/SizeEnum";
-import StatsUtils from "utils/StatsUtils";
-import clsx from "clsx";
-import BattleUtils from "utils/BattleUtils";
-import WeaponDialog from "components/weapon-dialog/WeaponDialog";
+} from '@material-ui/core'
+import StatsType from 'data/types/StatsEnum'
+import { useTheme } from '@material-ui/core/styles'
+import { Close, Check, Remove, Add } from '@material-ui/icons'
+import TextFieldNumber from 'components/text-field-number/TextFieldNumber'
+import TextFieldString from 'components/text-field-string/TextFieldString'
+import PG from 'pages/stats/models/PG'
+import SizeEnum from 'data/types/SizeEnum'
+import StatsUtils from 'utils/StatsUtils'
+import clsx from 'clsx'
+import BattleUtils from 'utils/BattleUtils'
+import WeaponDialog from 'components/weapon-dialog/WeaponDialog'
+import Weapon from 'data/types/Weapon'
+import WeaponInfo from 'data/types/WeaponInfo'
 
 export interface Modifier {
-  type: string;
-  value: number;
-  canDelete: boolean;
+  type: string
+  value: number
+  canDelete: boolean
 }
 
 interface BattleViewProps {
-  onEdit: boolean;
-  id: number;
-  pg: PG;
-  onSaveModifiers: (modifiers: Modifier[]) => void;
-  onChangeSpeed: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  onChangePF: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  onChangeTsMorte: (index: number) => void;
-  onChangeCurrentPf: (add: number) => void;
+  onEdit: boolean
+  id: number
+  pg: PG
+  onSaveModifiers: (modifiers: Modifier[]) => void
+  onChangeSpeed: (event: React.ChangeEvent<HTMLInputElement>) => void
+  onChangePF: (event: React.ChangeEvent<HTMLInputElement>) => void
+  onChangeTsMorte: (index: number) => void
+  onChangeCurrentPf: (add: number) => void
+  onAddWeapon: (bonus: number, notes: string, weapon?: Weapon) => void
 }
 
 function BattleView(props: BattleViewProps) {
@@ -51,90 +54,122 @@ function BattleView(props: BattleViewProps) {
     onChangeSpeed,
     onChangePF,
     onChangeTsMorte,
-    onChangeCurrentPf
-  } = props;
-  const classes = BattleViewStyles();
-  const [caModifiersOpen, setCaModifiersOpen] = useState(false);
-  const [dv, setDV] = useState(0);
-  const [weaponDialogOpen, setWeaponDialogOpen] = useState(false);
-  const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
+    onChangeCurrentPf,
+    onAddWeapon
+  } = props
+  const classes = BattleViewStyles()
+  const [caModifiersOpen, setCaModifiersOpen] = useState(false)
+  const [dv, setDV] = useState(0)
+  const [weaponDialogOpen, setWeaponDialogOpen] = useState(false)
+  const theme = useTheme()
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
   let defaultModifiers = [
-    { type: "Base", value: 10, canDelete: false },
+    { type: 'Base', value: 10, canDelete: false },
     {
       type: StatsType.Destrezza,
       value: StatsUtils.getStatValue(StatsType.Destrezza, pg),
       canDelete: false
     }
-  ];
+  ]
 
   if (StatsUtils.getRaceSize(pg) === SizeEnum.Piccola) {
-    defaultModifiers.push({ type: "Taglia", value: 1, canDelete: false });
+    defaultModifiers.push({ type: 'Taglia', value: 1, canDelete: false })
   }
-  const [caModifiers, setCaModifiers] = useState<Modifier[]>(defaultModifiers);
+  const [caModifiers, setCaModifiers] = useState<Modifier[]>(defaultModifiers)
 
   const getCA = useCallback(() => {
-    let count = 0;
+    let count = 0
     caModifiers.forEach(modifier => {
-      count += modifier.value;
-    });
-    return count;
-  }, [caModifiers]);
+      count += modifier.value
+    })
+    return count
+  }, [caModifiers])
 
   const showCAmodifiers = useCallback(() => {
-    setCaModifiersOpen(true);
-  }, []);
+    setCaModifiersOpen(true)
+  }, [])
 
   const addCAitem = useCallback(() => {
-    setCaModifiers([...caModifiers, { type: "", value: 0, canDelete: true }]);
-  }, [caModifiers]);
+    setCaModifiers([...caModifiers, { type: '', value: 0, canDelete: true }])
+  }, [caModifiers])
 
   const deleteCaModifier = useCallback(
     (index: number) => {
-      let modifiers = [...caModifiers];
-      modifiers.splice(index, 1);
-      setCaModifiers(modifiers);
+      let modifiers = [...caModifiers]
+      modifiers.splice(index, 1)
+      setCaModifiers(modifiers)
     },
     [caModifiers]
-  );
+  )
 
   const onChangeModifierType = useCallback(
     (value: string, index: number) => {
-      let modifiers = [...caModifiers];
-      modifiers[index].type = value;
-      setCaModifiers(modifiers);
+      let modifiers = [...caModifiers]
+      modifiers[index].type = value
+      setCaModifiers(modifiers)
     },
     [caModifiers]
-  );
+  )
 
   const onChangeModifierValue = useCallback(
     (value: number, index: number) => {
-      let modifiers = [...caModifiers];
-      modifiers[index].value = value;
-      setCaModifiers(modifiers);
+      let modifiers = [...caModifiers]
+      modifiers[index].value = value
+      setCaModifiers(modifiers)
     },
     [caModifiers]
-  );
+  )
 
   const getPFColorClass = useCallback(() => {
-    let className = "";
+    let className = ''
     if (pg.currentPF > pg.pfTot) {
-      className = "blue";
+      className = 'blue'
     } else if (pg.currentPF !== pg.pfTot) {
       if (pg.currentPF >= pg.pfTot / 2) {
-        className = "green";
+        className = 'green'
       } else if (pg.currentPF >= pg.pfTot / 4) {
-        className = "yellow";
+        className = 'yellow'
       } else if (pg.currentPF < pg.pfTot / 4) {
-        className = "red";
+        className = 'red'
       }
     }
 
-    return className;
-  }, [pg]);
+    return className
+  }, [pg])
+
+  const getWeaponTPC = useCallback(
+    (weaponInfo: WeaponInfo) => {
+      const { level, pgClass, stats } = pg
+      let tpc = weaponInfo.bonus + StatsUtils.getProficiency(level, pgClass)
+      if (
+        weaponInfo.weapon.property.find(property => property === 'Accurata')
+      ) {
+        //TODO get higher from Des or For
+      } else {
+        tpc += StatsUtils.getStatModifierFromName(StatsType.Forza, pg)
+      }
+      return `${tpc >= 0 ? '+' : '-'}${tpc}`
+    },
+    [pg]
+  )
+
+  const getWeaponDamageBonus = useCallback(
+    (weaponInfo: WeaponInfo) => {
+      let damage = weaponInfo.bonus
+      if (
+        weaponInfo.weapon.property.find(property => property === 'Accurata')
+      ) {
+        //TODO get higher from Des or For
+      } else {
+        damage += StatsUtils.getStatModifierFromName(StatsType.Forza, pg)
+      }
+      return damage
+    },
+    [pg]
+  )
 
   useEffect(() => {
-    const modifiers = [...caModifiers];
+    const modifiers = [...caModifiers]
     if (pg && pg.caModifiers) {
       pg.caModifiers.forEach(modifier => {
         if (
@@ -142,21 +177,21 @@ function BattleView(props: BattleViewProps) {
             ca => ca.type === modifier.type && ca.value === modifier.value
           )
         ) {
-          modifiers.push(modifier);
+          modifiers.push(modifier)
         }
-      });
+      })
       if (
         modifiers.length >= pg.caModifiers.length + defaultModifiers.length &&
         modifiers.length > caModifiers.length
       ) {
-        setCaModifiers(modifiers);
+        setCaModifiers(modifiers)
       }
     }
-  }, [pg, pg.caModifiers, caModifiers, defaultModifiers.length]);
+  }, [pg, pg.caModifiers, caModifiers, defaultModifiers.length])
 
   useEffect(() => {
-    setDV(BattleUtils.getDV(pg.pgClass));
-  }, [pg.race, pg.pgClass]);
+    setDV(BattleUtils.getDV(pg.pgClass))
+  }, [pg.race, pg.pgClass])
 
   return (
     <div className={classes.container}>
@@ -178,7 +213,7 @@ function BattleView(props: BattleViewProps) {
         <Grid item xs={4} className={classes.gridItem}>
           <TextFieldNumber
             disabled
-            label={"Iniziativa"}
+            label={'Iniziativa'}
             value={StatsUtils.getStatValue(StatsType.Destrezza, pg)}
             onChange={() => {}}
           />
@@ -187,18 +222,18 @@ function BattleView(props: BattleViewProps) {
         <Grid item xs={4} className={clsx(classes.gridItem, classes.speed)}>
           <TextFieldNumber
             disabled={!onEdit}
-            label={"Velocità(m)"}
-            value={pg.speed && pg.speed !== "" ? parseFloat(pg.speed) : 0}
+            label={'Velocità(m)'}
+            value={pg.speed && pg.speed !== '' ? parseFloat(pg.speed) : 0}
             onChange={onChangeSpeed}
             min={0}
             max={150}
-            step={"1.5"}
+            step={'1.5'}
           />
         </Grid>
         <Grid item xs={4} className={classes.gridItem}>
           <TextFieldNumber
             disabled={!onEdit}
-            label={"PF Tot"}
+            label={'PF Tot'}
             value={pg.pfTot}
             onChange={onChangePF}
             min={0}
@@ -209,7 +244,7 @@ function BattleView(props: BattleViewProps) {
         <Grid item xs={4} className={classes.gridItem}>
           <TextFieldString
             disabled
-            label={"Dado vita"}
+            label={'Dado vita'}
             value={`d${dv}`}
             onChange={() => {}}
           />
@@ -293,6 +328,26 @@ function BattleView(props: BattleViewProps) {
       </Grid>
 
       <Typography variant="subtitle2">Armi</Typography>
+      {pg.weapons.map((weaponInfo: WeaponInfo, index: number) => {
+        return (
+          <ListItem key={index}>
+            <Grid container spacing={1}>
+              <Grid item xs={3}>
+                {weaponInfo.weapon.name}
+              </Grid>
+              <Grid item xs={3}>
+                {getWeaponTPC(weaponInfo)}
+              </Grid>
+              <Grid item xs={3}>{`${
+                weaponInfo.weapon.damage
+              }+${getWeaponDamageBonus(weaponInfo)}`}</Grid>
+              <Grid item xs={3}>
+                {weaponInfo.weapon.damageType}
+              </Grid>
+            </Grid>
+          </ListItem>
+        )
+      })}
       <Button
         className={classes.dialogActionButton}
         onClick={() => setWeaponDialogOpen(!weaponDialogOpen)}
@@ -305,7 +360,7 @@ function BattleView(props: BattleViewProps) {
         open={weaponDialogOpen}
         fullScreen={fullScreen}
         onClose={() => setWeaponDialogOpen(false)}
-        onEdit={onEdit}
+        onAddWeapon={onAddWeapon}
       />
 
       {/* ________________ CA dialog _____________ */}
@@ -343,7 +398,7 @@ function BattleView(props: BattleViewProps) {
                         name=""
                         disabled={!onEdit}
                         onChange={(value: string, property: string) => {
-                          onChangeModifierType(value, index);
+                          onChangeModifierType(value, index)
                         }}
                         value={modifier.type}
                         root={classes.modifierType}
@@ -355,7 +410,7 @@ function BattleView(props: BattleViewProps) {
                           onChangeModifierValue(
                             parseInt(e.currentTarget.value),
                             index
-                          );
+                          )
                         }}
                         disabled={!onEdit}
                         min={0}
@@ -368,7 +423,7 @@ function BattleView(props: BattleViewProps) {
                     </React.Fragment>
                   )}
                 </ListItem>
-              );
+              )
             })}
             <div className={classes.addButton}>
               <Button
@@ -396,7 +451,7 @@ function BattleView(props: BattleViewProps) {
         </DialogActions>
       </Dialog>
     </div>
-  );
+  )
 }
 
-export default BattleView;
+export default BattleView

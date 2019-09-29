@@ -1,6 +1,6 @@
-import React, { Component } from "react";
-import SheetStyles from "./Sheet.styles";
-import { WithStyles } from "@material-ui/styles";
+import React, { Component } from 'react'
+import SheetStyles from './Sheet.styles'
+import { WithStyles } from '@material-ui/styles'
 import {
   withStyles,
   BottomNavigation,
@@ -8,40 +8,42 @@ import {
   WithTheme,
   Fab,
   Tooltip
-} from "@material-ui/core";
-import { ReactComponent as FightIcon } from "assets/images/swords.svg";
-import { ReactComponent as ProfileIcon } from "assets/images/viking.svg";
-import { ReactComponent as BackpackIcon } from "assets/images/backpack.svg";
-import { ReactComponent as BookIcon } from "assets/images/spellbook.svg";
-import { Edit, Done, ArrowBack, Settings, Close } from "@material-ui/icons";
-import SwipeableViews from "react-swipeable-views";
-import StatsView from "pages/stats/StatsView";
-import SpeedDial from "@material-ui/lab/SpeedDial";
-import SpeedDialIcon from "@material-ui/lab/SpeedDialIcon";
-import SpeedDialAction from "@material-ui/lab/SpeedDialAction";
-import { RouteComponentProps, withRouter } from "react-router-dom";
-import BattleView, { Modifier } from "pages/battle/BattleView";
-import PG from "pages/stats/models/PG";
-import { RacesEnum, SubRacesEnum } from "data/types/RacesEnum";
-import StatsType from "data/types/StatsEnum";
-import Dexie from "dexie";
-import { JobsEnum } from "data/types/JobsEnum";
-import AbilitiesEnum from "data/types/AbilitiesEnum";
-import PGAbility from "pages/stats/models/PGAbility";
-import StatsUtils from "utils/StatsUtils";
+} from '@material-ui/core'
+import { ReactComponent as FightIcon } from 'assets/images/swords.svg'
+import { ReactComponent as ProfileIcon } from 'assets/images/viking.svg'
+import { ReactComponent as BackpackIcon } from 'assets/images/backpack.svg'
+import { ReactComponent as BookIcon } from 'assets/images/spellbook.svg'
+import { Edit, Done, ArrowBack, Settings, Close } from '@material-ui/icons'
+import SwipeableViews from 'react-swipeable-views'
+import StatsView from 'pages/stats/StatsView'
+import SpeedDial from '@material-ui/lab/SpeedDial'
+import SpeedDialIcon from '@material-ui/lab/SpeedDialIcon'
+import SpeedDialAction from '@material-ui/lab/SpeedDialAction'
+import { RouteComponentProps, withRouter } from 'react-router-dom'
+import BattleView, { Modifier } from 'pages/battle/BattleView'
+import PG from 'pages/stats/models/PG'
+import { RacesEnum, SubRacesEnum } from 'data/types/RacesEnum'
+import StatsType from 'data/types/StatsEnum'
+import Dexie from 'dexie'
+import { JobsEnum } from 'data/types/JobsEnum'
+import AbilitiesEnum from 'data/types/AbilitiesEnum'
+import PGAbility from 'pages/stats/models/PGAbility'
+import StatsUtils from 'utils/StatsUtils'
+import Weapon from 'data/types/Weapon'
+import WeaponInfo from 'data/types/WeaponInfo'
 
 interface SheetProps {
-  id: number;
+  id: number
 }
 
 interface SheetState {
-  pageIndex: number;
-  onEdit: boolean;
-  direction: "down";
-  open: boolean;
-  sheetId: number;
-  pg: PG;
-  exist: boolean;
+  pageIndex: number
+  onEdit: boolean
+  direction: 'down'
+  open: boolean
+  sheetId: number
+  pg: PG
+  exist: boolean
 }
 
 class Sheet extends Component<
@@ -54,42 +56,42 @@ class Sheet extends Component<
   actions = [
     {
       icon: <ArrowBack />,
-      name: "Back",
+      name: 'Back',
       onClick: () => {
         //go back
-        this.props.history.goBack();
+        this.props.history.goBack()
       }
     },
     {
       icon: <Edit />,
-      name: "Edit",
+      name: 'Edit',
       onClick: () => {
-        this.onChangeEditMode();
+        this.onChangeEditMode()
       }
     }
-  ];
+  ]
 
-  pg: Dexie.Table<PG, number> | undefined;
-  db: Dexie;
+  pg: Dexie.Table<PG, number> | undefined
+  db: Dexie
   constructor(
     props: SheetProps &
       RouteComponentProps<{ id: string }> &
       WithStyles<typeof SheetStyles> &
       WithTheme
   ) {
-    super(props);
+    super(props)
 
-    const { id } = props.match.params;
-    const sheetId = parseInt(id);
+    const { id } = props.match.params
+    const sheetId = parseInt(id)
     this.state = {
       pageIndex: 0,
       onEdit: false,
-      direction: "down",
+      direction: 'down',
       open: false,
       sheetId: sheetId,
       pg: {
         id: sheetId,
-        name: "",
+        name: '',
         race: RacesEnum.Umano,
         level: 1,
         stats: [
@@ -103,29 +105,29 @@ class Sheet extends Component<
         abilities: [],
         ispiration: false,
         caModifiers: [],
-        speed: "9",
+        speed: '9',
         pfTot: 0,
         currentPF: 0,
-        tsMorte: [false, false, false, false, false, false]
+        tsMorte: [false, false, false, false, false, false],
+        weapons: []
       },
       exist: false
-    };
-    this.db = new Dexie("pg01_database");
+    }
+    this.db = new Dexie('pg01_database')
     this.db.version(1).stores({
-      pg: "id,name,race,pgClass,level,stats"
-    });
+      pg: 'id,name,race,pgClass,level,stats'
+    })
     this.db.open().then(() => {
-      this.pg = this.db.table("pg");
+      this.pg = this.db.table('pg')
       // this.pg.put({ name: 'Torendal DueLame', race: 'Nano' }).then(() => {
       //   return db.table('pg').get('Torendal DueLame')
       // })
-      this.db.table("pg").each((pg: PG) => {
+      this.db.table('pg').each((pg: PG) => {
         if (pg.id === sheetId) {
-          const mergedPG = Object.assign(this.state.pg, pg);
-          this.setState({ pg: mergedPG, exist: true });
-          console.log("tsMorte", mergedPG.tsMorte, pg.tsMorte);
+          const mergedPG = Object.assign(this.state.pg, pg)
+          this.setState({ pg: mergedPG, exist: true })
         }
-      });
+      })
       //   .then((pg: any) => {
       //     console.log(pg.name);
 
@@ -139,19 +141,19 @@ class Sheet extends Component<
       //   });
       // }).catch((err) => {
       //   console.error(err.stack || err);
-    });
+    })
   }
 
   componentDidUpdate(prevProps: SheetProps, prevState: SheetState) {
-    const { onEdit } = this.state;
+    const { onEdit } = this.state
     if (!onEdit && onEdit !== prevState.onEdit) {
-      this.updateDB();
+      this.updateDB()
     }
   }
 
   updateDB = () => {
-    const { exist, sheetId } = this.state;
-    const id = sheetId;
+    const { exist, sheetId } = this.state
+    const id = sheetId
     const {
       name,
       pgClass,
@@ -165,8 +167,9 @@ class Sheet extends Component<
       speed,
       pfTot,
       currentPF,
-      tsMorte
-    } = this.state.pg;
+      tsMorte,
+      weapons
+    } = this.state.pg
 
     if (this.pg) {
       if (exist) {
@@ -184,10 +187,11 @@ class Sheet extends Component<
             speed,
             pfTot,
             currentPF,
-            tsMorte
+            tsMorte,
+            weapons
           })
-          .then(() => console.log("update done"))
-          .catch(err => console.log("err: ", err));
+          .then(() => console.log('update done'))
+          .catch(err => console.log('err: ', err))
       } else {
         this.pg
           .put({
@@ -204,192 +208,211 @@ class Sheet extends Component<
             speed,
             pfTot,
             currentPF,
-            tsMorte
+            tsMorte,
+            weapons
           })
-          .then(() => console.log("create done"))
-          .catch(err => console.log("err: ", err));
+          .then(() => console.log('create done'))
+          .catch(err => console.log('err: ', err))
       }
     }
-  };
+  }
 
   onChangePage = (event: React.ChangeEvent<{}>, value: any) => {
-    this.setState({ pageIndex: value });
-  };
+    this.setState({ pageIndex: value })
+  }
 
   onSwipePage = (index: number, indexLatest: number) => {
-    this.setState({ pageIndex: index });
-  };
+    this.setState({ pageIndex: index })
+  }
 
   onChangeEditMode = () => {
-    const { onEdit } = this.state;
-    this.setState({ onEdit: !onEdit });
-  };
+    const { onEdit } = this.state
+    this.setState({ onEdit: !onEdit })
+  }
 
   handleClick = () => {
-    const { open } = this.state;
-    this.setState({ open: !open });
-  };
+    const { open } = this.state
+    this.setState({ open: !open })
+  }
 
   handleClose = () => {
-    this.setState({ open: false });
-  };
+    this.setState({ open: false })
+  }
 
   handleOpen = () => {
-    this.setState({ open: true });
-  };
+    this.setState({ open: true })
+  }
 
   onEditName = (value: string) => {
-    const { pg } = this.state;
-    this.setState({ pg: { ...pg, name: value } });
-  };
+    const { pg } = this.state
+    this.setState({ pg: { ...pg, name: value } })
+  }
 
   onEditLevel = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { pg } = this.state;
-    this.setState({ pg: { ...pg, level: parseInt(event.target.value) } });
-  };
+    const { pg } = this.state
+    this.setState({ pg: { ...pg, level: parseInt(event.target.value) } })
+  }
 
   onEditStats = (value: string, prop: number) => {
-    const { pg } = this.state;
-    const { stats } = pg;
-    const tempStats = stats.slice();
-    tempStats[prop].value = parseInt(value);
-    this.setState({ pg: { ...pg, stats: tempStats } });
-  };
+    const { pg } = this.state
+    const { stats } = pg
+    const tempStats = stats.slice()
+    tempStats[prop].value = parseInt(value)
+    this.setState({ pg: { ...pg, stats: tempStats } })
+  }
 
   onChangeRace = (
     event: React.ChangeEvent<{
-      name?: string | undefined;
-      value: unknown;
+      name?: string | undefined
+      value: unknown
     }>
   ) => {
-    let { pg } = this.state;
-    const value = event.target.value as RacesEnum;
-    pg = StatsUtils.removeRaceStatModifiers(pg);
-    this.setState({ pg: { ...pg, race: value, subRace: undefined } });
-  };
+    let { pg } = this.state
+    const value = event.target.value as RacesEnum
+    pg = StatsUtils.removeRaceStatModifiers(pg)
+    this.setState({ pg: { ...pg, race: value, subRace: undefined } })
+  }
 
   onChangeSubRace = (
     event: React.ChangeEvent<{
-      name?: string | undefined;
-      value: unknown;
+      name?: string | undefined
+      value: unknown
     }>
   ) => {
-    let { pg } = this.state;
-    const value = event.target.value as SubRacesEnum;
+    let { pg } = this.state
+    const value = event.target.value as SubRacesEnum
     if (pg.subRace) {
-      pg = StatsUtils.removeRaceStatModifiers(pg);
+      pg = StatsUtils.removeRaceStatModifiers(pg)
     }
-    pg = { ...pg, subRace: value };
-    const stats = StatsUtils.getStatsFromRace(pg);
-    pg = { ...pg, stats: stats };
-    this.setState({ pg });
-  };
+    pg = { ...pg, subRace: value }
+    const stats = StatsUtils.getStatsFromRace(pg)
+    pg = { ...pg, stats: stats }
+    this.setState({ pg })
+  }
 
   onChangeJob = (
     event: React.ChangeEvent<{
-      name?: string | undefined;
-      value: unknown;
+      name?: string | undefined
+      value: unknown
     }>
   ) => {
-    const { pg } = this.state;
-    const value = event.target.value as JobsEnum;
-    this.setState({ pg: { ...pg, pgClass: value } });
-  };
+    const { pg } = this.state
+    const value = event.target.value as JobsEnum
+    this.setState({ pg: { ...pg, pgClass: value } })
+  }
 
   onChangeAbilityCheck = (type: AbilitiesEnum, checked: boolean) => {
-    const { pg } = this.state;
-    let { abilities } = pg;
-    let index = -1;
+    const { pg } = this.state
+    let { abilities } = pg
+    let index = -1
     abilities.forEach((ability: PGAbility, i: number) => {
       if (ability.type === type) {
-        index = i;
+        index = i
       }
-    });
+    })
     if (index >= 0) {
       if (checked || abilities[index].points > 0) {
-        abilities[index].hasProficiency = checked;
+        abilities[index].hasProficiency = checked
       } else if (abilities[index].points <= 0) {
-        abilities.splice(index, 1);
+        abilities.splice(index, 1)
       }
     } else {
       abilities.push({
         hasProficiency: checked,
         points: 0,
         type: type
-      });
+      })
     }
-    this.setState({ pg: { ...pg, abilities } });
-  };
+    this.setState({ pg: { ...pg, abilities } })
+  }
 
   onChangeAbilityPoints = (type: AbilitiesEnum, value: number) => {
-    const { pg } = this.state;
-    let { abilities } = pg;
-    let index = -1;
+    const { pg } = this.state
+    let { abilities } = pg
+    let index = -1
     abilities.forEach((ability: PGAbility, i: number) => {
       if (ability.type === type) {
-        index = i;
+        index = i
       }
-    });
+    })
     if (index >= 0) {
       if (abilities[index].hasProficiency || value > 0) {
-        abilities[index].points = value;
+        abilities[index].points = value
       } else if (value <= 0) {
-        abilities.splice(index, 1);
+        abilities.splice(index, 1)
       }
     } else {
       abilities.push({
         hasProficiency: false,
         points: value,
         type: type
-      });
+      })
     }
 
-    this.setState({ pg: { ...pg, abilities } });
-  };
+    this.setState({ pg: { ...pg, abilities } })
+  }
 
   onChangeIspiration = (checked: boolean) => {
-    const { pg } = this.state;
-    this.setState({ pg: { ...pg, ispiration: checked } });
-  };
+    const { pg } = this.state
+    this.setState({ pg: { ...pg, ispiration: checked } })
+  }
 
   onSaveModifiers = (modifiers: Modifier[]) => {
-    const { pg } = this.state;
-    const finalModifiers = modifiers.filter(modifier => modifier.canDelete);
-    this.setState({ pg: { ...pg, caModifiers: finalModifiers } });
-  };
+    const { pg } = this.state
+    const finalModifiers = modifiers.filter(modifier => modifier.canDelete)
+    this.setState({ pg: { ...pg, caModifiers: finalModifiers } })
+  }
 
   onChangeSpeed = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { pg } = this.state;
-    this.setState({ pg: { ...pg, speed: event.currentTarget.value } });
-  };
+    const { pg } = this.state
+    this.setState({ pg: { ...pg, speed: event.currentTarget.value } })
+  }
 
   onChangePF = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { pg } = this.state;
+    const { pg } = this.state
     this.setState({
       pg: { ...pg, pfTot: parseInt(event.currentTarget.value) }
-    });
-  };
+    })
+  }
 
   onChangeTsMorte = (index: number) => {
-    let { pg } = this.state;
-    pg.tsMorte[index] = !pg.tsMorte[index];
+    let { pg } = this.state
+    pg.tsMorte[index] = !pg.tsMorte[index]
     this.setState({ pg }, () => {
-      const { onEdit } = this.state;
+      const { onEdit } = this.state
       if (!onEdit) {
-        this.updateDB();
+        this.updateDB()
       }
-    });
-  };
+    })
+  }
 
   onChangeCurrentPf = (add: number) => {
-    const { pg } = this.state;
+    const { pg } = this.state
     this.setState({ pg: { ...pg, currentPF: pg.currentPF + add } }, () => {
-      this.updateDB();
-    });
-  };
+      this.updateDB()
+    })
+  }
+
+  onAddWeapon = (bonus: number, notes: string, weapon?: Weapon) => {
+    const { pg, onEdit } = this.state
+    if (weapon) {
+      const weaponInfo: WeaponInfo = {
+        weapon: weapon,
+        bonus: bonus,
+        notes: notes
+      }
+      const weapons = [...pg.weapons]
+      weapons.push(weaponInfo)
+      this.setState({ pg: { ...pg, weapons: weapons } }, () => {
+        if (!onEdit) {
+          this.updateDB()
+        }
+      })
+    }
+  }
 
   render() {
-    const { classes, theme } = this.props;
+    const { classes, theme } = this.props
     const {
       pageIndex,
       onEdit,
@@ -398,7 +421,7 @@ class Sheet extends Component<
       sheetId,
       pg,
       exist
-    } = this.state;
+    } = this.state
     return (
       <React.Fragment>
         {onEdit ? (
@@ -444,7 +467,7 @@ class Sheet extends Component<
           </SpeedDial>
         )}
         <SwipeableViews
-          axis={theme.direction === "rtl" ? "x-reverse" : "x"}
+          axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
           index={pageIndex}
           onChangeIndex={this.onSwipePage}
           className="tab-container"
@@ -478,6 +501,7 @@ class Sheet extends Component<
               onChangePF={this.onChangePF}
               onChangeTsMorte={this.onChangeTsMorte}
               onChangeCurrentPf={this.onChangeCurrentPf}
+              onAddWeapon={this.onAddWeapon}
             />
           </div>
           <div>{/* slide n°3 */}</div>
@@ -507,8 +531,8 @@ class Sheet extends Component<
           />
         </BottomNavigation>
       </React.Fragment>
-    );
+    )
   }
 }
 
-export default withRouter(withStyles(SheetStyles, { withTheme: true })(Sheet));
+export default withRouter(withStyles(SheetStyles, { withTheme: true })(Sheet))

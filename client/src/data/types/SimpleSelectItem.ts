@@ -1,6 +1,7 @@
 interface SimpleSelectItem {
-  type: string
-  value: string | number
+  type: string;
+  value: string | number;
+  extra?: string;
 }
 
-export default SimpleSelectItem
+export default SimpleSelectItem;

@@ -1,5 +1,8 @@
 enum WeaponEnum {
-  AsciaDaBattaglia = "Ascia da battaglia"
+  Ascia = "ascia",
+  AsciaDaBattaglia = "asciaDaBattaglia",
+  BastoneFerrato = "bastoneFerrato",
+  Falcetto = "falcetto"
 }
 
 export default WeaponEnum;
