@@ -31,6 +31,7 @@ import PGAbility from 'pages/stats/models/PGAbility'
 import StatsUtils from 'utils/StatsUtils'
 import Weapon from 'data/types/Weapon'
 import WeaponInfo from 'data/types/WeaponInfo'
+import EquipmentView from 'pages/equipment/EquipmentView'
 
 interface SheetProps {
   id: number
@@ -109,7 +110,10 @@ class Sheet extends Component<
         pfTot: 0,
         currentPF: 0,
         tsMorte: [false, false, false, false, false, false],
-        weapons: []
+        weapons: [],
+        equipment: {
+          moneys: [0, 0, 0, 0, 0]
+        }
       },
       exist: false
     }
@@ -168,7 +172,8 @@ class Sheet extends Component<
       pfTot,
       currentPF,
       tsMorte,
-      weapons
+      weapons,
+      equipment
     } = this.state.pg
 
     if (this.pg) {
@@ -188,7 +193,8 @@ class Sheet extends Component<
             pfTot,
             currentPF,
             tsMorte,
-            weapons
+            weapons,
+            equipment
           })
           .then(() => console.log('update done'))
           .catch(err => console.log('err: ', err))
@@ -209,7 +215,8 @@ class Sheet extends Component<
             pfTot,
             currentPF,
             tsMorte,
-            weapons
+            weapons,
+            equipment
           })
           .then(() => console.log('create done'))
           .catch(err => console.log('err: ', err))
@@ -411,6 +418,31 @@ class Sheet extends Component<
     }
   }
 
+  onRemoveWeapon = (index: number) => {
+    const { pg, onEdit } = this.state
+    const weapons = [...pg.weapons]
+    weapons.splice(index, 1)
+    this.setState({ pg: { ...pg, weapons: weapons } }, () => {
+      if (!onEdit) {
+        this.updateDB()
+      }
+    })
+  }
+
+  onChangeMoney = (index: number, value: number) => {
+    const { pg, onEdit } = this.state
+    const moneys = [...pg.equipment.moneys]
+    moneys[index] = value
+    this.setState(
+      { pg: { ...pg, equipment: { ...pg.equipment, moneys: moneys } } },
+      () => {
+        if (!onEdit) {
+          this.updateDB()
+        }
+      }
+    )
+  }
+
   render() {
     const { classes, theme } = this.props
     const {
@@ -502,9 +534,17 @@ class Sheet extends Component<
               onChangeTsMorte={this.onChangeTsMorte}
               onChangeCurrentPf={this.onChangeCurrentPf}
               onAddWeapon={this.onAddWeapon}
+              onRemoveWeapon={this.onRemoveWeapon}
             />
           </div>
-          <div>{/* slide n°3 */}</div>
+          <div>
+            {/* slide n°3 */}
+            <EquipmentView
+              onEdit={onEdit}
+              pg={pg}
+              onChangeMoney={this.onChangeMoney}
+            />
+          </div>
           <div>{/* slide n°4 */}</div>
         </SwipeableViews>
 

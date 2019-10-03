@@ -4,6 +4,7 @@ import { JobsEnum } from 'data/types/JobsEnum'
 import PGAbility from './PGAbility'
 import { Modifier } from 'pages/battle/BattleView'
 import WeaponInfo from 'data/types/WeaponInfo'
+import Equipment from 'pages/equipment/Equipment'
 
 interface PG {
   id: number
@@ -21,6 +22,7 @@ interface PG {
   currentPF: number
   tsMorte: boolean[]
   weapons: WeaponInfo[]
+  equipment: Equipment
 }
 
 export default PG

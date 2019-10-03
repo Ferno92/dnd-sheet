@@ -44,6 +44,7 @@ interface BattleViewProps {
   onChangeTsMorte: (index: number) => void
   onChangeCurrentPf: (add: number) => void
   onAddWeapon: (bonus: number, notes: string, weapon?: Weapon) => void
+  onRemoveWeapon: (index: number) => void
 }
 
 function BattleView(props: BattleViewProps) {
@@ -55,7 +56,8 @@ function BattleView(props: BattleViewProps) {
     onChangePF,
     onChangeTsMorte,
     onChangeCurrentPf,
-    onAddWeapon
+    onAddWeapon,
+    onRemoveWeapon
   } = props
   const classes = BattleViewStyles()
   const [caModifiersOpen, setCaModifiersOpen] = useState(false)
@@ -139,7 +141,7 @@ function BattleView(props: BattleViewProps) {
 
   const getWeaponTPC = useCallback(
     (weaponInfo: WeaponInfo) => {
-      const { level, pgClass, stats } = pg
+      const { level, pgClass } = pg
       let tpc = weaponInfo.bonus + StatsUtils.getProficiency(level, pgClass)
       if (
         weaponInfo.weapon.property.find(property => property === 'Accurata')
@@ -184,6 +186,7 @@ function BattleView(props: BattleViewProps) {
         modifiers.length >= pg.caModifiers.length + defaultModifiers.length &&
         modifiers.length > caModifiers.length
       ) {
+        console.log('modifiers', modifiers)
         setCaModifiers(modifiers)
       }
     }
@@ -328,26 +331,69 @@ function BattleView(props: BattleViewProps) {
       </Grid>
 
       <Typography variant="subtitle2">Armi</Typography>
-      {pg.weapons.map((weaponInfo: WeaponInfo, index: number) => {
-        return (
-          <ListItem key={index}>
-            <Grid container spacing={1}>
-              <Grid item xs={3}>
-                {weaponInfo.weapon.name}
+      {pg.weapons.length > 0 && (
+        <Grid container className={classes.weaponHeader}>
+          <Grid item xs={3}>
+            Nome
+          </Grid>
+          <Grid item xs={2}>
+            TPC
+          </Grid>
+          <Grid item xs={3}>
+            Danno
+          </Grid>
+          <Grid item xs={3}>
+            Tipologia
+          </Grid>
+        </Grid>
+      )}
+
+      <Grid container>
+        {pg.weapons.map((weaponInfo: WeaponInfo, index: number) => {
+          return (
+            <React.Fragment key={index}>
+              <Grid
+                item
+                xs={3}
+                className={clsx(classes.weaponGridItem, classes.weaponName)}
+              >
+                {`${weaponInfo.weapon.name}${
+                  weaponInfo.bonus ? `(+${weaponInfo.bonus})` : ''
+                }`}
               </Grid>
-              <Grid item xs={3}>
+              <Grid item xs={2} className={classes.weaponGridItem}>
                 {getWeaponTPC(weaponInfo)}
               </Grid>
-              <Grid item xs={3}>{`${
+              <Grid item xs={3} className={classes.weaponGridItem}>{`${
                 weaponInfo.weapon.damage
               }+${getWeaponDamageBonus(weaponInfo)}`}</Grid>
-              <Grid item xs={3}>
+              <Grid item xs={3} className={classes.weaponGridItem}>
                 {weaponInfo.weapon.damageType}
               </Grid>
-            </Grid>
-          </ListItem>
-        )
-      })}
+
+              <Grid item xs={1} className={classes.weaponGridItem}>
+                <IconButton
+                  size="small"
+                  color="secondary"
+                  onClick={() => onRemoveWeapon(index)}
+                >
+                  <Close className={classes.weaponInfoButton} />
+                </IconButton>
+              </Grid>
+              <Grid
+                item
+                xs={12}
+                className={clsx(classes.weaponGridItem, classes.weaponInfo)}
+              >
+                {weaponInfo.notes && <div>{weaponInfo.notes}</div>}
+                <div>
+                  {weaponInfo.weapon.property.map(property => property)}
+                </div>
+              </Grid>
+            </React.Fragment>
+          )
+        })}
+      </Grid>
       <Button
         className={classes.dialogActionButton}
         onClick={() => setWeaponDialogOpen(!weaponDialogOpen)}
