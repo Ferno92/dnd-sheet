@@ -1,4 +1,4 @@
-export default [
+export default [ //TODO aggiungi peso
   {
     name: "Ascia",
     id: "ascia",

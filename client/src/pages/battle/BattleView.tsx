@@ -401,7 +401,7 @@ function BattleView(props: BattleViewProps) {
         <Add /> Aggiungi arma
       </Button>
 
-      {/* ________________ CA dialog _____________ */}
+      {/* ________________ Weapon dialog _____________ */}
       <WeaponDialog
         open={weaponDialogOpen}
         fullScreen={fullScreen}

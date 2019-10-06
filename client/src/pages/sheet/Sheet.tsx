@@ -32,6 +32,7 @@ import StatsUtils from 'utils/StatsUtils'
 import Weapon from 'data/types/Weapon'
 import WeaponInfo from 'data/types/WeaponInfo'
 import EquipmentView from 'pages/equipment/EquipmentView'
+import EquipmentObject from 'pages/equipment/EquipmentObject'
 
 interface SheetProps {
   id: number
@@ -112,7 +113,8 @@ class Sheet extends Component<
         tsMorte: [false, false, false, false, false, false],
         weapons: [],
         equipment: {
-          moneys: [0, 0, 0, 0, 0]
+          moneys: [0, 0, 0, 0, 0],
+          backpack: []
         }
       },
       exist: false
@@ -443,6 +445,52 @@ class Sheet extends Component<
     )
   }
 
+  onAddEquipment = (equipment: EquipmentObject) => {
+    const { pg } = this.state
+    let tempBackpack = pg.equipment.backpack ? [...pg.equipment.backpack] : []
+    tempBackpack.push(equipment)
+    this.setState(
+      {
+        pg: {
+          ...pg,
+          equipment: {
+            ...pg.equipment,
+            backpack: tempBackpack
+          }
+        }
+      },
+      () => {
+        const { onEdit } = this.state
+        if (!onEdit) {
+          this.updateDB()
+        }
+      }
+    )
+  }
+
+  onRemoveEquipment = (index: number) => {
+    const { pg } = this.state
+    let tempBackpack = pg.equipment.backpack ? [...pg.equipment.backpack] : []
+    tempBackpack.splice(index, 1)
+    this.setState(
+      {
+        pg: {
+          ...pg,
+          equipment: {
+            ...pg.equipment,
+            backpack: tempBackpack
+          }
+        }
+      },
+      () => {
+        const { onEdit } = this.state
+        if (!onEdit) {
+          this.updateDB()
+        }
+      }
+    )
+  }
+
   render() {
     const { classes, theme } = this.props
     const {
@@ -543,6 +591,8 @@ class Sheet extends Component<
               onEdit={onEdit}
               pg={pg}
               onChangeMoney={this.onChangeMoney}
+              onAddEquipment={this.onAddEquipment}
+              onRemoveEquipment={this.onRemoveEquipment}
             />
           </div>
           <div>{/* slide n°4 */}</div>
