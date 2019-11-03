@@ -57,6 +57,14 @@ const EquipmentDialog: React.FC<EquipmentDialogProps> = (
       </DialogTitle>
       <DialogContent>
         <Grid container spacing={3}>
+          <Grid item xs={12} className={styles.gridItem}>
+            <TextFieldString
+              label="Nome"
+              onChange={(value: string) => setName(value)}
+              disabled={false}
+              value={name}
+            />
+          </Grid>
           <Grid item xs={3} className={styles.gridItem}>
             <TextFieldNumber
               label="Quantità"
@@ -68,31 +76,30 @@ const EquipmentDialog: React.FC<EquipmentDialogProps> = (
               value={quantity}
             />
           </Grid>
-          <Grid item xs={6} className={styles.gridItem}>
-            <TextFieldString
-              label="Nome"
-              onChange={(value: string) => setName(value)}
-              disabled={false}
-              value={name}
-            />
-          </Grid>
-          <Grid item xs={3} className={styles.gridItem}>
+          <Grid item xs={9} className={styles.gridItem}>
             <TextFieldNumber
-              label="Peso"
+              label="Peso unitario(kg)"
               onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                 setWeight(parseInt(event.currentTarget.value))
               }
               min={0}
+              step={'0.1'}
               disabled={false}
               value={weight}
+              fullWidth
             />
           </Grid>
           <Grid item xs={12} className={styles.gridItem}>
-            <TextFieldString
+            <TextField
               label="Info"
-              onChange={(value: string) => setInfo(value)}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                setInfo(event.currentTarget.value)
+              }
               disabled={false}
               value={info}
+              multiline
+              fullWidth
+              variant="outlined"
             />
           </Grid>
         </Grid>

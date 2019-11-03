@@ -14,6 +14,9 @@ import EquipmentObject from './EquipmentObject'
 import { Add, CloseOutlined } from '@material-ui/icons'
 import clsx from 'clsx'
 import EquipmentDialog from 'components/equipment-dialog/EquipmentDialog'
+import StatsUtils from 'utils/StatsUtils'
+import StatsType from 'data/types/StatsEnum'
+import SizeEnum from 'data/types/SizeEnum'
 
 interface EquipmentViewProps {
   onEdit: boolean
@@ -31,6 +34,39 @@ const EquipmentView: React.FC<EquipmentViewProps> = (
   const [equipmentItemDialogOpen, setEquipmentItemDialogOpen] = useState(false)
   const theme = useTheme()
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
+
+  const onChangeItemQuantity = (value: number, item: EquipmentObject) => {
+    item.quantity = value
+    onAddEquipment(item)
+  }
+
+  const getMaxCapacity = useCallback(() => {
+    let value = StatsUtils.getStatValue(StatsType.Forza, pg) * 7.5
+    switch (StatsUtils.getRaceSize(pg)) {
+      case SizeEnum.Grande:
+        value = value * 2
+        break
+      case SizeEnum.Piccola:
+        value = value / 2
+        break
+    }
+    return value
+  }, [pg])
+
+  const getCurrentCapacity = useCallback(() => {
+    let value = 0
+    pg.equipment.backpack.forEach(item => {
+      value += item.weight * item.quantity
+    })
+    //TODO add armor
+    pg.weapons.forEach(weaponInfo => {
+      if (weaponInfo.weapon.weight) {
+        value += weaponInfo.weapon.weight
+      }
+    })
+
+    return value
+  }, [pg])
 
   return (
     <div className={styles.root}>
@@ -90,14 +126,14 @@ const EquipmentView: React.FC<EquipmentViewProps> = (
       <Typography variant="subtitle2">Oggetti:</Typography>
       {pg.equipment.backpack.length > 0 && (
         <Grid container className={styles.equipmentHeader}>
-          <Grid item xs={2}>
+          <Grid item xs={3}>
             Quantità
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={5}>
             Nome
           </Grid>
           <Grid item xs={2}>
-            Peso
+            Peso(kg)
           </Grid>
           <Grid item xs={2}></Grid>
         </Grid>
@@ -107,18 +143,32 @@ const EquipmentView: React.FC<EquipmentViewProps> = (
         {pg.equipment.backpack.map((item: EquipmentObject, index: number) => {
           return (
             <React.Fragment key={index}>
-              <Grid item xs={2} className={styles.gridItem}>
-                {item.quantity}
+              <Grid item xs={3} className={styles.gridItem}>
+                <TextFieldNumber
+                  value={item.quantity}
+                  min={0}
+                  max={999}
+                  label=""
+                  disabled={onEdit}
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                    onChangeItemQuantity(
+                      parseInt(event.currentTarget.value),
+                      item
+                    )
+                  }
+                ></TextFieldNumber>
               </Grid>
               <Grid
                 item
-                xs={6}
+                xs={5}
                 className={clsx(styles.gridItem, styles.equipmentName)}
               >
                 {item.name}
               </Grid>
               <Grid item xs={2} className={styles.gridItem}>
-                {item.weight}
+                <div className={styles.centerGridValue}>
+                  {item.weight * item.quantity}
+                </div>
               </Grid>
               <Grid item xs={2} className={styles.gridItem}>
                 <IconButton
@@ -133,7 +183,9 @@ const EquipmentView: React.FC<EquipmentViewProps> = (
                 item
                 xs={12}
                 className={clsx(styles.gridItem, styles.equipmentInfo)}
-              ></Grid>
+              >
+                {item.info}
+              </Grid>
             </React.Fragment>
           )
         })}
@@ -144,6 +196,21 @@ const EquipmentView: React.FC<EquipmentViewProps> = (
       >
         <Add /> Aggiungi oggetto
       </Button>
+
+      <Typography variant="subtitle2">
+        Peso trasportato / Peso massimo{' '}
+      </Typography>
+      <div className={styles.capacity}>
+        <span
+          className={clsx(
+            styles.currentCapacity,
+            getCurrentCapacity() > getMaxCapacity() ? 'red' : undefined
+          )}
+        >
+          {getCurrentCapacity()}
+        </span>
+        <span>{`/${getMaxCapacity()}kg`}</span>
+      </div>
 
       {/* ________________ Equipment dialog _____________ */}
 

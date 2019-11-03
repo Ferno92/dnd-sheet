@@ -33,6 +33,8 @@ import Weapon from 'data/types/Weapon'
 import WeaponInfo from 'data/types/WeaponInfo'
 import EquipmentView from 'pages/equipment/EquipmentView'
 import EquipmentObject from 'pages/equipment/EquipmentObject'
+import Armor from 'data/types/Armor'
+import ArmorInfo from 'data/types/ArmorInfo'
 
 interface SheetProps {
   id: number
@@ -112,6 +114,7 @@ class Sheet extends Component<
         currentPF: 0,
         tsMorte: [false, false, false, false, false, false],
         weapons: [],
+        armors: [],
         equipment: {
           moneys: [0, 0, 0, 0, 0],
           backpack: []
@@ -175,6 +178,7 @@ class Sheet extends Component<
       currentPF,
       tsMorte,
       weapons,
+      armors,
       equipment
     } = this.state.pg
 
@@ -196,6 +200,7 @@ class Sheet extends Component<
             currentPF,
             tsMorte,
             weapons,
+            armors,
             equipment
           })
           .then(() => console.log('update done'))
@@ -218,6 +223,7 @@ class Sheet extends Component<
             currentPF,
             tsMorte,
             weapons,
+            armors,
             equipment
           })
           .then(() => console.log('create done'))
@@ -420,11 +426,40 @@ class Sheet extends Component<
     }
   }
 
+  onAddArmor = (bonus: number, notes: string, armor?: Armor) => {
+    const { pg, onEdit } = this.state
+    if (armor) {
+      const armorInfo: ArmorInfo = {
+        armor: armor,
+        bonus: bonus,
+        notes: notes
+      }
+      const armors = [...pg.armors]
+      armors.push(armorInfo)
+      this.setState({ pg: { ...pg, armors: armors } }, () => {
+        if (!onEdit) {
+          this.updateDB()
+        }
+      })
+    }
+  }
+
   onRemoveWeapon = (index: number) => {
     const { pg, onEdit } = this.state
     const weapons = [...pg.weapons]
     weapons.splice(index, 1)
     this.setState({ pg: { ...pg, weapons: weapons } }, () => {
+      if (!onEdit) {
+        this.updateDB()
+      }
+    })
+  }
+
+  onRemoveArmor = (index: number) => {
+    const { pg, onEdit } = this.state
+    const armors = [...pg.armors]
+    armors.splice(index, 1)
+    this.setState({ pg: { ...pg, armors: armors } }, () => {
       if (!onEdit) {
         this.updateDB()
       }
@@ -448,7 +483,12 @@ class Sheet extends Component<
   onAddEquipment = (equipment: EquipmentObject) => {
     const { pg } = this.state
     let tempBackpack = pg.equipment.backpack ? [...pg.equipment.backpack] : []
-    tempBackpack.push(equipment)
+    const index = tempBackpack.findIndex(item => item.id === equipment.id)
+    if (index !== -1) {
+      tempBackpack[index] = equipment
+    } else {
+      tempBackpack.push(equipment)
+    }
     this.setState(
       {
         pg: {
@@ -583,6 +623,8 @@ class Sheet extends Component<
               onChangeCurrentPf={this.onChangeCurrentPf}
               onAddWeapon={this.onAddWeapon}
               onRemoveWeapon={this.onRemoveWeapon}
+              onRemoveArmor={this.onRemoveArmor}
+              onAddArmor={this.onAddArmor}
             />
           </div>
           <div>

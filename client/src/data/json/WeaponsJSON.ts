@@ -5,7 +5,8 @@ export default [ //TODO aggiungi peso
     type: "Arma da mischia semplice",
     damageType: "Tagliente",
     damage: "d6",
-    property: ["Gittata 6/18", "Leggera"]
+    property: ["Gittata 6/18", "Leggera"],
+    weight: 1
   },
   {
     name: "Bastone Ferrato",
@@ -13,7 +14,8 @@ export default [ //TODO aggiungi peso
     type: "Arma da mischia semplice",
     damageType: "Contundente",
     damage: "d6",
-    property: ["Gittata 6/18", "Leggera"]
+    property: ["Gittata 6/18", "Leggera"],
+    weight: 2
   },
   {
     name: "Falcetto",
@@ -21,6 +23,7 @@ export default [ //TODO aggiungi peso
     type: "Arma da mischia semplice",
     damageType: "Tagliente",
     damage: "d4",
-    property: ["Leggera"]
+    property: ["Leggera"],
+    weight: 1
   }
 ];

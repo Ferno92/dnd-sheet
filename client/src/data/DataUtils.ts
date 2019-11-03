@@ -4,6 +4,7 @@ import StatsType from './types/StatsEnum'
 import Job from './types/Job'
 import Ability from './types/Ability'
 import Weapon from './types/Weapon'
+import Armor from './types/Armor'
 
 class DataUtils {
   static RaceMapper(json: any): Race[] {
@@ -69,10 +70,30 @@ class DataUtils {
         damage: child.damage,
         value: child.name,
         property: child.property,
-        extra: child.damage
+        extra: child.damage,
+        weight: child.weight
       })
     })
     return weapons
+  }
+
+  static ArmorsMapper(json: any): Armor[] {
+    let armors: Armor[] = []
+    json.forEach((child: any) => {
+      armors.push({
+        name: child.name,
+        id: child.id,
+        armorType: child.armorType,
+        type: child.id,
+        ca: child.ca,
+        value: child.name,
+        noFurtivity: child.noFurtivity,
+        // extra: child.damage,
+        weight: child.weight,
+        addDes: child.addDes
+      })
+    })
+    return armors
   }
 }
 

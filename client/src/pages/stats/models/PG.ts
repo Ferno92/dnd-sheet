@@ -5,6 +5,7 @@ import PGAbility from './PGAbility'
 import { Modifier } from 'pages/battle/BattleView'
 import WeaponInfo from 'data/types/WeaponInfo'
 import Equipment from 'pages/equipment/Equipment'
+import ArmorInfo from 'data/types/ArmorInfo'
 
 interface PG {
   id: number
@@ -22,6 +23,7 @@ interface PG {
   currentPF: number
   tsMorte: boolean[]
   weapons: WeaponInfo[]
+  armors: ArmorInfo[]
   equipment: Equipment
 }
 

@@ -39,6 +39,18 @@ const useEquipmentViewStyles = makeStyles((theme: Theme) => ({
   itemInfoButton: {
     height: '0.8em',
     width: '0.8em'
+  },
+  centerGridValue: {
+    textAlign: 'center'
+  },
+  capacity: {
+    margin: '0 16px'
+  },
+  currentCapacity: {
+    fontSize: '3rem',
+    '&.red': {
+      color: 'red'
+    }
   }
 }))
 

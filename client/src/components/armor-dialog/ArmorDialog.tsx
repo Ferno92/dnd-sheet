@@ -11,32 +11,30 @@ import {
   TextField
 } from '@material-ui/core'
 import { Close } from '@material-ui/icons'
-import useWeaponDialogStyles from './WeaponDialog.styles'
+import useStyles from './ArmorDialog.styles'
 import SimpleSelect from 'components/simple-select/SimpleSelect'
-import { default as weaponsJSON } from 'data/json/WeaponsJSON'
+import { default as armorsJSON } from 'data/json/ArmorsJSON'
 import DataUtils from 'data/DataUtils'
-import Weapon from 'data/types/Weapon'
-import WeaponEnum from 'data/types/WeaponEnum'
+import Armor from 'data/types/Armor'
+import ArmorEnum from 'data/types/ArmorEnum'
 import TextFieldNumber from 'components/text-field-number/TextFieldNumber'
 
-interface WeaponDialogProps {
+interface ArmorDialogProps {
   open: boolean
   fullScreen: boolean
   onClose: () => void
-  onAddWeapon: (bonus: number, notes: string, weapon?: Weapon) => void
+  onAddArmor: (bonus: number, notes: string, armor?: Armor) => void
 }
 
-const WeaponDialog: React.FC<WeaponDialogProps> = (
-  props: WeaponDialogProps
-) => {
-  const { open, onClose, fullScreen, onAddWeapon } = props
-  const [weapon, setWeapon] = useState<Weapon>()
+const ArmorDialog: React.FC<ArmorDialogProps> = (props: ArmorDialogProps) => {
+  const { open, onClose, fullScreen, onAddArmor } = props
+  const [armor, setArmor] = useState<Armor>()
   const [bonus, setBonus] = useState(0)
   const [notes, setNotes] = useState('')
-  const styles = useWeaponDialogStyles()
-  const weaponsData = DataUtils.WeaponsMapper(weaponsJSON as any)
+  const styles = useStyles()
+  const armorsData = DataUtils.ArmorsMapper(armorsJSON as any)
 
-  const onChangeWeapon = useCallback(
+  const onChangeArmor = useCallback(
     (
       event: React.ChangeEvent<{
         name?: string | undefined
@@ -44,22 +42,22 @@ const WeaponDialog: React.FC<WeaponDialogProps> = (
       }>
     ) => {
       const id = event.target.value
-      const found = weaponsData.find(weaponData => weaponData.id === id)
+      const found = armorsData.find(armorData => armorData.id === id)
       setBonus(0)
       setNotes('')
-      setWeapon(found)
+      setArmor(found)
     },
-    [weaponsData]
+    [armorsData]
   )
 
   const onChangeNotes = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNotes(e.currentTarget.value)
   }
 
-  const addWeapon = useCallback(() => {
-    onAddWeapon(bonus, notes, weapon)
+  const addArmor = useCallback(() => {
+    onAddArmor(bonus, notes, armor)
     onClose()
-  }, [bonus, notes, onAddWeapon, onClose, weapon])
+  }, [bonus, notes, onAddArmor, onClose, armor])
   return (
     <Dialog
       fullScreen={fullScreen}
@@ -68,41 +66,40 @@ const WeaponDialog: React.FC<WeaponDialogProps> = (
       className={styles.dialogRoot}
     >
       <DialogTitle className={styles.dialogTitle}>
-        <Typography>Scegli l'arma</Typography>
+        <Typography>Scegli l'armatura o scudo</Typography>
         <IconButton className={styles.closeDialog} onClick={() => onClose()}>
           <Close />
         </IconButton>
       </DialogTitle>
       <DialogContent>
-        <SimpleSelect<WeaponEnum>
-          label={'Arma'}
-          item={weapon ? weapon.id : undefined}
-          data={weaponsData}
+        <SimpleSelect<ArmorEnum>
+          label={'Armatura o scudo'}
+          item={armor ? armor.id : undefined}
+          data={armorsData}
           onEdit={true}
-          onChange={onChangeWeapon}
+          onChange={onChangeArmor}
         />
-        {weapon && (
+        {armor && (
           <React.Fragment>
-            <Typography variant="h5" className={styles.weaponName}>
-              {weapon.name}
+            <Typography variant="h5" className={styles.armorName}>
+              {armor.name}
             </Typography>
             <Grid container spacing={3}>
               <Grid item xs={6} className={styles.gridItem}>
                 <div className={styles.itemTitle}>Tipo</div>
-                <div>{weapon.weaponType}</div>
+                <div>{armor.armorType}</div>
               </Grid>
               <Grid item xs={6} className={styles.gridItem}>
-                <div className={styles.itemTitle}>Tipo di danno</div>
-                <div>{weapon.damageType}</div>
+                <div className={styles.itemTitle}>CA</div>
+                <div>{armor.ca}</div>
               </Grid>
               <Grid item xs={6} className={styles.gridItem}>
-                <div className={styles.itemTitle}>Danno</div>
-                <div>{weapon.damage}</div>
+                <div className={styles.itemTitle}>Furtività</div>
+                <div>{armor.noFurtivity ? 'No' : 'Si'}</div>
               </Grid>
               <Grid item xs={6} className={styles.gridItem}>
-                {weapon.property.map(property => {
-                  return <div key={property}>{property}</div>
-                })}
+                <div className={styles.itemTitle}>Destrezza</div>
+                <div>{!armor.addDes ? 'No' : 'Si'}</div>
               </Grid>
               <Grid item xs={6} className={styles.gridItem}>
                 <TextFieldNumber
@@ -120,7 +117,7 @@ const WeaponDialog: React.FC<WeaponDialogProps> = (
               </Grid>
               <Grid item xs={6} className={styles.gridItem}>
                 <div className={styles.itemTitle}>Peso</div>
-                <div>{`${weapon.weight} kg`}</div>
+                <div>{`${armor.weight} kg`}</div>
               </Grid>
             </Grid>
 
@@ -139,7 +136,7 @@ const WeaponDialog: React.FC<WeaponDialogProps> = (
           variant="outlined"
           className={styles.dialogActionButton}
           color="primary"
-          onClick={addWeapon}
+          onClick={addArmor}
         >
           Aggiungi
         </Button>
@@ -148,4 +145,4 @@ const WeaponDialog: React.FC<WeaponDialogProps> = (
   )
 }
 
-export default WeaponDialog
+export default ArmorDialog

@@ -149,6 +149,9 @@ const BattleViewStyles = makeStyles((theme: Theme) => ({
   },
   weaponName: {
     fontWeight: 700
+  },
+  weaponTitle: {
+    marginTop: 16
   }
 }))
 

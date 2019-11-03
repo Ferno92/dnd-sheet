@@ -27,6 +27,9 @@ import BattleUtils from 'utils/BattleUtils'
 import WeaponDialog from 'components/weapon-dialog/WeaponDialog'
 import Weapon from 'data/types/Weapon'
 import WeaponInfo from 'data/types/WeaponInfo'
+import ArmorInfo from 'data/types/ArmorInfo'
+import ArmorDialog from 'components/armor-dialog/ArmorDialog'
+import Armor from 'data/types/Armor'
 
 export interface Modifier {
   type: string
@@ -44,7 +47,9 @@ interface BattleViewProps {
   onChangeTsMorte: (index: number) => void
   onChangeCurrentPf: (add: number) => void
   onAddWeapon: (bonus: number, notes: string, weapon?: Weapon) => void
+  onAddArmor: (bonus: number, notes: string, armor?: Armor) => void
   onRemoveWeapon: (index: number) => void
+  onRemoveArmor: (index: number) => void
 }
 
 function BattleView(props: BattleViewProps) {
@@ -57,12 +62,15 @@ function BattleView(props: BattleViewProps) {
     onChangeTsMorte,
     onChangeCurrentPf,
     onAddWeapon,
-    onRemoveWeapon
+    onAddArmor,
+    onRemoveWeapon,
+    onRemoveArmor
   } = props
   const classes = BattleViewStyles()
   const [caModifiersOpen, setCaModifiersOpen] = useState(false)
   const [dv, setDV] = useState(0)
   const [weaponDialogOpen, setWeaponDialogOpen] = useState(false)
+  const [armorDialogOpen, setArmorDialogOpen] = useState(false)
   const theme = useTheme()
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
   let defaultModifiers = [
@@ -329,8 +337,86 @@ function BattleView(props: BattleViewProps) {
           </div>
         </Grid>
       </Grid>
+      {/* ________________ Armor sections _____________ */}
+      <Typography variant="subtitle2" className={classes.weaponTitle}>
+        Armature e scudi
+      </Typography>
+      {pg.armors.length > 0 && (
+        <Grid container className={classes.weaponHeader}>
+          <Grid item xs={6}>
+            Nome
+          </Grid>
+          <Grid item xs={3}>
+            CA
+          </Grid>
+          <Grid item xs={3}>
+            Tipologia
+          </Grid>
+        </Grid>
+      )}
 
-      <Typography variant="subtitle2">Armi</Typography>
+      <Grid container>
+        {pg.armors.map((armorInfo: ArmorInfo, index: number) => {
+          return (
+            <React.Fragment key={index}>
+              <Grid
+                item
+                xs={3}
+                className={clsx(classes.weaponGridItem, classes.weaponName)}
+              >
+                {`${armorInfo.armor.name}${
+                  armorInfo.bonus ? `(+${armorInfo.bonus})` : ''
+                }`}
+              </Grid>
+              <Grid item xs={2} className={classes.weaponGridItem}>
+                {armorInfo.armor.ca + armorInfo.bonus}
+              </Grid>
+              <Grid item xs={3} className={classes.weaponGridItem}>
+                {}
+              </Grid>
+              <Grid item xs={3} className={classes.weaponGridItem}>
+                {armorInfo.armor.type}
+              </Grid>
+
+              <Grid item xs={1} className={classes.weaponGridItem}>
+                <IconButton
+                  size="small"
+                  color="secondary"
+                  onClick={() => onRemoveArmor(index)}
+                >
+                  <Close className={classes.weaponInfoButton} />
+                </IconButton>
+              </Grid>
+              <Grid
+                item
+                xs={12}
+                className={clsx(classes.weaponGridItem, classes.weaponInfo)}
+              >
+                {armorInfo.notes && <div>{armorInfo.notes}</div>}
+              </Grid>
+            </React.Fragment>
+          )
+        })}
+      </Grid>
+      <Button
+        className={classes.dialogActionButton}
+        onClick={() => setArmorDialogOpen(!armorDialogOpen)}
+      >
+        <Add /> Aggiungi armatura o scudo
+      </Button>
+
+      {/* ________________ Armor dialog _____________ */}
+      <ArmorDialog
+        open={armorDialogOpen}
+        fullScreen={fullScreen}
+        onClose={() => setArmorDialogOpen(false)}
+        onAddArmor={onAddArmor}
+      />
+
+      {/* ________________ Weapon sections _____________ */}
+      <Typography variant="subtitle2" className={classes.weaponTitle}>
+        Armi
+      </Typography>
       {pg.weapons.length > 0 && (
         <Grid container className={classes.weaponHeader}>
           <Grid item xs={3}>
