@@ -10,7 +10,6 @@ import {
   ListItem,
   List,
   IconButton,
-  DialogActions,
   Grid,
   Checkbox
 } from '@material-ui/core'
@@ -30,6 +29,10 @@ import WeaponInfo from 'data/types/WeaponInfo'
 import ArmorInfo from 'data/types/ArmorInfo'
 import ArmorDialog from 'components/armor-dialog/ArmorDialog'
 import Armor from 'data/types/Armor'
+import { RacesEnum, SubRacesEnum } from 'data/types/RacesEnum'
+import { default as racesJSON } from 'data/json/RacesJSON'
+import DataUtils from 'data/DataUtils'
+import RaceAbility from 'data/types/RaceAbility'
 
 export interface Modifier {
   type: string
@@ -41,7 +44,6 @@ interface BattleViewProps {
   onEdit: boolean
   id: number
   pg: PG
-  onSaveModifiers: (modifiers: Modifier[]) => void
   onChangeSpeed: (event: React.ChangeEvent<HTMLInputElement>) => void
   onChangePF: (event: React.ChangeEvent<HTMLInputElement>) => void
   onChangeTsMorte: (index: number) => void
@@ -55,7 +57,6 @@ interface BattleViewProps {
 function BattleView(props: BattleViewProps) {
   const {
     onEdit,
-    onSaveModifiers,
     pg,
     onChangeSpeed,
     onChangePF,
@@ -94,9 +95,15 @@ function BattleView(props: BattleViewProps) {
     armors.forEach(armorInfo => {
       //TODO if armor missing add 10
       count += armorInfo.armor.ca + armorInfo.bonus
+      if (armorInfo.armor.addDes) {
+        count += StatsUtils.getStatModifier(
+          pg.stats.find(stat => stat.type === StatsType.Destrezza)!,
+          pg
+        )
+      }
     })
     return count < 10 ? count + 10 : count
-  }, [props.pg])
+  }, [pg, props.pg])
 
   const showCAmodifiers = useCallback(() => {
     setCaModifiersOpen(true)
@@ -150,10 +157,25 @@ function BattleView(props: BattleViewProps) {
     [pg]
   )
 
+  const getRaceAbilities = useCallback(
+    (race: RacesEnum, subRace?: SubRacesEnum) => {
+      let raceAbilities: RaceAbility[] = []
+      const racesData = DataUtils.RaceMapper(racesJSON as any)
+      racesData.forEach(raceData => {
+        if (raceData.type === race.toString()) {
+          raceAbilities.push.apply(raceAbilities, raceData.abilities)
+        }
+      })
+      return raceAbilities
+    },
+    []
+  )
+
   useEffect(() => {
     setDV(BattleUtils.getDV(pg.pgClass))
   }, [pg.race, pg.pgClass])
 
+  const raceAbilities = getRaceAbilities(pg.race, pg.subRace)
   return (
     <div className={classes.container}>
       <Typography variant="h6" className={classes.title}>
@@ -433,6 +455,26 @@ function BattleView(props: BattleViewProps) {
         <Add /> Aggiungi arma
       </Button>
 
+      {/* ________________ Abilità speciali di razza _____________ */}
+      <Typography variant="subtitle1" className={classes.weaponTitle}>
+        Abilità razziali
+      </Typography>
+      {raceAbilities.map(raceAbility => {
+        return (
+          //TODO description in dialog?
+          <React.Fragment key={raceAbility.name}>
+            <Typography variant="subtitle2" itemType="span">
+              {raceAbility.name}:
+            </Typography>
+            <Typography variant="body1" itemType="span">
+              {raceAbility.description}
+            </Typography>
+          </React.Fragment>
+        )
+      })}
+
+      {/* ________________ Abilità speciali di classe _____________ */}
+
       {/* ________________ Weapon dialog _____________ */}
       <WeaponDialog
         open={weaponDialogOpen}
@@ -469,14 +511,24 @@ function BattleView(props: BattleViewProps) {
                   <Typography variant="body1" itemType="span">
                     {armorInfo.armor.ca + armorInfo.bonus}
                   </Typography>
-                  {index !== pg.armors.length - 1 && (
-                    <Typography variant="body1" itemType="span">
-                      +
-                    </Typography>
-                  )}
+                  <Typography variant="body1" itemType="span">
+                    +
+                  </Typography>
                 </ListItem>
               )
             })}
+
+            <ListItem className={classes.listItem}>
+              <Typography variant="subtitle1" itemType="span">
+                Destrezza
+              </Typography>
+              <Typography variant="body1" itemType="span">
+                {StatsUtils.getStatModifier(
+                  pg.stats.find(stat => stat.type === StatsType.Destrezza)!,
+                  pg
+                )}
+              </Typography>
+            </ListItem>
             <ListItem className={classes.listItem}>
               <div>TOT</div>
               <div>{getCA()}</div>

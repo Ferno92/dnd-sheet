@@ -22,7 +22,7 @@ class DataUtils {
         value: child.name,
         subraces: child.subraces || [],
         stats: stats,
-        abilities: [],
+        abilities: child.abilities,
         special: [],
         languages: [],
         size: child.size

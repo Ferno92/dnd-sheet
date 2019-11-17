@@ -6,7 +6,8 @@ import {
   Grid,
   Button,
   IconButton,
-  useMediaQuery
+  useMediaQuery,
+  TextField
 } from '@material-ui/core'
 import { useTheme } from '@material-ui/core/styles'
 import PG from 'pages/stats/models/PG'
@@ -211,6 +212,9 @@ const EquipmentView: React.FC<EquipmentViewProps> = (
         </span>
         <span>{`/${getMaxCapacity()}kg`}</span>
       </div>
+
+      <Typography variant="subtitle2">Note</Typography>
+      <TextField placeholder="Scrivi qui.." multiline fullWidth />
 
       {/* ________________ Equipment dialog _____________ */}
 

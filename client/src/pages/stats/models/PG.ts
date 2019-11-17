@@ -17,7 +17,6 @@ interface PG {
   stats: Stats[]
   abilities: PGAbility[]
   ispiration: boolean
-  caModifiers: Modifier[]
   speed: string
   pfTot: number
   currentPF: number
@@ -25,6 +24,7 @@ interface PG {
   weapons: WeaponInfo[]
   armors: ArmorInfo[]
   equipment: Equipment
+  notes: string
 }
 
 export default PG

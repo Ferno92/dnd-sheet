@@ -108,7 +108,6 @@ class Sheet extends Component<
         ],
         abilities: [],
         ispiration: false,
-        caModifiers: [],
         speed: '9',
         pfTot: 0,
         currentPF: 0,
@@ -118,7 +117,8 @@ class Sheet extends Component<
         equipment: {
           moneys: [0, 0, 0, 0, 0],
           backpack: []
-        }
+        },
+        notes: ''
       },
       exist: false
     }
@@ -172,14 +172,14 @@ class Sheet extends Component<
       stats,
       abilities,
       ispiration,
-      caModifiers,
       speed,
       pfTot,
       currentPF,
       tsMorte,
       weapons,
       armors,
-      equipment
+      equipment,
+      notes
     } = this.state.pg
 
     if (this.pg) {
@@ -194,14 +194,14 @@ class Sheet extends Component<
             stats,
             abilities,
             ispiration,
-            caModifiers,
             speed,
             pfTot,
             currentPF,
             tsMorte,
             weapons,
             armors,
-            equipment
+            equipment,
+            notes
           })
           .then(() => console.log('update done'))
           .catch(err => console.log('err: ', err))
@@ -217,14 +217,14 @@ class Sheet extends Component<
             stats,
             abilities,
             ispiration,
-            caModifiers,
             speed,
             pfTot,
             currentPF,
             tsMorte,
             weapons,
             armors,
-            equipment
+            equipment,
+            notes
           })
           .then(() => console.log('create done'))
           .catch(err => console.log('err: ', err))
@@ -370,12 +370,6 @@ class Sheet extends Component<
   onChangeIspiration = (checked: boolean) => {
     const { pg } = this.state
     this.setState({ pg: { ...pg, ispiration: checked } })
-  }
-
-  onSaveModifiers = (modifiers: Modifier[]) => {
-    const { pg } = this.state
-    const finalModifiers = modifiers.filter(modifier => modifier.canDelete)
-    this.setState({ pg: { ...pg, caModifiers: finalModifiers } })
   }
 
   onChangeSpeed = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -615,7 +609,6 @@ class Sheet extends Component<
             <BattleView
               onEdit={onEdit}
               id={sheetId}
-              onSaveModifiers={this.onSaveModifiers}
               pg={pg}
               onChangeSpeed={this.onChangeSpeed}
               onChangePF={this.onChangePF}
