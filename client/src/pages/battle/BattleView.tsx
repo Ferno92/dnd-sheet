@@ -74,10 +74,12 @@ function BattleView(props: BattleViewProps) {
   const theme = useTheme()
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
   let defaultModifiers = [
-    { type: 'Base', value: 10, canDelete: false },
     {
-      type: StatsType.Destrezza,
-      value: StatsUtils.getStatValue(StatsType.Destrezza, pg),
+      type: StatsType.Destrezza as string,
+      value: StatsUtils.getStatModifier(
+        pg.stats.find(stat => stat.type === StatsType.Destrezza)!,
+        pg
+      ),
       canDelete: false
     }
   ]
@@ -85,50 +87,20 @@ function BattleView(props: BattleViewProps) {
   if (StatsUtils.getRaceSize(pg) === SizeEnum.Piccola) {
     defaultModifiers.push({ type: 'Taglia', value: 1, canDelete: false })
   }
-  const [caModifiers, setCaModifiers] = useState<Modifier[]>(defaultModifiers)
 
   const getCA = useCallback(() => {
     let count = 0
-    caModifiers.forEach(modifier => {
-      count += modifier.value
+    const { armors } = props.pg
+    armors.forEach(armorInfo => {
+      //TODO if armor missing add 10
+      count += armorInfo.armor.ca + armorInfo.bonus
     })
-    return count
-  }, [caModifiers])
+    return count < 10 ? count + 10 : count
+  }, [props.pg])
 
   const showCAmodifiers = useCallback(() => {
     setCaModifiersOpen(true)
   }, [])
-
-  const addCAitem = useCallback(() => {
-    setCaModifiers([...caModifiers, { type: '', value: 0, canDelete: true }])
-  }, [caModifiers])
-
-  const deleteCaModifier = useCallback(
-    (index: number) => {
-      let modifiers = [...caModifiers]
-      modifiers.splice(index, 1)
-      setCaModifiers(modifiers)
-    },
-    [caModifiers]
-  )
-
-  const onChangeModifierType = useCallback(
-    (value: string, index: number) => {
-      let modifiers = [...caModifiers]
-      modifiers[index].type = value
-      setCaModifiers(modifiers)
-    },
-    [caModifiers]
-  )
-
-  const onChangeModifierValue = useCallback(
-    (value: number, index: number) => {
-      let modifiers = [...caModifiers]
-      modifiers[index].value = value
-      setCaModifiers(modifiers)
-    },
-    [caModifiers]
-  )
 
   const getPFColorClass = useCallback(() => {
     let className = ''
@@ -179,28 +151,6 @@ function BattleView(props: BattleViewProps) {
   )
 
   useEffect(() => {
-    const modifiers = [...caModifiers]
-    if (pg && pg.caModifiers) {
-      pg.caModifiers.forEach(modifier => {
-        if (
-          !caModifiers.find(
-            ca => ca.type === modifier.type && ca.value === modifier.value
-          )
-        ) {
-          modifiers.push(modifier)
-        }
-      })
-      if (
-        modifiers.length >= pg.caModifiers.length + defaultModifiers.length &&
-        modifiers.length > caModifiers.length
-      ) {
-        console.log('modifiers', modifiers)
-        setCaModifiers(modifiers)
-      }
-    }
-  }, [pg, pg.caModifiers, caModifiers, defaultModifiers.length])
-
-  useEffect(() => {
     setDV(BattleUtils.getDV(pg.pgClass))
   }, [pg.race, pg.pgClass])
 
@@ -212,10 +162,9 @@ function BattleView(props: BattleViewProps) {
       <Grid container spacing={3}>
         <Grid item xs={4} className={classes.gridItem}>
           <Button
-            disabled={!onEdit}
             variant="outlined"
             className={classes.caContainer}
-            onClick={() => (onEdit ? showCAmodifiers() : undefined)}
+            onClick={showCAmodifiers}
           >
             <div className={classes.caTitle}>CA</div>
             <div className={classes.caValue}>{getCA()}</div>
@@ -346,7 +295,7 @@ function BattleView(props: BattleViewProps) {
           <Grid item xs={6}>
             Nome
           </Grid>
-          <Grid item xs={3}>
+          <Grid item xs={2}>
             CA
           </Grid>
           <Grid item xs={3}>
@@ -361,7 +310,7 @@ function BattleView(props: BattleViewProps) {
             <React.Fragment key={index}>
               <Grid
                 item
-                xs={3}
+                xs={6}
                 className={clsx(classes.weaponGridItem, classes.weaponName)}
               >
                 {`${armorInfo.armor.name}${
@@ -372,10 +321,7 @@ function BattleView(props: BattleViewProps) {
                 {armorInfo.armor.ca + armorInfo.bonus}
               </Grid>
               <Grid item xs={3} className={classes.weaponGridItem}>
-                {}
-              </Grid>
-              <Grid item xs={3} className={classes.weaponGridItem}>
-                {armorInfo.armor.type}
+                {armorInfo.armor.armorType}
               </Grid>
 
               <Grid item xs={1} className={classes.weaponGridItem}>
@@ -514,73 +460,29 @@ function BattleView(props: BattleViewProps) {
             </IconButton>
           </DialogTitle>
           <List>
-            {caModifiers.map((modifier: Modifier, index: number) => {
+            {pg.armors.map((armorInfo: ArmorInfo, index: number) => {
               return (
                 <ListItem key={index} className={classes.listItem}>
-                  {!modifier.canDelete && (
-                    <React.Fragment>
-                      <div>{modifier.type}</div>
-                      <div>{modifier.value}</div>
-                    </React.Fragment>
-                  )}
-                  {modifier.canDelete && (
-                    <React.Fragment>
-                      <TextFieldString
-                        label=""
-                        name=""
-                        disabled={!onEdit}
-                        onChange={(value: string, property: string) => {
-                          onChangeModifierType(value, index)
-                        }}
-                        value={modifier.type}
-                        root={classes.modifierType}
-                      />
-                      <TextFieldNumber
-                        label=""
-                        value={modifier.value}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                          onChangeModifierValue(
-                            parseInt(e.currentTarget.value),
-                            index
-                          )
-                        }}
-                        disabled={!onEdit}
-                        min={0}
-                        max={100}
-                        root={classes.modifierValue}
-                      />
-                      <IconButton onClick={() => deleteCaModifier(index)}>
-                        <Close />
-                      </IconButton>
-                    </React.Fragment>
+                  <Typography variant="subtitle1" itemType="span">
+                    {armorInfo.armor.name}
+                  </Typography>
+                  <Typography variant="body1" itemType="span">
+                    {armorInfo.armor.ca + armorInfo.bonus}
+                  </Typography>
+                  {index !== pg.armors.length - 1 && (
+                    <Typography variant="body1" itemType="span">
+                      +
+                    </Typography>
                   )}
                 </ListItem>
               )
             })}
-            <div className={classes.addButton}>
-              <Button
-                className={classes.dialogActionButton}
-                onClick={addCAitem}
-              >
-                Aggiungi
-              </Button>
-            </div>
             <ListItem className={classes.listItem}>
               <div>TOT</div>
               <div>{getCA()}</div>
             </ListItem>
           </List>
         </DialogContent>
-        <DialogActions>
-          <Button
-            variant="outlined"
-            className={classes.dialogActionButton}
-            color="primary"
-            onClick={() => onSaveModifiers(caModifiers)}
-          >
-            Salva
-          </Button>
-        </DialogActions>
       </Dialog>
     </div>
   )
