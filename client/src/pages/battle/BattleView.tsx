@@ -11,7 +11,10 @@ import {
   List,
   IconButton,
   Grid,
-  Checkbox
+  Checkbox,
+  ExpansionPanel,
+  ExpansionPanelSummary,
+  ExpansionPanelDetails
 } from '@material-ui/core'
 import StatsType from 'data/types/StatsEnum'
 import { useTheme } from '@material-ui/core/styles'
@@ -72,6 +75,7 @@ function BattleView(props: BattleViewProps) {
   const [dv, setDV] = useState(0)
   const [weaponDialogOpen, setWeaponDialogOpen] = useState(false)
   const [armorDialogOpen, setArmorDialogOpen] = useState(false)
+  const [abilityExpanded, setAbilityExpanded] = useState<string>()
   const theme = useTheme()
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
   let defaultModifiers = [
@@ -459,17 +463,29 @@ function BattleView(props: BattleViewProps) {
       <Typography variant="subtitle1" className={classes.weaponTitle}>
         Abilità razziali
       </Typography>
+
       {raceAbilities.map(raceAbility => {
         return (
-          //TODO description in dialog?
-          <React.Fragment key={raceAbility.name}>
-            <Typography variant="subtitle2" itemType="span">
-              {raceAbility.name}:
-            </Typography>
-            <Typography variant="body1" itemType="span">
-              {raceAbility.description}
-            </Typography>
-          </React.Fragment>
+          <ExpansionPanel
+            key={raceAbility.name}
+            square
+            expanded={abilityExpanded === raceAbility.name}
+            onChange={() => setAbilityExpanded(raceAbility.name)}
+          >
+            <ExpansionPanelSummary
+              aria-controls="panel1d-content"
+              id="panel1d-header"
+            >
+              <Typography variant="subtitle2" itemType="span">
+                {raceAbility.name}:
+              </Typography>
+            </ExpansionPanelSummary>
+            <ExpansionPanelDetails>
+              <Typography variant="body2" itemType="span">
+                {raceAbility.description}
+              </Typography>
+            </ExpansionPanelDetails>
+          </ExpansionPanel>
         )
       })}
 

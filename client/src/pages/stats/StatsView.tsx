@@ -6,7 +6,10 @@ import {
   Typography,
   Divider,
   Checkbox,
-  IconButton
+  IconButton,
+  ExpansionPanel,
+  ExpansionPanelSummary,
+  ExpansionPanelDetails
 } from '@material-ui/core'
 import StatsViewStyles from './StatsView.styles'
 import TextFieldString from 'components/text-field-string/TextFieldString'
@@ -61,6 +64,8 @@ interface StatsViewProps {
 
 interface StatsViewState {
   dialogInfoAbilitiesOpen: boolean
+  tsExpanded?: string
+  abilityExpanded?: string
 }
 
 class StatsView extends Component<
@@ -178,7 +183,7 @@ class StatsView extends Component<
       onEditLevel,
       onEditStats
     } = this.props
-    const { dialogInfoAbilitiesOpen } = this.state
+    const { dialogInfoAbilitiesOpen, tsExpanded, abilityExpanded } = this.state
     const currentRaceObj = StatsUtils.getCurrentRace(race)
     return (
       <div className={classes.container}>
@@ -314,15 +319,32 @@ class StatsView extends Component<
             Tiri Salvezza
           </Typography>
           <div className={classes.gridContainer}>
-            <Grid container spacing={3}>
-              {stats.map((stat, index) => {
-                return (
-                  <Grid
-                    item
-                    xs={12}
-                    key={stat.type}
-                    className={classes.gridItem}
-                  >
+            {stats.map((stat, index) => {
+              return (
+                <ExpansionPanel
+                  key={stat.type}
+                  square
+                  expanded={tsExpanded === stat.type}
+                  onChange={() =>
+                    stat.type === tsExpanded
+                      ? this.setState({ tsExpanded: undefined })
+                      : this.setState({ tsExpanded: stat.type })
+                  }
+                >
+                  <ExpansionPanelSummary>
+                    <div className={classes.tsPanelTitle}>
+                      <Typography variant={'subtitle1'}>
+                        {TextUtils.getFullStatsType(stat.type)}
+                      </Typography>
+                      <Typography variant={'subtitle1'}>
+                        {TextUtils.getValueWithSign(
+                          StatsUtils.getStatModifier(stat, this.props.pg) +
+                            this.getTSProficiency(stat.type)
+                        )}
+                      </Typography>
+                    </div>
+                  </ExpansionPanelSummary>
+                  <ExpansionPanelDetails>
                     <MixedInput
                       inputInfo={{ type: 'Temp', value: 0 }}
                       inputPos={InputPosition.End}
@@ -340,10 +362,10 @@ class StatsView extends Component<
                       onEdit={onEdit}
                       label={TextUtils.getSmallStatsType(stat.type)}
                     />
-                  </Grid>
-                )
-              })}
-            </Grid>
+                  </ExpansionPanelDetails>
+                </ExpansionPanel>
+              )
+            })}
           </div>
           <Divider className={classes.divider} />
           <div className={classes.abilitiesHeader}>
@@ -360,61 +382,74 @@ class StatsView extends Component<
             )}
           </div>
           <div className={classes.gridContainer}>
-            <Grid container spacing={3}>
-              {this.abilitiesData.map((ability, index) => {
-                return (
-                  <Grid
-                    item
-                    xs={12}
-                    key={ability.type}
-                    className={classes.gridItem}
-                  >
-                    <div className={classes.abilityContainer}>
-                      {onEdit && (
-                        <Checkbox
-                          checked={this.hasProficiency(ability.type)}
-                          onChange={(
-                            event: React.ChangeEvent<HTMLInputElement>,
-                            checked: boolean
-                          ) => onChangeAbilityCheck(ability.type, checked)}
-                          disabled={!onEdit}
-                        />
-                      )}
-                      <MixedInput
-                        inputInfo={{
-                          type: 'Extra',
-                          value: this.getAbilityPoints(ability.type)
-                        }}
-                        inputPos={InputPosition.End}
-                        modifiers={[
-                          {
-                            type: `${TextUtils.getSmallStatsType(
-                              ability.stat
-                            )}${
-                              this.hasProficiency(ability.type) ? '+ Comp' : ''
-                            }`,
-                            value:
-                              StatsUtils.getStatModifierFromName(
-                                ability.stat,
-                                this.props.pg
-                              ) +
-                              (this.hasProficiency(ability.type)
-                                ? StatsUtils.getProficiency(level, pgClass)
-                                : 0)
-                          }
-                        ]}
-                        onChange={(value: number) => {
-                          onChangeAbilityPoints(ability.type, value)
-                        }}
-                        onEdit={onEdit}
-                        label={ability.type}
-                        labelOnTop
-                      />
+            {this.abilitiesData.map((ability, index) => {
+              const totValue =
+                StatsUtils.getStatModifierFromName(
+                  ability.stat,
+                  this.props.pg
+                ) +
+                (this.hasProficiency(ability.type)
+                  ? StatsUtils.getProficiency(level, pgClass)
+                  : 0)
+              return (
+                <ExpansionPanel
+                  key={ability.type}
+                  square
+                  expanded={abilityExpanded === ability.type}
+                  onChange={() =>
+                    ability.type === abilityExpanded
+                      ? this.setState({ abilityExpanded: undefined })
+                      : this.setState({ abilityExpanded: ability.type })
+                  }
+                >
+                  <ExpansionPanelSummary>
+                    <div className={classes.tsPanelTitle}>
+                      <div className={classes.abilityCheckbox}>
+                        {onEdit && (
+                          <Checkbox
+                            checked={this.hasProficiency(ability.type)}
+                            onChange={(
+                              event: React.ChangeEvent<HTMLInputElement>,
+                              checked: boolean
+                            ) => onChangeAbilityCheck(ability.type, checked)}
+                            disabled={!onEdit}
+                          />
+                        )}
+                        <Typography variant={'subtitle1'}>
+                          {ability.type}
+                        </Typography>
+                      </div>
+                      <Typography variant={'subtitle1'}>
+                        {TextUtils.getValueWithSign(totValue)}
+                      </Typography>
                     </div>
-                  </Grid>
-                )
-              })}
-            </Grid>
+                  </ExpansionPanelSummary>
+                  <ExpansionPanelDetails>
+                    <MixedInput
+                      inputInfo={{
+                        type: 'Extra',
+                        value: this.getAbilityPoints(ability.type)
+                      }}
+                      inputPos={InputPosition.End}
+                      modifiers={[
+                        {
+                          type: `${TextUtils.getSmallStatsType(ability.stat)}${
+                            this.hasProficiency(ability.type) ? '+ Comp' : ''
+                          }`,
+                          value: totValue
+                        }
+                      ]}
+                      onChange={(value: number) => {
+                        onChangeAbilityPoints(ability.type, value)
+                      }}
+                      onEdit={onEdit}
+                      label={ability.type}
+                      labelOnTop
+                    />
+                  </ExpansionPanelDetails>
+                </ExpansionPanel>
+              )
+            })}
           </div>
           <Divider className={classes.divider} />
         </div>
