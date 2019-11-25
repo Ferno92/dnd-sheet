@@ -9,6 +9,7 @@ import SizeEnum from 'data/types/SizeEnum'
 import Stats from 'pages/stats/models/Stats'
 import { JobsEnum } from 'data/types/JobsEnum'
 import SimpleSelectItem from 'data/types/SimpleSelectItem'
+import TextUtils from './TextUtils'
 
 class StatsUtils {
   static getStatModifier = (stat: Stats, pg: PG) => {
@@ -124,7 +125,7 @@ class StatsUtils {
     if (pgClass) {
       const jobsData = DataUtils.JobMapper(jobsJSON as any)
       jobsData.forEach(job => {
-        if (job.type === pgClass) {
+        if (job.type === pgClass.toString()) {
           job.levels.forEach(levelData => {
             if (levelData.id === level) {
               proficiency = levelData.proficiency
@@ -139,6 +140,39 @@ class StatsUtils {
   static getInfoName = (type: string, dataList: SimpleSelectItem[]) => {
     const item = dataList.find(data => data.type === type)
     return item ? item.value : undefined
+  }
+
+  static getMainSpellStat = (job?: JobsEnum): StatsType => {
+    let text: StatsType = StatsType.Forza
+    if (job) {
+      switch (job) {
+        case JobsEnum.Bardo:
+          text = StatsType.Carisma
+          break
+        case JobsEnum.Chierico:
+          text = StatsType.Saggezza
+          break
+        case JobsEnum.Druido:
+          text = StatsType.Saggezza
+          break
+        case JobsEnum.Mago:
+          text = StatsType.Intelligenza
+          break
+        case JobsEnum.Paladino:
+          text = StatsType.Carisma
+          break
+        case JobsEnum.Ranger:
+          text = StatsType.Saggezza
+          break
+        case JobsEnum.Stregone:
+          text = StatsType.Carisma
+          break
+        case JobsEnum.Warlock:
+          text = StatsType.Carisma
+          break
+      }
+    }
+    return text
   }
 }
 

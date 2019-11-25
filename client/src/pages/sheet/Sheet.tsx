@@ -35,9 +35,11 @@ import EquipmentView from 'pages/equipment/EquipmentView'
 import EquipmentObject from 'pages/equipment/EquipmentObject'
 import Armor from 'data/types/Armor'
 import ArmorInfo from 'data/types/ArmorInfo'
+import SpellsView from 'pages/spells/SpellsView'
 
 interface SheetProps {
   id: number
+  page?: number
 }
 
 interface SheetState {
@@ -79,16 +81,16 @@ class Sheet extends Component<
   db: Dexie
   constructor(
     props: SheetProps &
-      RouteComponentProps<{ id: string }> &
+      RouteComponentProps<{ id: string; page?: string }> &
       WithStyles<typeof SheetStyles> &
       WithTheme
   ) {
     super(props)
 
-    const { id } = props.match.params
+    const { id, page } = props.match.params
     const sheetId = parseInt(id)
     this.state = {
-      pageIndex: 0,
+      pageIndex: page ? parseInt(page) : 0,
       onEdit: false,
       direction: 'down',
       open: false,
@@ -556,48 +558,7 @@ class Sheet extends Component<
             )}
           </Fab>
         </Tooltip>
-        {/* {onEdit ? (
-          <Tooltip title="Save" aria-label="Save">
-            <Fab
-              color="primary"
-              aria-label="Done"
-              size="large"
-              onClick={this.onChangeEditMode}
-              className={classes.fab}
-            >
-              <Done />
-            </Fab>
-          </Tooltip>
-        ) : (
-          <SpeedDial
-            ariaLabel="Options"
-            icon={
-              <SpeedDialIcon
-                className={classes.speedDial}
-                openIcon={<Close />}
-                icon={<Settings />}
-              />
-            }
-            onBlur={this.handleClose}
-            onClick={this.handleClick}
-            onClose={this.handleClose}
-            onFocus={this.handleOpen}
-            onMouseEnter={this.handleOpen}
-            onMouseLeave={this.handleClose}
-            open={open}
-            direction={direction}
-            className={classes.fab}
-          >
-            {this.actions.map(action => (
-              <SpeedDialAction
-                key={action.name}
-                icon={action.icon}
-                tooltipTitle={action.name}
-                onClick={action.onClick}
-              />
-            ))}
-          </SpeedDial>
-        )} */}
+
         <SwipeableViews
           axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
           index={pageIndex}
@@ -648,7 +609,10 @@ class Sheet extends Component<
               onRemoveEquipment={this.onRemoveEquipment}
             />
           </div>
-          <div>{/* slide n°4 */}</div>
+          <div>
+            {/* slide n°4 */}
+            <SpellsView onEdit={onEdit} pg={pg} />
+          </div>
           <div>
             {/* slide n°5 */}
             {this.actions.map(action => (
