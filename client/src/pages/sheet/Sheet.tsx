@@ -7,20 +7,20 @@ import {
   BottomNavigationAction,
   WithTheme,
   Fab,
-  Tooltip
+  Tooltip,
+  MenuItem,
+  ListItemIcon,
+  ListItemText
 } from '@material-ui/core'
 import { ReactComponent as FightIcon } from 'assets/images/swords.svg'
 import { ReactComponent as ProfileIcon } from 'assets/images/viking.svg'
 import { ReactComponent as BackpackIcon } from 'assets/images/backpack.svg'
 import { ReactComponent as BookIcon } from 'assets/images/spellbook.svg'
-import { Edit, Done, ArrowBack, Settings, Close } from '@material-ui/icons'
+import { Edit, Done, ArrowBack, MoreHoriz } from '@material-ui/icons'
 import SwipeableViews from 'react-swipeable-views'
 import StatsView from 'pages/stats/StatsView'
-import SpeedDial from '@material-ui/lab/SpeedDial'
-import SpeedDialIcon from '@material-ui/lab/SpeedDialIcon'
-import SpeedDialAction from '@material-ui/lab/SpeedDialAction'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
-import BattleView, { Modifier } from 'pages/battle/BattleView'
+import BattleView from 'pages/battle/BattleView'
 import PG from 'pages/stats/models/PG'
 import { RacesEnum, SubRacesEnum } from 'data/types/RacesEnum'
 import StatsType from 'data/types/StatsEnum'
@@ -65,14 +65,14 @@ class Sheet extends Component<
         //go back
         this.props.history.goBack()
       }
-    },
-    {
-      icon: <Edit />,
-      name: 'Edit',
-      onClick: () => {
-        this.onChangeEditMode()
-      }
     }
+    // {
+    //   icon: <Edit />,
+    //   name: 'Edit',
+    //   onClick: () => {
+    //     this.onChangeEditMode()
+    //   }
+    // }
   ]
 
   pg: Dexie.Table<PG, number> | undefined
@@ -313,7 +313,7 @@ class Sheet extends Component<
   ) => {
     const { pg } = this.state
     const value = event.target.value as JobsEnum
-    this.setState({ pg: { ...pg, pgClass: value } })
+    this.setState({ pg: { ...pg, pgClass: value, abilities: [] } })
   }
 
   onChangeAbilityCheck = (type: AbilitiesEnum, checked: boolean) => {
@@ -538,7 +538,25 @@ class Sheet extends Component<
     } = this.state
     return (
       <React.Fragment>
-        {onEdit ? (
+        <Tooltip
+          title={onEdit ? 'Salva' : 'Modifica'}
+          aria-label={onEdit ? 'Save' : 'Edit'}
+        >
+          <Fab
+            color="primary"
+            aria-label="Done"
+            size="small"
+            onClick={this.onChangeEditMode}
+            className={classes.fab}
+          >
+            {onEdit ? (
+              <Done className={classes.fabIcon} />
+            ) : (
+              <Edit className={classes.fabIcon} />
+            )}
+          </Fab>
+        </Tooltip>
+        {/* {onEdit ? (
           <Tooltip title="Save" aria-label="Save">
             <Fab
               color="primary"
@@ -579,7 +597,7 @@ class Sheet extends Component<
               />
             ))}
           </SpeedDial>
-        )}
+        )} */}
         <SwipeableViews
           axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
           index={pageIndex}
@@ -631,6 +649,15 @@ class Sheet extends Component<
             />
           </div>
           <div>{/* slide n°4 */}</div>
+          <div>
+            {/* slide n°5 */}
+            {this.actions.map(action => (
+              <MenuItem key={action.name} onClick={action.onClick}>
+                <ListItemIcon>{action.icon}</ListItemIcon>
+                <ListItemText>{action.name}</ListItemText>
+              </MenuItem>
+            ))}
+          </div>
         </SwipeableViews>
 
         <BottomNavigation
@@ -653,6 +680,9 @@ class Sheet extends Component<
           <BottomNavigationAction
             label="Magie"
             icon={<BookIcon className={classes.navigationIcon} />}
+          />
+          <BottomNavigationAction
+            icon={<MoreHoriz className={classes.navigationIcon} />}
           />
         </BottomNavigation>
       </React.Fragment>

@@ -8,6 +8,7 @@ import DataUtils from 'data/DataUtils'
 import SizeEnum from 'data/types/SizeEnum'
 import Stats from 'pages/stats/models/Stats'
 import { JobsEnum } from 'data/types/JobsEnum'
+import SimpleSelectItem from 'data/types/SimpleSelectItem'
 
 class StatsUtils {
   static getStatModifier = (stat: Stats, pg: PG) => {
@@ -133,6 +134,11 @@ class StatsUtils {
       })
     }
     return proficiency
+  }
+
+  static getInfoName = (type: string, dataList: SimpleSelectItem[]) => {
+    const item = dataList.find(data => data.type === type)
+    return item ? item.value : undefined
   }
 }
 

@@ -470,12 +470,13 @@ function BattleView(props: BattleViewProps) {
             key={raceAbility.name}
             square
             expanded={abilityExpanded === raceAbility.name}
-            onChange={() => setAbilityExpanded(raceAbility.name)}
+            onChange={() =>
+              abilityExpanded === raceAbility.name
+                ? setAbilityExpanded(undefined)
+                : setAbilityExpanded(raceAbility.name)
+            }
           >
-            <ExpansionPanelSummary
-              aria-controls="panel1d-content"
-              id="panel1d-header"
-            >
+            <ExpansionPanelSummary>
               <Typography variant="subtitle2" itemType="span">
                 {raceAbility.name}:
               </Typography>

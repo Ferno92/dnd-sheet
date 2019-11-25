@@ -6,6 +6,19 @@ const StatsViewStyles = (theme: Theme) =>
     container: {
       height: 'calc(100vh - 75px)'
     },
+    infoAvatar: {
+      height: 60,
+      width: 60,
+      marginRight: 16
+    },
+    infoSummary: {
+      display: 'flex',
+      alignItems: 'center'
+    },
+    infoDetails: {
+      display: 'flex',
+      flexDirection: 'column'
+    },
     inputContainer: {
       padding: 10
     },
@@ -44,7 +57,8 @@ const StatsViewStyles = (theme: Theme) =>
       justifyContent: 'center'
     },
     abilitiesHeader: {
-      display: 'flex'
+      display: 'flex',
+      alignItems: 'center'
     },
     abilityContainer: {
       display: 'flex',
@@ -71,7 +85,22 @@ const StatsViewStyles = (theme: Theme) =>
     },
     abilityCheckbox: {
       display: 'flex',
-      alignItems: 'center'
+      alignItems: 'center',
+      '& .MuiButtonBase-root': {
+        padding: 4,
+        marginRight: 8
+      },
+      '& .MuiSvgIcon-root': {
+        height: 24,
+        width: 24
+      }
+    },
+    noCheckbox: {
+      width: 40
+    },
+    abilityHighlight: {
+      border: 'solid 1px',
+      borderRadius: 3
     }
   })
 

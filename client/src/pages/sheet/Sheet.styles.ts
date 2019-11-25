@@ -1,5 +1,5 @@
-import { createStyles } from "@material-ui/core";
-import Theme from "assets/styles/Theme";
+import { createStyles } from '@material-ui/core'
+import Theme from 'assets/styles/Theme'
 
 const SheetStyles = (theme: Theme) =>
   createStyles({
@@ -7,28 +7,35 @@ const SheetStyles = (theme: Theme) =>
       background: theme.palette.backgroundSecondary.default
     },
     bottomNavigation: {
-      position: "fixed",
+      position: 'fixed',
       bottom: 0,
       right: 0,
       left: 0,
       height: 76,
-      "& .Mui-selected svg": {
+      '& .Mui-selected svg': {
         fill: theme.palette.background.default
+      },
+      '& .MuiBottomNavigationAction-root': {
+        minWidth: 'auto'
       }
     },
     navigationIcon: {
       marginTop: 10
     },
     fab: {
-      position: "absolute",
-      top: 0,
+      position: 'absolute',
+      bottom: 45,
       right: 0,
       margin: 10,
       zIndex: 10
     },
+    fabIcon: {
+      height: 24,
+      width: 24
+    },
     speedDial: {
       marginTop: 6
     }
-  });
+  })
 
-export default SheetStyles;
+export default SheetStyles

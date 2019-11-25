@@ -213,9 +213,6 @@ const EquipmentView: React.FC<EquipmentViewProps> = (
         <span>{`/${getMaxCapacity()}kg`}</span>
       </div>
 
-      <Typography variant="subtitle2">Note</Typography>
-      <TextField placeholder="Scrivi qui.." multiline fullWidth />
-
       {/* ________________ Equipment dialog _____________ */}
 
       <EquipmentDialog

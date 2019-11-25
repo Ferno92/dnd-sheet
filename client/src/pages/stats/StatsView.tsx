@@ -9,7 +9,8 @@ import {
   IconButton,
   ExpansionPanel,
   ExpansionPanelSummary,
-  ExpansionPanelDetails
+  ExpansionPanelDetails,
+  Avatar
 } from '@material-ui/core'
 import StatsViewStyles from './StatsView.styles'
 import TextFieldString from 'components/text-field-string/TextFieldString'
@@ -27,9 +28,10 @@ import DataUtils from 'data/DataUtils'
 import SimpleSelect from 'components/simple-select/SimpleSelect'
 import { JobsEnum } from 'data/types/JobsEnum'
 import AbilitiesEnum from 'data/types/AbilitiesEnum'
-import { Info } from '@material-ui/icons'
+import { Info, ExpandMore, ErrorOutline } from '@material-ui/icons'
 import InfoDialog from 'components/info-dialog/InfoDialog'
 import StatsUtils from 'utils/StatsUtils'
+import Ability from 'data/types/Ability'
 
 interface StatsViewProps {
   onEdit: boolean
@@ -64,6 +66,7 @@ interface StatsViewProps {
 
 interface StatsViewState {
   dialogInfoAbilitiesOpen: boolean
+  infoExpanded: boolean
   tsExpanded?: string
   abilityExpanded?: string
 }
@@ -82,7 +85,8 @@ class StatsView extends Component<
     super(props)
 
     this.state = {
-      dialogInfoAbilitiesOpen: false
+      dialogInfoAbilitiesOpen: false,
+      infoExpanded: false
     }
   }
 
@@ -152,6 +156,23 @@ class StatsView extends Component<
     return count
   }
 
+  missingAbilitiesToSelect = (): number => {
+    let count = 0
+    const abilities = this.getAbilitiesListFromClass()
+    abilities.forEach(ability => {
+      if (this.hasProficiency(ability)) {
+        count++
+      }
+    })
+    return this.getAbilitiesCountFromClass() - count
+  }
+
+  isAbilityEnabled = (ability: Ability) => {
+    const abilities = this.getAbilitiesListFromClass()
+    const found = abilities.find(item => item === ability.type)
+    return found !== undefined
+  }
+
   getSubRacesData = () => {
     const { race } = this.props.pg
     const filtered = this.subRacesData.filter(
@@ -183,48 +204,83 @@ class StatsView extends Component<
       onEditLevel,
       onEditStats
     } = this.props
-    const { dialogInfoAbilitiesOpen, tsExpanded, abilityExpanded } = this.state
+    const {
+      dialogInfoAbilitiesOpen,
+      tsExpanded,
+      abilityExpanded,
+      infoExpanded
+    } = this.state
     const currentRaceObj = StatsUtils.getCurrentRace(race)
     return (
       <div className={classes.container}>
         <div className={classes.inputContainer}>
-          <TextFieldString
-            label="Nome Personaggio"
-            value={name}
-            onChange={onEditName}
-            disabled={!onEdit}
-            name={'name'}
-          />
-          <SimpleSelect<RacesEnum>
-            label={'Razza'}
-            item={race}
-            data={this.racesData}
-            onEdit={onEdit}
-            onChange={onChangeRace}
-          />
-          {currentRaceObj && currentRaceObj.subraces.length > 0 && (
-            <SimpleSelect<SubRacesEnum>
-              label={'Sotto-razza'}
-              item={subRace}
-              data={this.getSubRacesData()}
-              onEdit={onEdit}
-              onChange={onChangeSubRace}
-            />
-          )}
-          <SimpleSelect<JobsEnum>
-            label={'Classe'}
-            item={pgClass}
-            data={this.jobsData}
-            onEdit={onEdit}
-            onChange={onChangeJob}
-          />
-          <TextFieldNumber
-            label="Livello"
-            value={level}
-            onChange={onEditLevel}
-            fullWidth
-            disabled={!onEdit}
-          />
+          <ExpansionPanel
+            square
+            expanded={infoExpanded}
+            onChange={() => this.setState({ infoExpanded: !infoExpanded })}
+          >
+            <ExpansionPanelSummary expandIcon={<ExpandMore />}>
+              <div className={classes.infoSummary}>
+                <Avatar
+                  className={classes.infoAvatar}
+                  src="https://ksr-ugc.imgix.net/assets/015/493/122/e9404ba4aaab990c2824c2ab59dd1d36_original.jpg?ixlib=rb-2.1.0&w=700&fit=max&v=1487008697&auto=format&gif-q=50&q=92&s=4baaea0e032928875a8889e5313f1162"
+                />
+                <div>
+                  <Typography variant="body1">{name}</Typography>
+                  <Typography variant="body2">{`${StatsUtils.getInfoName(
+                    `${race}`,
+                    this.racesData
+                  )} ${StatsUtils.getInfoName(
+                    `${subRace}`,
+                    this.getSubRacesData()
+                  )}`}</Typography>
+                  <Typography variant="body2">{`${StatsUtils.getInfoName(
+                    `${pgClass}`,
+                    this.jobsData
+                  )} Lv. ${level}`}</Typography>
+                </div>
+              </div>
+            </ExpansionPanelSummary>
+            <ExpansionPanelDetails className={classes.infoDetails}>
+              <TextFieldString
+                label="Nome Personaggio"
+                value={name}
+                onChange={onEditName}
+                disabled={!onEdit}
+                name={'name'}
+              />
+              <SimpleSelect<RacesEnum>
+                label={'Razza'}
+                item={race}
+                data={this.racesData}
+                onEdit={onEdit}
+                onChange={onChangeRace}
+              />
+              {currentRaceObj && currentRaceObj.subraces.length > 0 && (
+                <SimpleSelect<SubRacesEnum>
+                  label={'Sotto-razza'}
+                  item={subRace}
+                  data={this.getSubRacesData()}
+                  onEdit={onEdit}
+                  onChange={onChangeSubRace}
+                />
+              )}
+              <SimpleSelect<JobsEnum>
+                label={'Classe'}
+                item={pgClass}
+                data={this.jobsData}
+                onEdit={onEdit}
+                onChange={onChangeJob}
+              />
+              <TextFieldNumber
+                label="Livello"
+                value={level}
+                onChange={onEditLevel}
+                fullWidth
+                disabled={!onEdit}
+              />
+            </ExpansionPanelDetails>
+          </ExpansionPanel>
 
           <div className={classes.gridContainer}>
             <Grid container spacing={3}>
@@ -372,15 +428,20 @@ class StatsView extends Component<
             <Typography variant="h6" className={classes.title}>
               Abilità
             </Typography>
-            {pgClass && (
+            {pgClass && this.missingAbilitiesToSelect() !== 0 && (
               <IconButton
                 className={classes.abilityInfo}
                 onClick={this.showAbilityInfo}
               >
-                <Info />
+                <ErrorOutline color="primary" />
               </IconButton>
             )}
           </div>
+          {this.missingAbilitiesToSelect() !== 0 && (
+            <Typography variant="body2" className={classes.title}>
+              {`Ancora ${this.missingAbilitiesToSelect()} da selezionare`}
+            </Typography>
+          )}
           <div className={classes.gridContainer}>
             {this.abilitiesData.map((ability, index) => {
               const totValue =
@@ -402,19 +463,33 @@ class StatsView extends Component<
                       : this.setState({ abilityExpanded: ability.type })
                   }
                 >
-                  <ExpansionPanelSummary>
+                  <ExpansionPanelSummary
+                    className={
+                      this.hasProficiency(ability.type)
+                        ? classes.abilityHighlight
+                        : undefined
+                    }
+                  >
                     <div className={classes.tsPanelTitle}>
                       <div className={classes.abilityCheckbox}>
-                        {onEdit && (
-                          <Checkbox
-                            checked={this.hasProficiency(ability.type)}
-                            onChange={(
-                              event: React.ChangeEvent<HTMLInputElement>,
-                              checked: boolean
-                            ) => onChangeAbilityCheck(ability.type, checked)}
-                            disabled={!onEdit}
-                          />
-                        )}
+                        {onEdit &&
+                          (this.isAbilityEnabled(ability) ? (
+                            <Checkbox
+                              checked={this.hasProficiency(ability.type)}
+                              onChange={(
+                                event: React.ChangeEvent<HTMLInputElement>,
+                                checked: boolean
+                              ) => onChangeAbilityCheck(ability.type, checked)}
+                              disabled={
+                                !onEdit ||
+                                (this.missingAbilitiesToSelect() === 0 &&
+                                  !this.hasProficiency(ability.type))
+                              }
+                              onClick={e => e.stopPropagation()}
+                            />
+                          ) : (
+                            <div className={classes.noCheckbox} />
+                          ))}
                         <Typography variant={'subtitle1'}>
                           {ability.type}
                         </Typography>
