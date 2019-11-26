@@ -238,9 +238,17 @@ function BattleView(props: BattleViewProps) {
 
         <Grid item xs={4} className={classes.gridItem}>
           <div className={classes.tsContainer}>
-            <span>TS vs Morte</span>
+            <Typography variant="body1" itemType="span">
+              TS vs Morte
+            </Typography>
             <div className={classes.flexRow}>
-              <span className={classes.tslabel}>S</span>
+              <Typography
+                variant="body1"
+                itemType="span"
+                className={classes.tslabel}
+              >
+                S
+              </Typography>
               <div className={classes.checkboxContainer}>
                 <Checkbox
                   className={classes.checkbox}
@@ -266,7 +274,13 @@ function BattleView(props: BattleViewProps) {
               </div>
             </div>
             <div className={classes.flexRow}>
-              <span className={classes.tslabel}>F</span>
+              <Typography
+                variant="body1"
+                itemType="span"
+                className={classes.tslabel}
+              >
+                F
+              </Typography>
               <div className={classes.checkboxContainer}>
                 <Checkbox
                   className={classes.checkbox}
@@ -301,10 +315,16 @@ function BattleView(props: BattleViewProps) {
               <Remove />
             </IconButton>
             <div className={classes.pf}>
-              <span className={clsx(classes.currentPf, getPFColorClass())}>
+              <Typography
+                variant="h2"
+                className={clsx(classes.currentPf, getPFColorClass())}
+              >
                 {pg.currentPF}
-              </span>
-              <span>{`/${pg.pfTot}`}</span>
+              </Typography>
+              <Typography
+                variant="body2"
+                className={clsx(classes.pfTot, getPFColorClass())}
+              >{`/${pg.pfTot}`}</Typography>
             </div>
             <IconButton disabled={onEdit} onClick={() => onChangeCurrentPf(1)}>
               <Add />
@@ -547,8 +567,8 @@ function BattleView(props: BattleViewProps) {
               </Typography>
             </ListItem>
             <ListItem className={classes.listItem}>
-              <div>TOT</div>
-              <div>{getCA()}</div>
+              <Typography variant="body1">TOT</Typography>
+              <Typography variant="body1">{getCA()}</Typography>
             </ListItem>
           </List>
         </DialogContent>

@@ -25,7 +25,11 @@ declare module '@material-ui/core/styles/createPalette' {
     success: PaletteColor
     warning: PaletteColor
     info: PaletteColor
+    icon: PaletteColor
     picture: PaletteColor
+    border: PaletteColor
+    highlight: string
+    hover: string
   }
 
   // Allow configuration using `createMuiTheme`
@@ -34,13 +38,19 @@ declare module '@material-ui/core/styles/createPalette' {
     success?: PaletteColor
     warning?: PaletteColor
     info?: PaletteColor
+    icon?: PaletteColor
     picture?: PaletteColor
-    
+    border?: PaletteColor
+    highlight?: string
+    hover?: string
   }
 }
 
 declare module '@material-ui/core/styles/createTypography' {
-  interface Typography extends Record<ThemeStyle, TypographyStyle>, FontStyle, TypographyUtils {
+  interface Typography
+    extends Record<ThemeStyle, TypographyStyle>,
+      FontStyle,
+      TypographyUtils {
     customTypography: {
       fontSize: number
       color: string
@@ -48,7 +58,10 @@ declare module '@material-ui/core/styles/createTypography' {
   }
 
   // Allow configuration using `createMuiTheme`
-  interface TypographyOptions extends Partial<Record<ThemeStyle, TypographyStyleOptions> & FontStyleOptions> {
+  interface TypographyOptions
+    extends Partial<
+      Record<ThemeStyle, TypographyStyleOptions> & FontStyleOptions
+    > {
     customTypography?: {
       fontSize?: number
       color?: string

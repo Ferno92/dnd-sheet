@@ -527,6 +527,17 @@ class Sheet extends Component<
     )
   }
 
+  hasSpells = () => {
+    const { pg } = this.state
+    return (
+      pg.pgClass &&
+      pg.pgClass !== JobsEnum.Barbaro &&
+      pg.pgClass !== JobsEnum.Guerriero &&
+      pg.pgClass !== JobsEnum.Ladro &&
+      pg.pgClass !== JobsEnum.Monaco
+    )
+  }
+
   render() {
     const { classes, theme } = this.props
     const {
@@ -609,10 +620,12 @@ class Sheet extends Component<
               onRemoveEquipment={this.onRemoveEquipment}
             />
           </div>
-          <div>
-            {/* slide n°4 */}
-            <SpellsView onEdit={onEdit} pg={pg} />
-          </div>
+          {this.hasSpells() && (
+            <div>
+              {/* slide n°4 */}
+              <SpellsView onEdit={onEdit} pg={pg} />
+            </div>
+          )}
           <div>
             {/* slide n°5 */}
             {this.actions.map(action => (
@@ -641,10 +654,12 @@ class Sheet extends Component<
             label="Zaino"
             icon={<BackpackIcon className={classes.navigationIcon} />}
           />
-          <BottomNavigationAction
-            label="Magie"
-            icon={<BookIcon className={classes.navigationIcon} />}
-          />
+          {this.hasSpells() && (
+            <BottomNavigationAction
+              label="Magie"
+              icon={<BookIcon className={classes.navigationIcon} />}
+            />
+          )}
           <BottomNavigationAction
             icon={<MoreHoriz className={classes.navigationIcon} />}
           />

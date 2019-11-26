@@ -86,20 +86,32 @@ const ArmorDialog: React.FC<ArmorDialogProps> = (props: ArmorDialogProps) => {
             </Typography>
             <Grid container spacing={3}>
               <Grid item xs={6} className={styles.gridItem}>
-                <div className={styles.itemTitle}>Tipo</div>
-                <div>{armor.armorType}</div>
+                <Typography variant="body1" className={styles.itemTitle}>
+                  Tipo
+                </Typography>
+                <Typography variant="body1">{armor.armorType}</Typography>
               </Grid>
               <Grid item xs={6} className={styles.gridItem}>
-                <div className={styles.itemTitle}>CA</div>
-                <div>{armor.ca}</div>
+                <Typography variant="body1" className={styles.itemTitle}>
+                  CA
+                </Typography>
+                <Typography variant="body1">{armor.ca}</Typography>
               </Grid>
               <Grid item xs={6} className={styles.gridItem}>
-                <div className={styles.itemTitle}>Furtività</div>
-                <div>{armor.noFurtivity ? 'No' : 'Si'}</div>
+                <Typography variant="body1" className={styles.itemTitle}>
+                  Furtività
+                </Typography>
+                <Typography variant="body1">
+                  {armor.noFurtivity ? 'No' : 'Si'}
+                </Typography>
               </Grid>
               <Grid item xs={6} className={styles.gridItem}>
-                <div className={styles.itemTitle}>Destrezza</div>
-                <div>{!armor.addDes ? 'No' : 'Si'}</div>
+                <Typography variant="body1" className={styles.itemTitle}>
+                  Destrezza
+                </Typography>
+                <Typography variant="body1">
+                  {!armor.addDes ? 'No' : 'Si'}
+                </Typography>
               </Grid>
               <Grid item xs={6} className={styles.gridItem}>
                 <TextFieldNumber
@@ -116,8 +128,10 @@ const ArmorDialog: React.FC<ArmorDialogProps> = (props: ArmorDialogProps) => {
                 />
               </Grid>
               <Grid item xs={6} className={styles.gridItem}>
-                <div className={styles.itemTitle}>Peso</div>
-                <div>{`${armor.weight} kg`}</div>
+                <Typography variant="body1" className={styles.itemTitle}>
+                  Peso
+                </Typography>
+                <Typography variant="body1">{`${armor.weight} kg`}</Typography>
               </Grid>
             </Grid>
 

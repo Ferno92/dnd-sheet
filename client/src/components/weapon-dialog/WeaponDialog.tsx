@@ -88,20 +88,30 @@ const WeaponDialog: React.FC<WeaponDialogProps> = (
             </Typography>
             <Grid container spacing={3}>
               <Grid item xs={6} className={styles.gridItem}>
-                <div className={styles.itemTitle}>Tipo</div>
-                <div>{weapon.weaponType}</div>
+                <Typography variant="body1" className={styles.itemTitle}>
+                  Tipo
+                </Typography>
+                <Typography variant="body1">{weapon.weaponType}</Typography>
               </Grid>
               <Grid item xs={6} className={styles.gridItem}>
-                <div className={styles.itemTitle}>Tipo di danno</div>
-                <div>{weapon.damageType}</div>
+                <Typography variant="body1" className={styles.itemTitle}>
+                  Tipo di danno
+                </Typography>
+                <Typography variant="body1">{weapon.damageType}</Typography>
               </Grid>
               <Grid item xs={6} className={styles.gridItem}>
-                <div className={styles.itemTitle}>Danno</div>
-                <div>{weapon.damage}</div>
+                <Typography variant="body1" className={styles.itemTitle}>
+                  Danno
+                </Typography>
+                <Typography variant="body1">{weapon.damage}</Typography>
               </Grid>
               <Grid item xs={6} className={styles.gridItem}>
                 {weapon.property.map(property => {
-                  return <div key={property}>{property}</div>
+                  return (
+                    <Typography variant="body1" key={property}>
+                      {property}
+                    </Typography>
+                  )
                 })}
               </Grid>
               <Grid item xs={6} className={styles.gridItem}>
@@ -119,8 +129,10 @@ const WeaponDialog: React.FC<WeaponDialogProps> = (
                 />
               </Grid>
               <Grid item xs={6} className={styles.gridItem}>
-                <div className={styles.itemTitle}>Peso</div>
-                <div>{`${weapon.weight} kg`}</div>
+                <Typography variant="body1" className={styles.itemTitle}>
+                  Peso
+                </Typography>
+                <Typography variant="body1">{`${weapon.weight} kg`}</Typography>
               </Grid>
             </Grid>
 

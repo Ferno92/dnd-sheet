@@ -202,15 +202,19 @@ const EquipmentView: React.FC<EquipmentViewProps> = (
         Peso trasportato / Peso massimo{' '}
       </Typography>
       <div className={styles.capacity}>
-        <span
+        <Typography
+          variant="h2"
           className={clsx(
             styles.currentCapacity,
             getCurrentCapacity() > getMaxCapacity() ? 'red' : undefined
           )}
         >
           {getCurrentCapacity()}
-        </span>
-        <span>{`/${getMaxCapacity()}kg`}</span>
+        </Typography>
+        <Typography
+          variant="body2"
+          className={styles.capacityTot}
+        >{`/${getMaxCapacity()}kg`}</Typography>
       </div>
 
       {/* ________________ Equipment dialog _____________ */}

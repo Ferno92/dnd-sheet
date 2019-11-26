@@ -1,13 +1,16 @@
 import createMuiTheme from '@material-ui/core/styles/createMuiTheme'
 import createPalette, { Palette } from '@material-ui/core/styles/createPalette'
 import createTypography from '@material-ui/core/styles/createTypography'
+import ColorUtils from 'utils/ColorUtils'
 
 export enum Colors {
   Black = '#0D0D0D',
+  Black10 = '#E6E6E6',
+  Black30 = '#B6B6B6',
   Black50 = '#858585',
   Black75 = '#494949',
   SilverGrey = '#CCCCCC',
-  SilverGray50 = '#ECECEC',
+  SilverGrey50 = '#ECECEC',
   DirtyWhite = '#F3F3F3',
   BrightWhite = '#FFFFFF',
   Cherry = '#D6001A',
@@ -19,7 +22,7 @@ export enum Colors {
   DndRedDark = '#8a1e1c',
   DndBlack = '#212121',
   DndBlackLight = '#4d4d4d',
-  DndBlackDark = '#171717',
+  DndBlackDark = '#171717'
 }
 
 const palette: Palette = createPalette({
@@ -35,18 +38,18 @@ const palette: Palette = createPalette({
     primary: Colors.Black,
     secondary: Colors.Black50
   },
-    primary: {
-      light: Colors.DndRedLight,
-      main: Colors.DndRed,
-      dark: Colors.DndRedDark,
-      contrastText: Colors.BrightWhite,
-    },
-    secondary: {
-      light: Colors.DndBlackLight,
-      main: Colors.DndBlack,
-      dark: Colors.DndBlackDark,
-      contrastText: Colors.BrightWhite,
-    },
+  primary: {
+    light: Colors.DndRedLight,
+    main: Colors.DndRed,
+    dark: Colors.DndRedDark,
+    contrastText: Colors.BrightWhite
+  },
+  secondary: {
+    light: Colors.DndBlackLight,
+    main: Colors.DndBlack,
+    dark: Colors.DndBlackDark,
+    contrastText: Colors.BrightWhite
+  },
   success: {
     main: Colors.Fern,
     light: Colors.Fern,
@@ -72,11 +75,20 @@ const palette: Palette = createPalette({
     contrastText: Colors.BrightWhite
   },
   picture: {
-    dark: Colors.SilverGray50,
-    main: Colors.SilverGray50,
-    light: Colors.SilverGray50,
+    dark: Colors.SilverGrey50,
+    main: Colors.SilverGrey50,
+    light: Colors.SilverGrey50,
     contrastText: Colors.Black
-  }  
+  },
+  divider: Colors.SilverGrey50,
+  border: {
+    main: Colors.SilverGrey,
+    light: Colors.SilverGrey50,
+    dark: Colors.Black30,
+    contrastText: Colors.BrightWhite
+  },
+  highlight: Colors.DndRedLight,
+  hover: Colors.DndRedLight
 })
 
 const typography = createTypography(palette, {
@@ -90,7 +102,6 @@ const typography = createTypography(palette, {
     '"Cantarell"',
     '"Fira Sans"',
     '"Droid Sans"',
-    '"Helvetica Neue"',
     '"Arial"',
     '"sans-serif"'
   ].join(','),
@@ -145,7 +156,7 @@ const typography = createTypography(palette, {
     textTransform: 'none'
   },
   overline: {
-    fontSize: '1rem',
+    fontSize: '1.2rem',
     fontWeight: 700,
     textTransform: 'none',
     lineHeight: 'normal'
@@ -167,6 +178,15 @@ const ThemeLight = createMuiTheme({
   typography: typography,
   shape: {
     borderRadius: 3
+  },
+  breakpoints: {
+    values: {
+      xs: 0,
+      sm: 600,
+      md: 960,
+      lg: 1280,
+      xl: 1600
+    }
   },
   shadows: [
     'none',
@@ -201,9 +221,15 @@ const ThemeLight = createMuiTheme({
         height: '2.2rem'
       }
     },
+    MuiOutlinedInput: {
+      input: {
+        height: 'unset'
+      }
+    },
     MuiInputLabel: {
       root: {
-        fontSize: typography.body2.fontSize
+        fontSize: typography.body2.fontSize,
+        color: ColorUtils.hexToRgbString(Colors.Black, 0.5)
       }
     },
     MuiLink: {
@@ -233,17 +259,18 @@ const ThemeLight = createMuiTheme({
     MuiButton: {
       root: {
         minWidth: 100,
-        height: 40,
-        padding: '10px 20px'
+        minHeight: 40,
+        padding: '8px 20px'
       },
       sizeSmall: {
-        ...typography.button,
-        height: 32,
+        fontSize: typography.button.fontSize,
+        minHeight: 32,
         padding: '6px 12px'
       },
       contained: {
         '&.Mui-disabled': {
-          backgroundColor: Colors.SilverGrey
+          backgroundColor: Colors.SilverGrey,
+          color: ColorUtils.hexToRgbString(Colors.BrightWhite, 0.5)
         }
       },
       containedPrimary: {
@@ -265,27 +292,44 @@ const ThemeLight = createMuiTheme({
         borderColor: Colors.SilverGrey,
         '&:hover': {
           borderColor: Colors.SilverGrey,
-          backgroundColor: Colors.SilverGrey
+          backgroundColor: ColorUtils.hexToRgbString(Colors.Black, 0.1)
+        },
+        '&.Mui-disabled': {
+          color: ColorUtils.hexToRgbString(Colors.Black, 0.3)
         }
       },
       outlinedPrimary: {
         borderColor: Colors.SilverGrey,
         '&:hover': {
           borderColor: Colors.Transparent,
+          backgroundColor: ColorUtils.hexToRgbString(Colors.Black, 0.1)
         }
       },
       outlinedSecondary: {
         borderColor: Colors.SilverGrey,
         '&:hover': {
-          borderColor: Colors.Transparent
+          borderColor: Colors.Transparent,
+          backgroundColor: ColorUtils.hexToRgbString(Colors.Black, 0.1)
         }
       },
       text: {
-        padding: '10px 20px'
+        padding: '10px 20px',
+        '&:hover': {
+          backgroundColor: ColorUtils.hexToRgbString(Colors.Black, 0.1)
+        },
+        '&.Mui-disabled': {
+          color: ColorUtils.hexToRgbString(Colors.Black, 0.3)
+        }
       },
       textPrimary: {
+        '&:hover': {
+          backgroundColor: ColorUtils.hexToRgbString(Colors.Black, 0.1)
+        }
       },
       textSecondary: {
+        '&:hover': {
+          backgroundColor: ColorUtils.hexToRgbString(Colors.Black, 0.1)
+        }
       }
     },
     MuiDialogTitle: {
@@ -310,11 +354,38 @@ const ThemeLight = createMuiTheme({
       root: {
         height: 36
       }
+    },
+    MuiTabs: {
+      root: {
+        minHeight: 28
+      },
+      indicator: {
+        height: 1
+      }
+    },
+    MuiTab: {
+      root: {
+        minHeight: 28,
+        ...typography.body1,
+        '@media (min-width: 960px)': {
+          ...typography.body1
+        },
+        '&$selected': {
+          ...typography.button
+        }
+      }
     }
   },
   props: {
     MuiLink: {
       underline: 'always'
+    },
+    MuiCircularProgress: {
+      size: 32
+    },
+    MuiTabs: {
+      textColor: 'primary',
+      indicatorColor: 'primary'
     }
   },
   highlightSearchWords: {

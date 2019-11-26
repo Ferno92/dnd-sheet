@@ -309,11 +309,12 @@ class StatsView extends Component<
           </div>
 
           <div className={classes.stat}>
-            <div
+            <Typography
+              variant="body1"
               className={classes.subTitle}
-            >{`Taglia: ${StatsUtils.getRaceSize(this.props.pg)}`}</div>
+            >{`Taglia: ${StatsUtils.getRaceSize(this.props.pg)}`}</Typography>
             <div className={classes.ispiration}>
-              <div>Ispirazione</div>
+              <Typography variant="body1">Ispirazione</Typography>
               <div>
                 <Checkbox
                   checked={ispiration}
@@ -352,7 +353,10 @@ class StatsView extends Component<
                         }}
                         disabled={!onEdit}
                       />
-                      <div className={classes.modifier}>
+                      <Typography
+                        variant="caption"
+                        className={classes.modifier}
+                      >
                         {`${
                           StatsUtils.getStatModifier(stat, this.props.pg) === 0
                             ? ''
@@ -363,7 +367,7 @@ class StatsView extends Component<
                         }${Math.abs(
                           StatsUtils.getStatModifier(stat, this.props.pg)
                         )}`}
-                      </div>
+                      </Typography>
                     </div>
                   </Grid>
                 )
@@ -518,7 +522,7 @@ class StatsView extends Component<
                         onChangeAbilityPoints(ability.type, value)
                       }}
                       onEdit={onEdit}
-                      label={ability.type}
+                      // label={ability.type}
                       labelOnTop
                     />
                   </ExpansionPanelDetails>

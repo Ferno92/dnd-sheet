@@ -47,10 +47,13 @@ const useEquipmentViewStyles = makeStyles((theme: Theme) => ({
     margin: '0 16px'
   },
   currentCapacity: {
-    fontSize: '3rem',
+    display: 'inline',
     '&.red': {
       color: 'red'
     }
+  },
+  capacityTot: {
+    display: 'inline'
   }
 }))
 

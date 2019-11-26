@@ -67,8 +67,7 @@ const StatsViewStyles = (theme: Theme) =>
     },
     abilityInfo: {},
     subTitle: {
-      flex: 1,
-      fontSize: 24
+      flex: 1
     },
     ispiration: {
       flex: 1,

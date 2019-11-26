@@ -107,7 +107,7 @@ const BattleViewStyles = makeStyles((theme: Theme) => ({
     margin: '0 16px'
   },
   currentPf: {
-    fontSize: '3rem',
+    display: 'inline',
     '&.red': {
       color: 'red'
     },
@@ -120,6 +120,9 @@ const BattleViewStyles = makeStyles((theme: Theme) => ({
     '&.blue': {
       color: 'blue'
     }
+  },
+  pfTot: {
+    display: 'inline'
   },
   weaponHeader: {
     // paddingLeft: 16,
