@@ -185,7 +185,7 @@ function BattleView(props: BattleViewProps) {
       <Typography variant="h6" className={classes.title}>
         Combattimento
       </Typography>
-      <Grid container spacing={3}>
+      <Grid container spacing={1}>
         <Grid item xs={4} className={classes.gridItem}>
           <Button
             variant="outlined"
@@ -196,7 +196,7 @@ function BattleView(props: BattleViewProps) {
             <div className={classes.caValue}>{getCA()}</div>
           </Button>
         </Grid>
-        <Grid item xs={4} className={classes.gridItem}>
+        <Grid item xs={3} className={classes.gridItem}>
           <TextFieldNumber
             disabled
             label={'Iniziativa'}
@@ -205,7 +205,7 @@ function BattleView(props: BattleViewProps) {
           />
         </Grid>
 
-        <Grid item xs={4} className={clsx(classes.gridItem, classes.speed)}>
+        <Grid item xs={5} className={clsx(classes.gridItem, classes.speed)}>
           <TextFieldNumber
             disabled={!onEdit}
             label={'Velocità(m)'}
@@ -227,7 +227,7 @@ function BattleView(props: BattleViewProps) {
           />
         </Grid>
 
-        <Grid item xs={4} className={classes.gridItem}>
+        <Grid item xs={3} className={classes.gridItem}>
           <TextFieldString
             disabled
             label={'Dado vita'}
@@ -236,7 +236,7 @@ function BattleView(props: BattleViewProps) {
           />
         </Grid>
 
-        <Grid item xs={4} className={classes.gridItem}>
+        <Grid item xs={5} className={classes.gridItem}>
           <div className={classes.tsContainer}>
             <Typography variant="body1" itemType="span">
               TS vs Morte
@@ -333,19 +333,19 @@ function BattleView(props: BattleViewProps) {
         </Grid>
       </Grid>
       {/* ________________ Armor sections _____________ */}
-      <Typography variant="subtitle2" className={classes.weaponTitle}>
+      <Typography variant="h5" className={classes.weaponTitle}>
         Armature e scudi
       </Typography>
       {pg.armors.length > 0 && (
         <Grid container className={classes.weaponHeader}>
           <Grid item xs={6}>
-            Nome
+            <Typography variant="subtitle2">Nome</Typography>
           </Grid>
           <Grid item xs={2}>
-            CA
+            <Typography variant="subtitle2">CA</Typography>
           </Grid>
           <Grid item xs={3}>
-            Tipologia
+            <Typography variant="subtitle2">Tipologia</Typography>
           </Grid>
         </Grid>
       )}
@@ -359,15 +359,19 @@ function BattleView(props: BattleViewProps) {
                 xs={6}
                 className={clsx(classes.weaponGridItem, classes.weaponName)}
               >
-                {`${armorInfo.armor.name}${
+                <Typography variant="caption">{`${armorInfo.armor.name}${
                   armorInfo.bonus ? `(+${armorInfo.bonus})` : ''
-                }`}
+                }`}</Typography>
               </Grid>
               <Grid item xs={2} className={classes.weaponGridItem}>
-                {armorInfo.armor.ca + armorInfo.bonus}
+                <Typography variant="caption">
+                  {armorInfo.armor.ca + armorInfo.bonus}
+                </Typography>
               </Grid>
               <Grid item xs={3} className={classes.weaponGridItem}>
-                {armorInfo.armor.armorType}
+                <Typography variant="caption">
+                  {armorInfo.armor.armorType}
+                </Typography>
               </Grid>
 
               <Grid item xs={1} className={classes.weaponGridItem}>
@@ -384,7 +388,9 @@ function BattleView(props: BattleViewProps) {
                 xs={12}
                 className={clsx(classes.weaponGridItem, classes.weaponInfo)}
               >
-                {armorInfo.notes && <div>{armorInfo.notes}</div>}
+                {armorInfo.notes && (
+                  <Typography variant="caption">{armorInfo.notes}</Typography>
+                )}
               </Grid>
             </React.Fragment>
           )
@@ -406,22 +412,22 @@ function BattleView(props: BattleViewProps) {
       />
 
       {/* ________________ Weapon sections _____________ */}
-      <Typography variant="subtitle2" className={classes.weaponTitle}>
+      <Typography variant="h5" className={classes.weaponTitle}>
         Armi
       </Typography>
       {pg.weapons.length > 0 && (
         <Grid container className={classes.weaponHeader}>
           <Grid item xs={3}>
-            Nome
+            <Typography variant="subtitle2">Nome</Typography>
           </Grid>
           <Grid item xs={2}>
-            TPC
+            <Typography variant="subtitle2">TPC</Typography>
           </Grid>
           <Grid item xs={3}>
-            Danno
+            <Typography variant="subtitle2">Danno</Typography>
           </Grid>
           <Grid item xs={3}>
-            Tipologia
+            <Typography variant="subtitle2">Tipologia</Typography>
           </Grid>
         </Grid>
       )}
@@ -435,18 +441,28 @@ function BattleView(props: BattleViewProps) {
                 xs={3}
                 className={clsx(classes.weaponGridItem, classes.weaponName)}
               >
-                {`${weaponInfo.weapon.name}${
-                  weaponInfo.bonus ? `(+${weaponInfo.bonus})` : ''
-                }`}
+                <Typography variant="caption">
+                  {`${weaponInfo.weapon.name}${
+                    weaponInfo.bonus ? `(+${weaponInfo.bonus})` : ''
+                  }`}
+                </Typography>
               </Grid>
               <Grid item xs={2} className={classes.weaponGridItem}>
-                {getWeaponTPC(weaponInfo)}
+                <Typography variant="caption">
+                  {getWeaponTPC(weaponInfo)}
+                </Typography>
               </Grid>
-              <Grid item xs={3} className={classes.weaponGridItem}>{`${
-                weaponInfo.weapon.damage
-              }+${getWeaponDamageBonus(weaponInfo)}`}</Grid>
               <Grid item xs={3} className={classes.weaponGridItem}>
-                {weaponInfo.weapon.damageType}
+                <Typography variant="caption">
+                  {`${weaponInfo.weapon.damage}+${getWeaponDamageBonus(
+                    weaponInfo
+                  )}`}
+                </Typography>
+              </Grid>
+              <Grid item xs={3} className={classes.weaponGridItem}>
+                <Typography variant="caption">
+                  {weaponInfo.weapon.damageType}
+                </Typography>
               </Grid>
 
               <Grid item xs={1} className={classes.weaponGridItem}>
@@ -463,10 +479,12 @@ function BattleView(props: BattleViewProps) {
                 xs={12}
                 className={clsx(classes.weaponGridItem, classes.weaponInfo)}
               >
-                {weaponInfo.notes && <div>{weaponInfo.notes}</div>}
-                <div>
+                {weaponInfo.notes && (
+                  <Typography variant="caption">{weaponInfo.notes}</Typography>
+                )}
+                <Typography variant="caption">
                   {weaponInfo.weapon.property.map(property => property)}
-                </div>
+                </Typography>
               </Grid>
             </React.Fragment>
           )

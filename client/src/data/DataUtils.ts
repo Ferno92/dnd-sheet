@@ -41,7 +41,8 @@ class DataUtils {
         ts: child.ts,
         dice: child.dice,
         abilitiesCount: child.abilitiesCount,
-        abilities: child.abilities
+        abilities: child.abilities,
+        spellsByJobLevel: child.spellsByJobLevel
       })
     })
     return jobs

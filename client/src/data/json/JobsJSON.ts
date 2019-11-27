@@ -46,6 +46,62 @@ export default [
       AbilitiesEnum.Intuizione,
       AbilitiesEnum.Persuasione,
       AbilitiesEnum.Religione
+    ],
+    spellsByJobLevel: [
+      {
+        id: 1,
+        known: 2,
+        spells: [
+          { level: 0, slot: 4 },
+          { level: 1, slot: 2 }
+        ]
+      },
+      {
+        id: 2,
+        known: 3,
+        spells: [
+          { level: 0, slot: 4 },
+          { level: 1, slot: 3 }
+        ]
+      },
+      {
+        id: 3,
+        known: 4,
+        spells: [
+          { level: 0, slot: 4 },
+          { level: 1, slot: 4 },
+          { level: 2, slot: 2 }
+        ]
+      },
+      {
+        id: 4,
+        known: 5,
+        spells: [
+          { level: 0, slot: 5 },
+          { level: 1, slot: 4 },
+          { level: 2, slot: 3 }
+        ]
+      },
+      {
+        id: 5,
+        known: 6,
+        spells: [
+          { level: 0, slot: 5 },
+          { level: 1, slot: 4 },
+          { level: 2, slot: 3 },
+          { level: 3, slot: 2 }
+        ]
+      },
+      {
+        id: 6,
+        known: 7,
+        spells: [
+          { level: 0, slot: 5 },
+          { level: 1, slot: 4 },
+          { level: 2, slot: 3 },
+          { level: 3, slot: 3 }
+        ]
+      }
     ]
   }
 ]

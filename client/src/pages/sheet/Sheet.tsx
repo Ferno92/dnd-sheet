@@ -120,7 +120,7 @@ class Sheet extends Component<
           moneys: [0, 0, 0, 0, 0],
           backpack: []
         },
-        notes: ''
+        spellsByLevel: []
       },
       exist: false
     }
@@ -181,7 +181,7 @@ class Sheet extends Component<
       weapons,
       armors,
       equipment,
-      notes
+      spellsByLevel
     } = this.state.pg
 
     if (this.pg) {
@@ -203,7 +203,7 @@ class Sheet extends Component<
             weapons,
             armors,
             equipment,
-            notes
+            spellsByLevel
           })
           .then(() => console.log('update done'))
           .catch(err => console.log('err: ', err))
@@ -226,7 +226,7 @@ class Sheet extends Component<
             weapons,
             armors,
             equipment,
-            notes
+            spellsByLevel
           })
           .then(() => console.log('create done'))
           .catch(err => console.log('err: ', err))
@@ -549,6 +549,72 @@ class Sheet extends Component<
       pg,
       exist
     } = this.state
+
+    let swipeableViews = [
+      <div key={'slide1'}>
+        {/* slide n°1 */}
+        <StatsView
+          onEdit={onEdit}
+          id={sheetId}
+          pg={pg}
+          exist={exist}
+          onChangeAbilityCheck={this.onChangeAbilityCheck}
+          onChangeAbilityPoints={this.onChangeAbilityPoints}
+          onChangeIspiration={this.onChangeIspiration}
+          onChangeJob={this.onChangeJob}
+          onChangeRace={this.onChangeRace}
+          onChangeSubRace={this.onChangeSubRace}
+          onEditName={this.onEditName}
+          onEditLevel={this.onEditLevel}
+          onEditStats={this.onEditStats}
+        />
+      </div>,
+      <div key={'slide2'}>
+        {/* slide n°2 */}
+        <BattleView
+          onEdit={onEdit}
+          id={sheetId}
+          pg={pg}
+          onChangeSpeed={this.onChangeSpeed}
+          onChangePF={this.onChangePF}
+          onChangeTsMorte={this.onChangeTsMorte}
+          onChangeCurrentPf={this.onChangeCurrentPf}
+          onAddWeapon={this.onAddWeapon}
+          onRemoveWeapon={this.onRemoveWeapon}
+          onRemoveArmor={this.onRemoveArmor}
+          onAddArmor={this.onAddArmor}
+        />
+      </div>,
+      <div key={'slide3'}>
+        {/* slide n°3 */}
+        <EquipmentView
+          onEdit={onEdit}
+          pg={pg}
+          onChangeMoney={this.onChangeMoney}
+          onAddEquipment={this.onAddEquipment}
+          onRemoveEquipment={this.onRemoveEquipment}
+        />
+      </div>
+    ]
+    if (this.hasSpells()) {
+      swipeableViews.push(
+        <div key={'slide4'}>
+          {/* slide n°4 */}
+          <SpellsView onEdit={onEdit} pg={pg} />
+        </div>
+      )
+    }
+    swipeableViews.push(
+      <div key={'slide5'}>
+        {/* slide n°5 */}
+        {this.actions.map(action => (
+          <MenuItem key={action.name} onClick={action.onClick}>
+            <ListItemIcon>{action.icon}</ListItemIcon>
+            <ListItemText>{action.name}</ListItemText>
+          </MenuItem>
+        ))}
+      </div>
+    )
     return (
       <React.Fragment>
         <Tooltip
@@ -576,65 +642,7 @@ class Sheet extends Component<
           onChangeIndex={this.onSwipePage}
           className="tab-container"
         >
-          <div>
-            {/* slide n°1 */}
-            <StatsView
-              onEdit={onEdit}
-              id={sheetId}
-              pg={pg}
-              exist={exist}
-              onChangeAbilityCheck={this.onChangeAbilityCheck}
-              onChangeAbilityPoints={this.onChangeAbilityPoints}
-              onChangeIspiration={this.onChangeIspiration}
-              onChangeJob={this.onChangeJob}
-              onChangeRace={this.onChangeRace}
-              onChangeSubRace={this.onChangeSubRace}
-              onEditName={this.onEditName}
-              onEditLevel={this.onEditLevel}
-              onEditStats={this.onEditStats}
-            />
-          </div>
-          <div>
-            {/* slide n°2 */}
-            <BattleView
-              onEdit={onEdit}
-              id={sheetId}
-              pg={pg}
-              onChangeSpeed={this.onChangeSpeed}
-              onChangePF={this.onChangePF}
-              onChangeTsMorte={this.onChangeTsMorte}
-              onChangeCurrentPf={this.onChangeCurrentPf}
-              onAddWeapon={this.onAddWeapon}
-              onRemoveWeapon={this.onRemoveWeapon}
-              onRemoveArmor={this.onRemoveArmor}
-              onAddArmor={this.onAddArmor}
-            />
-          </div>
-          <div>
-            {/* slide n°3 */}
-            <EquipmentView
-              onEdit={onEdit}
-              pg={pg}
-              onChangeMoney={this.onChangeMoney}
-              onAddEquipment={this.onAddEquipment}
-              onRemoveEquipment={this.onRemoveEquipment}
-            />
-          </div>
-          {this.hasSpells() && (
-            <div>
-              {/* slide n°4 */}
-              <SpellsView onEdit={onEdit} pg={pg} />
-            </div>
-          )}
-          <div>
-            {/* slide n°5 */}
-            {this.actions.map(action => (
-              <MenuItem key={action.name} onClick={action.onClick}>
-                <ListItemIcon>{action.icon}</ListItemIcon>
-                <ListItemText>{action.name}</ListItemText>
-              </MenuItem>
-            ))}
-          </div>
+          {swipeableViews.map(item => item)}
         </SwipeableViews>
 
         <BottomNavigation

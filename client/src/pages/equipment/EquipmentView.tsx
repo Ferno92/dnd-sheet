@@ -128,13 +128,13 @@ const EquipmentView: React.FC<EquipmentViewProps> = (
       {pg.equipment.backpack.length > 0 && (
         <Grid container className={styles.equipmentHeader}>
           <Grid item xs={3}>
-            Quantità
+            <Typography variant="subtitle2">Quantità</Typography>
           </Grid>
           <Grid item xs={5}>
-            Nome
+            <Typography variant="subtitle2">Nome</Typography>
           </Grid>
           <Grid item xs={2}>
-            Peso(kg)
+            <Typography variant="subtitle2">Peso(kg)</Typography>
           </Grid>
           <Grid item xs={2}></Grid>
         </Grid>
@@ -164,12 +164,15 @@ const EquipmentView: React.FC<EquipmentViewProps> = (
                 xs={5}
                 className={clsx(styles.gridItem, styles.equipmentName)}
               >
-                {item.name}
+                <Typography variant="caption">{item.name}</Typography>
               </Grid>
               <Grid item xs={2} className={styles.gridItem}>
-                <div className={styles.centerGridValue}>
+                <Typography
+                  variant="caption"
+                  className={styles.centerGridValue}
+                >
                   {item.weight * item.quantity}
-                </div>
+                </Typography>
               </Grid>
               <Grid item xs={2} className={styles.gridItem}>
                 <IconButton
@@ -185,7 +188,7 @@ const EquipmentView: React.FC<EquipmentViewProps> = (
                 xs={12}
                 className={clsx(styles.gridItem, styles.equipmentInfo)}
               >
-                {item.info}
+                <Typography variant="caption">{item.info}</Typography>
               </Grid>
             </React.Fragment>
           )

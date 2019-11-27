@@ -6,6 +6,7 @@ import { Modifier } from 'pages/battle/BattleView'
 import WeaponInfo from 'data/types/WeaponInfo'
 import Equipment from 'pages/equipment/Equipment'
 import ArmorInfo from 'data/types/ArmorInfo'
+import SpellsByLevel from 'data/types/SpellsByLevel'
 
 interface PG {
   id: number
@@ -24,7 +25,7 @@ interface PG {
   weapons: WeaponInfo[]
   armors: ArmorInfo[]
   equipment: Equipment
-  notes: string
+  spellsByLevel: SpellsByLevel[]
 }
 
 export default PG

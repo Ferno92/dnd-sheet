@@ -1,11 +1,10 @@
-import React from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import PG from 'pages/stats/models/PG'
 import useStyles from './SpellsView.styles'
 import { Typography } from '@material-ui/core'
 import StatsUtils from 'utils/StatsUtils'
 import MixedInput, { InputPosition } from 'components/mixed-input/MixedInput'
 import TextUtils from 'utils/TextUtils'
-import StatsType from 'data/types/StatsEnum'
 
 interface SpellsViewProps {
   onEdit: boolean
@@ -14,7 +13,14 @@ interface SpellsViewProps {
 
 const SpellsView: React.FC<SpellsViewProps> = (props: SpellsViewProps) => {
   const { onEdit, pg } = props
+  const [spellsByLevelOnState, setSpellsByLevelOnState] = useState([])
   const styles = useStyles()
+
+  const getSpellByLevel = useCallback(() => {}, [])
+
+  useEffect(() => {
+    let spellInfoList = getSpellByLevel()
+  }, pg.spellsByLevel)
 
   return (
     <div className={styles.root}>
@@ -90,6 +96,10 @@ const SpellsView: React.FC<SpellsViewProps> = (props: SpellsViewProps) => {
           value: 0
         }}
       />
+
+      <Typography variant="subtitle1" itemType="span">
+        Incantesimi
+      </Typography>
     </div>
   )
 }
