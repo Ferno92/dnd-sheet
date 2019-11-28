@@ -31,6 +31,30 @@ const useStyles = makeStyles((theme: Theme) => ({
   spellSummary: {
     display: 'flex',
     alignItems: 'center'
+  },
+  spellContainer: {
+    display: 'flex',
+    alignItems: 'center'
+  },
+  spellExpansionPanel: {
+    flex: 1
+  },
+  magicWand: {
+    marginLeft: 8,
+    '& svg': {
+      height: 24,
+      width: 24
+    }
+  },
+  spellDetails: {
+    flexDirection: 'column'
+  },
+  spellLabel: {
+    display: 'flex',
+    alignItems: 'center'
+  },
+  spellDetailTitle: {
+    marginRight: 8
   }
 }))
 

@@ -33,7 +33,7 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
   }, [])
 
   const addPG = () => {
-    props.history.push(`/sheet/${pgs.length + 1}`)
+    props.history.push(`/sheet/${pgs.length + 1}/0`)
   }
 
   const getFirstLetters = (name: string): string => {

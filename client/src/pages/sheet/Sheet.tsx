@@ -565,6 +565,70 @@ class Sheet extends Component<
     )
   }
 
+  onRemoveSpell = (spell: Spell) => {
+    const { pg } = this.state
+    const spellsByLevelCopy = [...pg.spellsByLevel]
+    let index = -1
+    spellsByLevelCopy.forEach((spellByLevel: SpellsByLevel, i: number) => {
+      if (spellByLevel.level === spell.level) {
+        index = i
+      }
+    })
+    const spellIndex = spellsByLevelCopy[index].spells.findIndex(
+      item => item.id === spell.id
+    )
+
+    if (spellIndex >= 0) {
+      spellsByLevelCopy[index].spells.splice(spellIndex, 1)
+    }
+
+    this.setState(
+      {
+        pg: {
+          ...pg,
+          spellsByLevel: spellsByLevelCopy
+        }
+      },
+      () => {
+        const { onEdit } = this.state
+        if (!onEdit) {
+          this.updateDB()
+        }
+      }
+    )
+  }
+
+  onUseSlot = (lv: number, clear?: boolean) => {
+    const { pg } = this.state
+    const spellsByLevelCopy = [...pg.spellsByLevel]
+    let index = -1
+    spellsByLevelCopy.forEach((spellByLevel: SpellsByLevel, i: number) => {
+      if (spellByLevel.level === lv) {
+        index = i
+      }
+    })
+
+    if (index >= 0) {
+      spellsByLevelCopy[index].slotSpent =
+        spellsByLevelCopy[index].slotSpent + 1
+    }
+
+    this.setState(
+      {
+        pg: {
+          ...pg,
+          spellsByLevel: spellsByLevelCopy
+        }
+      },
+      () => {
+        const { onEdit } = this.state
+        if (!onEdit) {
+          this.updateDB()
+        }
+      }
+    )
+  }
+
   hasSpells = () => {
     const { pg } = this.state
     return (
@@ -638,7 +702,13 @@ class Sheet extends Component<
       swipeableViews.push(
         <div key={'slide4'}>
           {/* slide n°4 */}
-          <SpellsView onEdit={onEdit} pg={pg} onAddSpell={this.onAddSpell} />
+          <SpellsView
+            onEdit={onEdit}
+            pg={pg}
+            onAddSpell={this.onAddSpell}
+            onRemoveSpell={this.onRemoveSpell}
+            onUseSlot={this.onUseSlot}
+          />
         </div>
       )
     }
@@ -652,6 +722,39 @@ class Sheet extends Component<
           </MenuItem>
         ))}
       </div>
+    )
+
+    let bottomNavigations = [
+      <BottomNavigationAction
+        key={'Stats'}
+        label="Stats"
+        icon={<ProfileIcon className={classes.navigationIcon} />}
+      />,
+      <BottomNavigationAction
+        key={'Armi'}
+        label="Armi"
+        icon={<FightIcon className={classes.navigationIcon} />}
+      />,
+      <BottomNavigationAction
+        key={'Zaino'}
+        label="Zaino"
+        icon={<BackpackIcon className={classes.navigationIcon} />}
+      />
+    ]
+    if (this.hasSpells()) {
+      bottomNavigations.push(
+        <BottomNavigationAction
+          key={'Magie'}
+          label="Magie"
+          icon={<BookIcon className={classes.navigationIcon} />}
+        />
+      )
+    }
+    bottomNavigations.push(
+      <BottomNavigationAction
+        key={'altro'}
+        icon={<MoreHoriz className={classes.navigationIcon} />}
+      />
     )
     return (
       <React.Fragment>
@@ -688,27 +791,7 @@ class Sheet extends Component<
           onChange={this.onChangePage}
           className={classes.bottomNavigation}
         >
-          <BottomNavigationAction
-            label="Stats"
-            icon={<ProfileIcon className={classes.navigationIcon} />}
-          />
-          <BottomNavigationAction
-            label="Armi"
-            icon={<FightIcon className={classes.navigationIcon} />}
-          />
-          <BottomNavigationAction
-            label="Zaino"
-            icon={<BackpackIcon className={classes.navigationIcon} />}
-          />
-          {this.hasSpells() && (
-            <BottomNavigationAction
-              label="Magie"
-              icon={<BookIcon className={classes.navigationIcon} />}
-            />
-          )}
-          <BottomNavigationAction
-            icon={<MoreHoriz className={classes.navigationIcon} />}
-          />
+          {bottomNavigations.map(item => item)}
         </BottomNavigation>
       </React.Fragment>
     )

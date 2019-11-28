@@ -77,9 +77,12 @@ const SpellDialog: React.FC<SpellDialogProps> = (props: SpellDialogProps) => {
     spellType,
     tempoDiLancio,
     gittata,
-    materials.length > 0,
     durata,
-    description
+    description,
+    level,
+    materials,
+    onAddSpell,
+    onClose
   ])
 
   const onChangeSpellType = useCallback(
