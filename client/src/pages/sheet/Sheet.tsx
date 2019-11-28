@@ -36,6 +36,8 @@ import EquipmentObject from 'pages/equipment/EquipmentObject'
 import Armor from 'data/types/Armor'
 import ArmorInfo from 'data/types/ArmorInfo'
 import SpellsView from 'pages/spells/SpellsView'
+import Spell from 'data/types/Spell'
+import SpellsByLevel from 'data/types/SpellsByLevel'
 
 interface SheetProps {
   id: number
@@ -527,6 +529,42 @@ class Sheet extends Component<
     )
   }
 
+  onAddSpell = (spell: Spell) => {
+    const { pg } = this.state
+    const spellsByLevelCopy = [...pg.spellsByLevel]
+    let index = -1
+    spellsByLevelCopy.forEach((spellByLevel: SpellsByLevel, i: number) => {
+      if (spellByLevel.level === spell.level) {
+        index = i
+      }
+    })
+    if (index < 0) {
+      index = spellsByLevelCopy.length
+      spellsByLevelCopy.push({
+        level: spell.level,
+        slotSpent: 0,
+        spells: []
+      })
+    }
+
+    spellsByLevelCopy[index].spells.push(spell)
+
+    this.setState(
+      {
+        pg: {
+          ...pg,
+          spellsByLevel: spellsByLevelCopy
+        }
+      },
+      () => {
+        const { onEdit } = this.state
+        if (!onEdit) {
+          this.updateDB()
+        }
+      }
+    )
+  }
+
   hasSpells = () => {
     const { pg } = this.state
     return (
@@ -600,7 +638,7 @@ class Sheet extends Component<
       swipeableViews.push(
         <div key={'slide4'}>
           {/* slide n°4 */}
-          <SpellsView onEdit={onEdit} pg={pg} />
+          <SpellsView onEdit={onEdit} pg={pg} onAddSpell={this.onAddSpell} />
         </div>
       )
     }
