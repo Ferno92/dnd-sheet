@@ -28,7 +28,7 @@ import DataUtils from 'data/DataUtils'
 import SimpleSelect from 'components/simple-select/SimpleSelect'
 import { JobsEnum } from 'data/types/JobsEnum'
 import AbilitiesEnum from 'data/types/AbilitiesEnum'
-import { Info, ExpandMore, ErrorOutline } from '@material-ui/icons'
+import { Info, ExpandMore, ErrorOutline, Edit } from '@material-ui/icons'
 import InfoDialog from 'components/info-dialog/InfoDialog'
 import StatsUtils from 'utils/StatsUtils'
 import Ability from 'data/types/Ability'
@@ -181,6 +181,11 @@ class StatsView extends Component<
     return filtered
   }
 
+  onEditAvatar = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    event.stopPropagation()
+    //TODO upload file, see vsk app
+  }
+
   render() {
     const {
       name,
@@ -221,10 +226,21 @@ class StatsView extends Component<
           >
             <ExpansionPanelSummary expandIcon={<ExpandMore />}>
               <div className={classes.infoSummary}>
-                <Avatar
-                  className={classes.infoAvatar}
-                  src="https://ksr-ugc.imgix.net/assets/015/493/122/e9404ba4aaab990c2824c2ab59dd1d36_original.jpg?ixlib=rb-2.1.0&w=700&fit=max&v=1487008697&auto=format&gif-q=50&q=92&s=4baaea0e032928875a8889e5313f1162"
-                />
+                <div className={classes.infoAvatar}>
+                  <Avatar
+                    className={classes.avatar}
+                    src="https://ksr-ugc.imgix.net/assets/015/493/122/e9404ba4aaab990c2824c2ab59dd1d36_original.jpg?ixlib=rb-2.1.0&w=700&fit=max&v=1487008697&auto=format&gif-q=50&q=92&s=4baaea0e032928875a8889e5313f1162"
+                    style={{ opacity: onEdit ? 0.5 : 1 }}
+                  />
+                  {onEdit && (
+                    <IconButton
+                      className={classes.editAvatar}
+                      onClick={this.onEditAvatar}
+                    >
+                      <Edit />
+                    </IconButton>
+                  )}
+                </div>
                 <div>
                   <Typography variant="body1">{name}</Typography>
                   <Typography variant="body2">{`${StatsUtils.getInfoName(
@@ -466,6 +482,7 @@ class StatsView extends Component<
                       ? this.setState({ abilityExpanded: undefined })
                       : this.setState({ abilityExpanded: ability.type })
                   }
+                  className={classes.abilityPanel}
                 >
                   <ExpansionPanelSummary
                     className={

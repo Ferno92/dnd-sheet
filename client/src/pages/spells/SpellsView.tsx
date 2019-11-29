@@ -10,7 +10,8 @@ import {
   ExpansionPanelDetails,
   useMediaQuery,
   Theme,
-  Tooltip
+  Tooltip,
+  Button
 } from '@material-ui/core'
 import StatsUtils from 'utils/StatsUtils'
 import MixedInput, { InputPosition } from 'components/mixed-input/MixedInput'
@@ -163,7 +164,7 @@ const SpellsView: React.FC<SpellsViewProps> = (props: SpellsViewProps) => {
             spellByLevel => spellByLevel.level === spellInfo.level
           )
           return (
-            <div key={spellInfo.level}>
+            <div key={spellInfo.level} className={styles.spellInfoContainer}>
               <div className={styles.spellInfo}>
                 <Typography variant="body1" className={styles.spellLevel}>
                   {spellInfo.level}
@@ -188,20 +189,41 @@ const SpellsView: React.FC<SpellsViewProps> = (props: SpellsViewProps) => {
                   </React.Fragment>
                 )}
                 {spellByJobLevel &&
-                  spellByJobLevel.known > pg.spellsByLevel.length && (
+                  spellByJobLevel.known > pg.spellsByLevel.length &&
+                  (!onEdit &&
+                  spellInfo.slot === getSpellSlotSpent(spellInfo.level) ? (
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      style={{ minWidth: 0 }}
+                    >
+                      <Typography variant="caption">Azzera</Typography>
+                    </Button>
+                  ) : (
                     <IconButton
                       disabled={!onEdit}
                       onClick={() => setSpellDialogOpen(spellInfo.level)}
                       style={{ visibility: onEdit ? 'visible' : 'hidden' }}
+                      className={styles.addSpell}
                     >
                       <Add />
                     </IconButton>
-                  )}
+                  ))}
               </div>
               {spellByLevel &&
                 spellByLevel.spells.map(spell => {
                   return (
                     <div key={spell.id} className={styles.spellContainer}>
+                      <Checkbox
+                        checked={spell.prepared}
+                        onChange={(
+                          event: React.ChangeEvent<HTMLInputElement>,
+                          checked: boolean
+                        ) => onChangeSpellChecked(spell)}
+                        disabled={!onEdit}
+                        className={styles.checkbox}
+                        style={{ visibility: onEdit ? 'visible' : 'hidden' }}
+                      />
                       <ExpansionPanel
                         square
                         expanded={spellExpanded === spell.id}
@@ -212,18 +234,11 @@ const SpellsView: React.FC<SpellsViewProps> = (props: SpellsViewProps) => {
                         }
                         className={styles.spellExpansionPanel}
                       >
-                        <ExpansionPanelSummary expandIcon={<ExpandMore />}>
+                        <ExpansionPanelSummary
+                          expandIcon={<ExpandMore />}
+                          className={styles.expansionPanelSummary}
+                        >
                           <div className={styles.spellSummary}>
-                            {onEdit && (
-                              <Checkbox
-                                checked={spell.prepared}
-                                onChange={(
-                                  event: React.ChangeEvent<HTMLInputElement>,
-                                  checked: boolean
-                                ) => onChangeSpellChecked(spell)}
-                                disabled={!onEdit}
-                              />
-                            )}
                             <Typography variant={'body1'}>
                               {spell.name}
                             </Typography>

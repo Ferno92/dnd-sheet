@@ -5,12 +5,16 @@ const useStyles = makeStyles((theme: Theme) => ({
   root: {
     padding: 16
   },
+  spellInfoContainer: {
+    marginBottom: 16
+  },
   spellInfo: {
     display: 'flex',
     width: '100%',
     justifyContent: 'space-between',
     alignItems: 'center',
-    borderBottom: `solid 1px ${theme.palette.border.main}`
+    borderBottom: `solid 1px ${theme.palette.border.main}`,
+    marginBottom: 4
   },
   spellError: {
     display: 'flex',
@@ -41,6 +45,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   magicWand: {
     marginLeft: 8,
+    padding: 8,
     '& svg': {
       height: 24,
       width: 24
@@ -55,6 +60,25 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   spellDetailTitle: {
     marginRight: 8
+  },
+  checkbox: {
+    padding: 8,
+    '& svg': {
+      height: 24,
+      width: 24
+    }
+  },
+  expansionPanelSummary: {
+    '& .MuiExpansionPanelSummary-content': {
+      margin: 0
+    }
+  },
+  addSpell: {
+    padding: 8,
+    '& svg': {
+      height: 24,
+      width: 24
+    }
   }
 }))
 

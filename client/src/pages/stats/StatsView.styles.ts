@@ -9,7 +9,22 @@ const StatsViewStyles = (theme: Theme) =>
     infoAvatar: {
       height: 60,
       width: 60,
-      marginRight: 16
+      marginRight: 16,
+      position: 'relative'
+    },
+    avatar: {
+      height: '100%',
+      width: '100%',
+      position: 'absolute',
+      top: 0,
+      left: 0
+    },
+    editAvatar: {
+      height: '100%',
+      width: '100%',
+      position: 'absolute',
+      top: 0,
+      left: 0
     },
     infoSummary: {
       display: 'flex',
@@ -100,6 +115,9 @@ const StatsViewStyles = (theme: Theme) =>
     abilityHighlight: {
       border: 'solid 1px',
       borderRadius: 3
+    },
+    abilityPanel: {
+      marginBottom: 1
     }
   })
 
