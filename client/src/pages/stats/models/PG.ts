@@ -11,6 +11,7 @@ import SpellsByLevel from 'data/types/SpellsByLevel'
 interface PG {
   id: number
   name: string
+  image: string
   race: RacesEnum
   subRace?: SubRacesEnum
   pgClass?: JobsEnum

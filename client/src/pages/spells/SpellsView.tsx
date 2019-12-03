@@ -24,13 +24,14 @@ import Spell from 'data/types/Spell'
 import SpellDialog from 'components/spell-dialog/SpellDialog'
 import { useTheme } from '@material-ui/styles'
 import { ReactComponent as MagicWand } from 'assets/images/magic-wand.svg'
+import { JobsEnum } from 'data/types/JobsEnum'
 
 interface SpellsViewProps {
   onEdit: boolean
   pg: PG
   onAddSpell: (spell: Spell) => void
   onRemoveSpell: (spell: Spell) => void
-  onUseSlot: (lv: number) => void
+  onUseSlot: (lv: number, clear?: boolean) => void
 }
 
 const SpellsView: React.FC<SpellsViewProps> = (props: SpellsViewProps) => {
@@ -56,6 +57,14 @@ const SpellsView: React.FC<SpellsViewProps> = (props: SpellsViewProps) => {
     alert('todo')
   }, [])
 
+  const canPrepareSpells = useCallback(() => {
+    return (
+      pg.pgClass === JobsEnum.Chierico ||
+      pg.pgClass === JobsEnum.Druido ||
+      pg.pgClass === JobsEnum.Mago
+    )
+  }, [pg])
+
   useEffect(() => {
     // let spellInfoList = getSpellsByLevel()
     if (spellByJobLevel === undefined || spellByJobLevel.id !== pg.level) {
@@ -68,7 +77,6 @@ const SpellsView: React.FC<SpellsViewProps> = (props: SpellsViewProps) => {
           )
         }
       })
-      console.log('spellByJobLevel', spellByJobLevel)
       setSpellByJobLevel(spellByJobLevel)
     }
   }, [spellByJobLevel, pg])
@@ -196,6 +204,7 @@ const SpellsView: React.FC<SpellsViewProps> = (props: SpellsViewProps) => {
                       variant="outlined"
                       size="small"
                       style={{ minWidth: 0 }}
+                      onClick={() => onUseSlot(spellInfo.level, true)}
                     >
                       <Typography variant="caption">Azzera</Typography>
                     </Button>
@@ -220,9 +229,14 @@ const SpellsView: React.FC<SpellsViewProps> = (props: SpellsViewProps) => {
                           event: React.ChangeEvent<HTMLInputElement>,
                           checked: boolean
                         ) => onChangeSpellChecked(spell)}
-                        disabled={!onEdit}
+                        disabled={!onEdit || !canPrepareSpells()}
                         className={styles.checkbox}
-                        style={{ visibility: onEdit ? 'visible' : 'hidden' }}
+                        style={{
+                          visibility:
+                            spell.prepared || (onEdit && canPrepareSpells())
+                              ? 'visible'
+                              : 'hidden'
+                        }}
                       />
                       <ExpansionPanel
                         square
@@ -319,6 +333,8 @@ const SpellsView: React.FC<SpellsViewProps> = (props: SpellsViewProps) => {
                                 visibility:
                                   getSpellSlotSpent(spellInfo.level) >=
                                   spellInfo.slot
+                                    ? 'hidden'
+                                    : canPrepareSpells() && !spell.prepared
                                     ? 'hidden'
                                     : 'visible'
                               }}

@@ -51,8 +51,13 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
           key={pg.id}
           onClick={() => props.history.push(`/sheet/${pg.id}/${0}`)}
         >
-          <Avatar className={classes.avatar}>{getFirstLetters(pg.name)}</Avatar>
-          {pg.name}
+          <Avatar className={classes.avatar} src={pg.image}>
+            {pg.image ? '' : getFirstLetters(pg.name)}
+          </Avatar>
+          <div>
+            <Typography variant="body1">{pg.name}</Typography>
+            <Typography variant="caption">{`${pg.race} ${pg.pgClass} LV.${pg.level}`}</Typography>
+          </div>
         </MenuItem>
       ))}
 

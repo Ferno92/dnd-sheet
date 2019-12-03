@@ -28,10 +28,11 @@ import DataUtils from 'data/DataUtils'
 import SimpleSelect from 'components/simple-select/SimpleSelect'
 import { JobsEnum } from 'data/types/JobsEnum'
 import AbilitiesEnum from 'data/types/AbilitiesEnum'
-import { Info, ExpandMore, ErrorOutline, Edit } from '@material-ui/icons'
+import { ExpandMore, ErrorOutline, Edit } from '@material-ui/icons'
 import InfoDialog from 'components/info-dialog/InfoDialog'
 import StatsUtils from 'utils/StatsUtils'
 import Ability from 'data/types/Ability'
+import ImageCompressor from 'image-compressor.js'
 
 interface StatsViewProps {
   onEdit: boolean
@@ -62,6 +63,7 @@ interface StatsViewProps {
   onChangeAbilityCheck: (type: AbilitiesEnum, checked: boolean) => void
   onChangeAbilityPoints: (type: AbilitiesEnum, value: number) => void
   onChangeIspiration: (checked: boolean) => void
+  onChangeImage: (url: string) => void
 }
 
 interface StatsViewState {
@@ -183,7 +185,36 @@ class StatsView extends Component<
 
   onEditAvatar = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event.stopPropagation()
-    //TODO upload file, see vsk app
+
+    const editFabs = document.getElementsByClassName('hidden-input')
+    const editFab = editFabs[0] as HTMLInputElement
+    editFab.click()
+  }
+
+  inputImageCallback = (evt: React.ChangeEvent<HTMLInputElement>) => {
+    if (evt && evt.target && evt.target.files) {
+      const imageFile = evt.target.files[0]
+      if (imageFile && imageFile.type.indexOf('image/') !== -1) {
+        new ImageCompressor(imageFile, {
+          quality: 0.5,
+          success: this.imageCompressCallback
+        })
+      } else {
+        //TODO error
+        // store.dispatch(showMessageAction("error", "Seleziona un immagine."));
+      }
+    }
+  }
+
+  imageCompressCallback = (file: File) => {
+    var reader = new FileReader()
+    reader.onload = (e: any) => {
+      if (e.target) {
+        const { onChangeImage } = this.props
+        onChangeImage(e.target.result)
+      }
+    }
+    reader.readAsDataURL(file)
   }
 
   render() {
@@ -194,7 +225,8 @@ class StatsView extends Component<
       level,
       stats,
       subRace,
-      ispiration
+      ispiration,
+      image
     } = this.props.pg
     const {
       classes,
@@ -229,8 +261,15 @@ class StatsView extends Component<
                 <div className={classes.infoAvatar}>
                   <Avatar
                     className={classes.avatar}
-                    src="https://ksr-ugc.imgix.net/assets/015/493/122/e9404ba4aaab990c2824c2ab59dd1d36_original.jpg?ixlib=rb-2.1.0&w=700&fit=max&v=1487008697&auto=format&gif-q=50&q=92&s=4baaea0e032928875a8889e5313f1162"
+                    src={image}
                     style={{ opacity: onEdit ? 0.5 : 1 }}
+                  />
+                  <input
+                    className="hidden-input"
+                    accept="image/*"
+                    type="file"
+                    style={{ display: 'none' }}
+                    onChange={this.inputImageCallback}
                   />
                   {onEdit && (
                     <IconButton

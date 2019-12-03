@@ -122,7 +122,8 @@ class Sheet extends Component<
           moneys: [0, 0, 0, 0, 0],
           backpack: []
         },
-        spellsByLevel: []
+        spellsByLevel: [],
+        image: ''
       },
       exist: false
     }
@@ -183,7 +184,8 @@ class Sheet extends Component<
       weapons,
       armors,
       equipment,
-      spellsByLevel
+      spellsByLevel,
+      image
     } = this.state.pg
 
     if (this.pg) {
@@ -205,7 +207,8 @@ class Sheet extends Component<
             weapons,
             armors,
             equipment,
-            spellsByLevel
+            spellsByLevel,
+            image
           })
           .then(() => console.log('update done'))
           .catch(err => console.log('err: ', err))
@@ -228,7 +231,8 @@ class Sheet extends Component<
             weapons,
             armors,
             equipment,
-            spellsByLevel
+            spellsByLevel,
+            image
           })
           .then(() => console.log('create done'))
           .catch(err => console.log('err: ', err))
@@ -609,8 +613,9 @@ class Sheet extends Component<
     })
 
     if (index >= 0) {
-      spellsByLevelCopy[index].slotSpent =
-        spellsByLevelCopy[index].slotSpent + 1
+      spellsByLevelCopy[index].slotSpent = clear
+        ? 0
+        : spellsByLevelCopy[index].slotSpent + 1
     }
 
     this.setState(
@@ -638,6 +643,16 @@ class Sheet extends Component<
       pg.pgClass !== JobsEnum.Ladro &&
       pg.pgClass !== JobsEnum.Monaco
     )
+  }
+
+  onChangeImage = (url: string) => {
+    const { pg } = this.state
+    this.setState({
+      pg: {
+        ...pg,
+        image: url
+      }
+    })
   }
 
   render() {
@@ -669,6 +684,7 @@ class Sheet extends Component<
           onEditName={this.onEditName}
           onEditLevel={this.onEditLevel}
           onEditStats={this.onEditStats}
+          onChangeImage={this.onChangeImage}
         />
       </div>,
       <div key={'slide2'}>
