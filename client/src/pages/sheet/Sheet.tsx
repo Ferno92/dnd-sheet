@@ -241,11 +241,17 @@ class Sheet extends Component<
   }
 
   onChangePage = (event: React.ChangeEvent<{}>, value: any) => {
+    const url = this.props.match.url
+    const newUrl = url.replace(/.$/, value)
     this.setState({ pageIndex: value })
+    this.props.history.replace(newUrl)
   }
 
   onSwipePage = (index: number, indexLatest: number) => {
+    const url = this.props.match.url
+    const newUrl = url.replace(/.$/, index.toString())
     this.setState({ pageIndex: index })
+    this.props.history.replace(newUrl)
   }
 
   onChangeEditMode = () => {

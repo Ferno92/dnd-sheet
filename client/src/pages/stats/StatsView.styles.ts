@@ -118,6 +118,10 @@ const StatsViewStyles = (theme: Theme) =>
     },
     abilityPanel: {
       marginBottom: 1
+    },
+    emptyImage: {
+      height: 70,
+      width: 70
     }
   })
 

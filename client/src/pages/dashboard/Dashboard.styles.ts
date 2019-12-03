@@ -3,7 +3,10 @@ import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
 const DashboardStyles = makeStyles((theme: Theme) =>
   createStyles({
     title: {
-      textAlign: 'center'
+      textAlign: 'center',
+      padding: '16px 0',
+      background: theme.palette.secondary.light,
+      color: '#fff'
     },
     avatar: {
       height: 50,
@@ -14,6 +17,27 @@ const DashboardStyles = makeStyles((theme: Theme) =>
       position: 'fixed',
       bottom: 20,
       right: 20
+    },
+    list: {
+      '& .MuiListItem-container': {
+        display: 'block'
+      }
+    },
+    emptyDescription: {
+      margin: '20vh auto',
+      maxWidth: 260,
+      textAlign: 'center'
+    },
+    skeletonContainer: {
+      display: 'flex',
+      alignItems: 'center',
+      padding: 16
+    },
+    skeletonInfo: {
+      marginLeft: 8
+    },
+    skeleton: {
+      marginBottom: 8
     }
   })
 )

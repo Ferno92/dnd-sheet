@@ -28,7 +28,12 @@ import DataUtils from 'data/DataUtils'
 import SimpleSelect from 'components/simple-select/SimpleSelect'
 import { JobsEnum } from 'data/types/JobsEnum'
 import AbilitiesEnum from 'data/types/AbilitiesEnum'
-import { ExpandMore, ErrorOutline, Edit } from '@material-ui/icons'
+import {
+  ExpandMore,
+  ErrorOutline,
+  Edit,
+  AccountCircle
+} from '@material-ui/icons'
 import InfoDialog from 'components/info-dialog/InfoDialog'
 import StatsUtils from 'utils/StatsUtils'
 import Ability from 'data/types/Ability'
@@ -263,7 +268,14 @@ class StatsView extends Component<
                     className={classes.avatar}
                     src={image}
                     style={{ opacity: onEdit ? 0.5 : 1 }}
-                  />
+                  >
+                    {!image && (
+                      <AccountCircle
+                        className={classes.emptyImage}
+                        color="secondary"
+                      />
+                    )}
+                  </Avatar>
                   <input
                     className="hidden-input"
                     accept="image/*"
