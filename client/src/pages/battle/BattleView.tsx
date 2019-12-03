@@ -36,6 +36,7 @@ import { RacesEnum, SubRacesEnum } from 'data/types/RacesEnum'
 import { default as racesJSON } from 'data/json/RacesJSON'
 import DataUtils from 'data/DataUtils'
 import RaceAbility from 'data/types/RaceAbility'
+import Privileges from 'data/types/Privileges'
 
 export interface Modifier {
   type: string
@@ -76,6 +77,8 @@ function BattleView(props: BattleViewProps) {
   const [weaponDialogOpen, setWeaponDialogOpen] = useState(false)
   const [armorDialogOpen, setArmorDialogOpen] = useState(false)
   const [abilityExpanded, setAbilityExpanded] = useState<string>()
+  const [privilegeExpanded, setPrivilegeExpanded] = useState<string>()
+  const [privileges, setPrivileges] = useState<Privileges[]>()
   const theme = useTheme()
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
   let defaultModifiers = [
@@ -178,6 +181,12 @@ function BattleView(props: BattleViewProps) {
   useEffect(() => {
     setDV(BattleUtils.getDV(pg.pgClass))
   }, [pg.race, pg.pgClass])
+
+  useEffect(() => {
+    if (pg.level && pg.pgClass) {
+      setPrivileges(BattleUtils.getPrivileges(pg.level, pg.pgClass))
+    }
+  }, [pg.level, pg.pgClass])
 
   const raceAbilities = getRaceAbilities(pg.race, pg.subRace)
   return (
@@ -502,6 +511,9 @@ function BattleView(props: BattleViewProps) {
         Abilità razziali
       </Typography>
 
+      {raceAbilities.length === 0 && (
+        <Typography variant="body2">Nessuna abilità</Typography>
+      )}
       {raceAbilities.map(raceAbility => {
         return (
           <ExpansionPanel
@@ -528,7 +540,43 @@ function BattleView(props: BattleViewProps) {
         )
       })}
 
-      {/* ________________ Abilità speciali di classe _____________ */}
+      {/* ________________ Privilegi di classe _____________ */}
+      {privileges && (
+        <React.Fragment>
+          <Typography variant="subtitle1" className={classes.weaponTitle}>
+            Privilegi di classe
+          </Typography>
+
+          {privileges.map(privilege => {
+            return (
+              <ExpansionPanel
+                key={privilege.type}
+                square
+                expanded={privilegeExpanded === privilege.type}
+                onChange={() =>
+                  privilegeExpanded === privilege.type
+                    ? setPrivilegeExpanded(undefined)
+                    : setPrivilegeExpanded(privilege.type)
+                }
+              >
+                <ExpansionPanelSummary>
+                  <Typography variant="subtitle2" itemType="span">
+                    {privilege.name}:
+                  </Typography>
+                </ExpansionPanelSummary>
+                <ExpansionPanelDetails>
+                  <Typography variant="body2" itemType="span">
+                    {privilege.description}
+                  </Typography>
+                </ExpansionPanelDetails>
+              </ExpansionPanel>
+            )
+          })}
+          {privileges.length === 0 && (
+            <Typography variant="body2">Nessun privilegio</Typography>
+          )}
+        </React.Fragment>
+      )}
 
       {/* ________________ Weapon dialog _____________ */}
       <WeaponDialog

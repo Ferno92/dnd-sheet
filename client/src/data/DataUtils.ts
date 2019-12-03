@@ -42,7 +42,8 @@ class DataUtils {
         dice: child.dice,
         abilitiesCount: child.abilitiesCount,
         abilities: child.abilities,
-        spellsByJobLevel: child.spellsByJobLevel
+        spellsByJobLevel: child.spellsByJobLevel,
+        privileges: child.privileges
       })
     })
     return jobs

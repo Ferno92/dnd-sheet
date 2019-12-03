@@ -3,6 +3,7 @@ import Level from './Level'
 import StatsType from './StatsEnum'
 import AbilitiesEnum from './AbilitiesEnum'
 import SpellsByJobLevel from './SpellsByJobLevel'
+import Privileges from './Privileges'
 
 interface Job extends SimpleSelectItem {
   levels: Level[]
@@ -11,5 +12,6 @@ interface Job extends SimpleSelectItem {
   abilitiesCount: number
   abilities: AbilitiesEnum[]
   spellsByJobLevel?: SpellsByJobLevel[]
+  privileges: Privileges[]
 }
 export default Job

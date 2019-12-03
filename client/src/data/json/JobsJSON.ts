@@ -23,6 +23,22 @@ export default [
       AbilitiesEnum.Natura,
       AbilitiesEnum.Percezione,
       AbilitiesEnum.Sopravvivenza
+    ],
+    privileges: [
+      {
+        lv: 1,
+        type: 'ira',
+        name: 'Ira',
+        description: 'In battaglia un barbaro, ecc ecc',
+        counter: 2,
+        counterType: 'volte'
+      },
+      {
+        lv: 1,
+        type: 'difesaSenzaArmatura',
+        name: 'Difesa Senza Armatura',
+        description: 'Finchè un barbaro, ecc ecc'
+      }
     ]
   },
   {
@@ -102,6 +118,7 @@ export default [
           { level: 3, slot: 3 }
         ]
       }
-    ]
+    ],
+    privileges: []
   }
 ]

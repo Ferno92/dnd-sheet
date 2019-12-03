@@ -105,7 +105,7 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
               </ListItemIcon>
               <ListItemText
                 primary={pg.name}
-                secondary={`${pg.race} ${pg.pgClass} LV.${pg.level}`}
+                secondary={`${pg.race} ${pg.pgClass} Lv.${pg.level}`}
               />
               <ListItemSecondaryAction>
                 <IconButton onClick={() => setPgToDelete(i)}>
