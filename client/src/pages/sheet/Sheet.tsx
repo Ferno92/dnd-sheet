@@ -16,7 +16,7 @@ import { ReactComponent as FightIcon } from 'assets/images/swords.svg'
 import { ReactComponent as ProfileIcon } from 'assets/images/viking.svg'
 import { ReactComponent as BackpackIcon } from 'assets/images/backpack.svg'
 import { ReactComponent as BookIcon } from 'assets/images/spellbook.svg'
-import { Edit, Done, ArrowBack, MoreHoriz } from '@material-ui/icons'
+import { Edit, Done, ArrowBack, MoreHoriz, Info } from '@material-ui/icons'
 import SwipeableViews from 'react-swipeable-views'
 import StatsView from 'pages/stats/StatsView'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
@@ -661,6 +661,23 @@ class Sheet extends Component<
     })
   }
 
+  onSelectArmor = (i: number) => {
+    const { pg } = this.state
+    const armorsCopy = [...pg.armors]
+    armorsCopy[i].isWearing = !armorsCopy[i].isWearing
+    armorsCopy.forEach((info: ArmorInfo, index: number) => {
+      if (index !== i) {
+        info.isWearing = false
+      }
+    })
+    this.setState({
+      pg: {
+        ...pg,
+        armors: armorsCopy
+      }
+    })
+  }
+
   render() {
     const { classes, theme } = this.props
     const {
@@ -707,6 +724,7 @@ class Sheet extends Component<
           onRemoveWeapon={this.onRemoveWeapon}
           onRemoveArmor={this.onRemoveArmor}
           onAddArmor={this.onAddArmor}
+          onSelectArmor={this.onSelectArmor}
         />
       </div>,
       <div key={'slide3'}>

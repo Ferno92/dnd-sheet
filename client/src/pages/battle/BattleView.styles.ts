@@ -155,6 +155,23 @@ const BattleViewStyles = makeStyles((theme: Theme) => ({
   },
   weaponTitle: {
     marginTop: 16
+  },
+  armorDetails: {
+    flexDirection: 'column'
+  },
+  armorLabel: {
+    display: 'flex',
+    alignItems: 'center'
+  },
+  armorDetailTitle: {
+    marginRight: 8
+  },
+  armorItem: {
+    display: 'flex',
+    alignItems: 'center'
+  },
+  armorPanel: {
+    flex: 1
   }
 }))
 

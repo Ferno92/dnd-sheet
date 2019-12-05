@@ -14,11 +14,19 @@ import {
   Checkbox,
   ExpansionPanel,
   ExpansionPanelSummary,
-  ExpansionPanelDetails
+  ExpansionPanelDetails,
+  Tooltip
 } from '@material-ui/core'
 import StatsType from 'data/types/StatsEnum'
 import { useTheme } from '@material-ui/core/styles'
-import { Close, Check, Remove, Add } from '@material-ui/icons'
+import {
+  Close,
+  Check,
+  Remove,
+  Add,
+  ExpandMore,
+  Clear
+} from '@material-ui/icons'
 import TextFieldNumber from 'components/text-field-number/TextFieldNumber'
 import TextFieldString from 'components/text-field-string/TextFieldString'
 import PG from 'pages/stats/models/PG'
@@ -56,6 +64,7 @@ interface BattleViewProps {
   onAddArmor: (bonus: number, notes: string, armor?: Armor) => void
   onRemoveWeapon: (index: number) => void
   onRemoveArmor: (index: number) => void
+  onSelectArmor: (index: number) => void
 }
 
 function BattleView(props: BattleViewProps) {
@@ -69,7 +78,8 @@ function BattleView(props: BattleViewProps) {
     onAddWeapon,
     onAddArmor,
     onRemoveWeapon,
-    onRemoveArmor
+    onRemoveArmor,
+    onSelectArmor
   } = props
   const classes = BattleViewStyles()
   const [caModifiersOpen, setCaModifiersOpen] = useState(false)
@@ -79,6 +89,7 @@ function BattleView(props: BattleViewProps) {
   const [abilityExpanded, setAbilityExpanded] = useState<string>()
   const [privilegeExpanded, setPrivilegeExpanded] = useState<string>()
   const [privileges, setPrivileges] = useState<Privileges[]>()
+  const [armorExpanded, setArmorExpanded] = useState<string>()
   const theme = useTheme()
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
   let defaultModifiers = [
@@ -109,6 +120,12 @@ function BattleView(props: BattleViewProps) {
         )
       }
     })
+    if (armors.length === 0) {
+      count += StatsUtils.getStatModifier(
+        pg.stats.find(stat => stat.type === StatsType.Destrezza)!,
+        pg
+      )
+    }
     return count < 10 ? count + 10 : count
   }, [pg, props.pg])
 
@@ -342,69 +359,128 @@ function BattleView(props: BattleViewProps) {
         </Grid>
       </Grid>
       {/* ________________ Armor sections _____________ */}
-      <Typography variant="h5" className={classes.weaponTitle}>
+
+      <Typography variant="subtitle1" className={classes.weaponTitle}>
         Armature e scudi
       </Typography>
-      {pg.armors.length > 0 && (
-        <Grid container className={classes.weaponHeader}>
-          <Grid item xs={6}>
-            <Typography variant="subtitle2">Nome</Typography>
-          </Grid>
-          <Grid item xs={2}>
-            <Typography variant="subtitle2">CA</Typography>
-          </Grid>
-          <Grid item xs={3}>
-            <Typography variant="subtitle2">Tipologia</Typography>
-          </Grid>
-        </Grid>
-      )}
 
-      <Grid container>
-        {pg.armors.map((armorInfo: ArmorInfo, index: number) => {
-          return (
-            <React.Fragment key={index}>
-              <Grid
-                item
-                xs={6}
-                className={clsx(classes.weaponGridItem, classes.weaponName)}
-              >
-                <Typography variant="caption">{`${armorInfo.armor.name}${
-                  armorInfo.bonus ? `(+${armorInfo.bonus})` : ''
-                }`}</Typography>
-              </Grid>
-              <Grid item xs={2} className={classes.weaponGridItem}>
-                <Typography variant="caption">
-                  {armorInfo.armor.ca + armorInfo.bonus}
+      {pg.armors.map((armorInfo: ArmorInfo, index: number) => {
+        return (
+          <div
+            className={classes.armorItem}
+            key={`${armorInfo.armor.id}_${index}`}
+          >
+            <Checkbox
+              checked={armorInfo.isWearing || false}
+              onClick={() => onSelectArmor(index)}
+              disabled={!onEdit}
+            />
+            <ExpansionPanel
+              square
+              expanded={armorExpanded === armorInfo.armor.id}
+              onChange={() =>
+                armorExpanded === armorInfo.armor.id
+                  ? setArmorExpanded(undefined)
+                  : setArmorExpanded(armorInfo.armor.id)
+              }
+              className={classes.armorPanel}
+            >
+              <ExpansionPanelSummary expandIcon={<ExpandMore />}>
+                <Typography variant="subtitle2" itemType="span">
+                  {armorInfo.armor.name}
                 </Typography>
-              </Grid>
-              <Grid item xs={3} className={classes.weaponGridItem}>
-                <Typography variant="caption">
-                  {armorInfo.armor.armorType}
-                </Typography>
-              </Grid>
-
-              <Grid item xs={1} className={classes.weaponGridItem}>
+              </ExpansionPanelSummary>
+              <ExpansionPanelDetails className={classes.armorDetails}>
+                <div className={classes.armorLabel}>
+                  <Typography
+                    variant={'subtitle1'}
+                    className={classes.armorDetailTitle}
+                  >{`CA base: `}</Typography>
+                  <Typography variant={'body2'}>
+                    {armorInfo.armor.ca}
+                  </Typography>
+                </div>
+                <div className={classes.armorLabel}>
+                  <Typography
+                    variant={'subtitle1'}
+                    className={classes.armorDetailTitle}
+                  >{`Aggiungi destrezza: `}</Typography>
+                  <Typography variant={'body2'}>
+                    {armorInfo.armor.addDes ? 'Sì' : 'No'}
+                  </Typography>
+                </div>
+                {armorInfo.armor.minFor && (
+                  <div className={classes.armorLabel}>
+                    <Typography
+                      variant={'subtitle1'}
+                      className={classes.armorDetailTitle}
+                    >{`Forza minima: `}</Typography>
+                    <Typography variant={'body2'}>
+                      {armorInfo.armor.minFor}
+                    </Typography>
+                  </div>
+                )}
+                <div className={classes.armorLabel}>
+                  <Typography
+                    variant={'subtitle1'}
+                    className={classes.armorDetailTitle}
+                  >{`Peso: `}</Typography>
+                  <Typography variant={'body2'}>
+                    {`${armorInfo.armor.weight} Kg`}
+                  </Typography>
+                </div>
+                {armorInfo.armor.noFurtivity && (
+                  <div className={classes.armorLabel}>
+                    <Typography
+                      variant={'subtitle1'}
+                      className={classes.armorDetailTitle}
+                    >{`Furtività: `}</Typography>
+                    <Typography variant={'body2'}>
+                      {armorInfo.armor.noFurtivity ? 'Svantaggio' : ''}
+                    </Typography>
+                  </div>
+                )}
+                {armorInfo.bonus && (
+                  <div className={classes.armorLabel}>
+                    <Typography
+                      variant={'subtitle1'}
+                      className={classes.armorDetailTitle}
+                    >{`Bonus Magico: `}</Typography>
+                    <Typography variant={'body2'}>{`${
+                      armorInfo.bonus > 0 ? '+' : ''
+                    }${armorInfo.bonus}`}</Typography>
+                  </div>
+                )}
+                {armorInfo.notes && (
+                  <React.Fragment>
+                    <div className={classes.armorLabel}>
+                      <Typography
+                        variant={'subtitle1'}
+                        className={classes.armorDetailTitle}
+                      >{`Note: `}</Typography>
+                    </div>
+                    <Typography variant={'body2'}>{armorInfo.notes}</Typography>
+                  </React.Fragment>
+                )}
+              </ExpansionPanelDetails>
+            </ExpansionPanel>
+            {onEdit && (
+              <Tooltip title="Rimuovi">
                 <IconButton
-                  size="small"
-                  color="secondary"
+                  color="primary"
                   onClick={() => onRemoveArmor(index)}
                 >
-                  <Close className={classes.weaponInfoButton} />
+                  <Clear />
                 </IconButton>
-              </Grid>
-              <Grid
-                item
-                xs={12}
-                className={clsx(classes.weaponGridItem, classes.weaponInfo)}
-              >
-                {armorInfo.notes && (
-                  <Typography variant="caption">{armorInfo.notes}</Typography>
-                )}
-              </Grid>
-            </React.Fragment>
-          )
-        })}
-      </Grid>
+              </Tooltip>
+            )}
+          </div>
+        )
+      })}
+      {pg.armors.length === 0 && (
+        <Typography variant="body2">Nessuna armatura o scudo</Typography>
+      )}
+
       <Button
         className={classes.dialogActionButton}
         onClick={() => setArmorDialogOpen(!armorDialogOpen)}
