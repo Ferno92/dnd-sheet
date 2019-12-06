@@ -45,6 +45,7 @@ import { default as racesJSON } from 'data/json/RacesJSON'
 import DataUtils from 'data/DataUtils'
 import RaceAbility from 'data/types/RaceAbility'
 import Privileges from 'data/types/Privileges'
+import ExpansionPanelItem from 'components/expansion-panel-item/ExpansionPanelItem'
 
 export interface Modifier {
   type: string
@@ -376,119 +377,16 @@ function BattleView(props: BattleViewProps) {
 
       {pg.armors.map((armorInfo: ArmorInfo, index: number) => {
         return (
-          <div
-            className={classes.armorItem}
+          <ExpansionPanelItem
             key={`${armorInfo.armor.id}_${index}`}
-            style={{
-              alignItems:
-                armorExpanded === armorInfo.armor.id ? 'flex-start' : 'center'
-            }}
-          >
-            <ExpansionPanel
-              square
-              expanded={armorExpanded === armorInfo.armor.id}
-              onChange={() =>
-                armorExpanded === armorInfo.armor.id
-                  ? setArmorExpanded(undefined)
-                  : setArmorExpanded(armorInfo.armor.id)
-              }
-              className={classes.armorPanel}
-            >
-              <ExpansionPanelSummary
-                expandIcon={<ExpandMore />}
-                className={clsx(
-                  classes.armorPanelSummary,
-                  armorInfo.isWearing ? classes.abilityHighlight : undefined
-                )}
-              >
-                {onEdit && (
-                  <Checkbox
-                    checked={armorInfo.isWearing || false}
-                    onChange={() => onSelectArmor(index)}
-                    disabled={!onEdit}
-                    className={classes.armorCheckBox}
-                    onClick={e => e.stopPropagation()}
-                  />
-                )}
-                <Typography variant="subtitle1" itemType="span">
-                  {armorInfo.armor.name}
-                </Typography>
-              </ExpansionPanelSummary>
-              <ExpansionPanelDetails className={classes.armorDetails}>
-                <div className={classes.armorLabel}>
-                  <Typography
-                    variant={'subtitle1'}
-                    className={classes.armorDetailTitle}
-                  >{`CA base: `}</Typography>
-                  <Typography variant={'body2'}>
-                    {armorInfo.armor.ca}
-                  </Typography>
-                </div>
-                <div className={classes.armorLabel}>
-                  <Typography
-                    variant={'subtitle1'}
-                    className={classes.armorDetailTitle}
-                  >{`Aggiungi destrezza: `}</Typography>
-                  <Typography variant={'body2'}>
-                    {armorInfo.armor.addDes ? 'Sì' : 'No'}
-                  </Typography>
-                </div>
-                {armorInfo.armor.minFor && (
-                  <div className={classes.armorLabel}>
-                    <Typography
-                      variant={'subtitle1'}
-                      className={classes.armorDetailTitle}
-                    >{`Forza minima: `}</Typography>
-                    <Typography variant={'body2'}>
-                      {armorInfo.armor.minFor}
-                    </Typography>
-                  </div>
-                )}
-                <div className={classes.armorLabel}>
-                  <Typography
-                    variant={'subtitle1'}
-                    className={classes.armorDetailTitle}
-                  >{`Peso: `}</Typography>
-                  <Typography variant={'body2'}>
-                    {`${armorInfo.armor.weight} Kg`}
-                  </Typography>
-                </div>
-                {armorInfo.armor.noFurtivity && (
-                  <div className={classes.armorLabel}>
-                    <Typography
-                      variant={'subtitle1'}
-                      className={classes.armorDetailTitle}
-                    >{`Furtività: `}</Typography>
-                    <Typography variant={'body2'}>
-                      {armorInfo.armor.noFurtivity ? 'Svantaggio' : ''}
-                    </Typography>
-                  </div>
-                )}
-                {armorInfo.bonus && (
-                  <div className={classes.armorLabel}>
-                    <Typography
-                      variant={'subtitle1'}
-                      className={classes.armorDetailTitle}
-                    >{`Bonus Magico: `}</Typography>
-                    <Typography variant={'body2'}>{`${
-                      armorInfo.bonus > 0 ? '+' : ''
-                    }${armorInfo.bonus}`}</Typography>
-                  </div>
-                )}
-                {armorInfo.notes && (
-                  <React.Fragment>
-                    <div className={classes.armorLabel}>
-                      <Typography
-                        variant={'subtitle1'}
-                        className={classes.armorDetailTitle}
-                      >{`Note: `}</Typography>
-                    </div>
-                    <Typography variant={'body2'}>{armorInfo.notes}</Typography>
-                  </React.Fragment>
-                )}
-              </ExpansionPanelDetails>
-            </ExpansionPanel>
-            {onEdit && (
+            id={armorInfo.armor.id}
+            name={armorInfo.armor.name}
+            expanded={armorExpanded === armorInfo.armor.id}
+            checked={armorInfo.isWearing || false}
+            checkbox
+            checkboxDisabled={false}
+            onEdit={onEdit}
+            RightIconButton={
               <Tooltip title="Rimuovi">
                 <IconButton
                   color="primary"
@@ -497,8 +395,86 @@ function BattleView(props: BattleViewProps) {
                   <Clear />
                 </IconButton>
               </Tooltip>
-            )}
-          </div>
+            }
+            onExpand={() =>
+              armorExpanded === armorInfo.armor.id
+                ? setArmorExpanded(undefined)
+                : setArmorExpanded(armorInfo.armor.id)
+            }
+            onChangeCheckbox={() => onSelectArmor(index)}
+          >
+            <React.Fragment>
+              <div className={classes.armorLabel}>
+                <Typography
+                  variant={'subtitle1'}
+                  className={classes.armorDetailTitle}
+                >{`CA base: `}</Typography>
+                <Typography variant={'body2'}>{armorInfo.armor.ca}</Typography>
+              </div>
+              <div className={classes.armorLabel}>
+                <Typography
+                  variant={'subtitle1'}
+                  className={classes.armorDetailTitle}
+                >{`Aggiungi destrezza: `}</Typography>
+                <Typography variant={'body2'}>
+                  {armorInfo.armor.addDes ? 'Sì' : 'No'}
+                </Typography>
+              </div>
+              {armorInfo.armor.minFor && (
+                <div className={classes.armorLabel}>
+                  <Typography
+                    variant={'subtitle1'}
+                    className={classes.armorDetailTitle}
+                  >{`Forza minima: `}</Typography>
+                  <Typography variant={'body2'}>
+                    {armorInfo.armor.minFor}
+                  </Typography>
+                </div>
+              )}
+              <div className={classes.armorLabel}>
+                <Typography
+                  variant={'subtitle1'}
+                  className={classes.armorDetailTitle}
+                >{`Peso: `}</Typography>
+                <Typography variant={'body2'}>
+                  {`${armorInfo.armor.weight} Kg`}
+                </Typography>
+              </div>
+              {armorInfo.armor.noFurtivity && (
+                <div className={classes.armorLabel}>
+                  <Typography
+                    variant={'subtitle1'}
+                    className={classes.armorDetailTitle}
+                  >{`Furtività: `}</Typography>
+                  <Typography variant={'body2'}>
+                    {armorInfo.armor.noFurtivity ? 'Svantaggio' : ''}
+                  </Typography>
+                </div>
+              )}
+              {armorInfo.bonus !== 0 && (
+                <div className={classes.armorLabel}>
+                  <Typography
+                    variant={'subtitle1'}
+                    className={classes.armorDetailTitle}
+                  >{`Bonus Magico: `}</Typography>
+                  <Typography variant={'body2'}>{`${
+                    armorInfo.bonus > 0 ? '+' : ''
+                  }${armorInfo.bonus}`}</Typography>
+                </div>
+              )}
+              {armorInfo.notes && (
+                <React.Fragment>
+                  <div className={classes.armorLabel}>
+                    <Typography
+                      variant={'subtitle1'}
+                      className={classes.armorDetailTitle}
+                    >{`Note: `}</Typography>
+                  </div>
+                  <Typography variant={'body2'}>{armorInfo.notes}</Typography>
+                </React.Fragment>
+              )}
+            </React.Fragment>
+          </ExpansionPanelItem>
         )
       })}
       {pg.armors.length === 0 && (

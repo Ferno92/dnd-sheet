@@ -21,6 +21,7 @@ const App: React.FC = () => {
       setShowNewVersionBanner(false)
 
       window.postMessage({ type: 'SKIP_WAITING' }, window.location.origin)
+      window.location.reload()
     }
   }
 
