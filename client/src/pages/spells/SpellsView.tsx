@@ -222,6 +222,12 @@ const SpellsView: React.FC<SpellsViewProps> = (props: SpellsViewProps) => {
               {spellByLevel &&
                 spellByLevel.spells.map(spell => {
                   return (
+                    // <EspansionPanelItem
+                    // id={spell.id}
+                    // name={}
+                    // >
+
+                    // </EspansionPanelItem>
                     <div key={spell.id} className={styles.spellContainer}>
                       <Checkbox
                         checked={spell.prepared}

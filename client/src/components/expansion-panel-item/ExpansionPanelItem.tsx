@@ -19,7 +19,7 @@ interface ExpansionPanelItemProps {
   checkboxDisabled: boolean
   onEdit: boolean
   children: React.ReactNode
-  RightIconButton: React.ReactNode
+  RightIconButton?: React.ReactNode
   onExpand: () => void
   onChangeCheckbox: (id: string, checked: boolean) => void
 }

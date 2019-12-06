@@ -38,6 +38,7 @@ import InfoDialog from 'components/info-dialog/InfoDialog'
 import StatsUtils from 'utils/StatsUtils'
 import Ability from 'data/types/Ability'
 import ImageCompressor from 'image-compressor.js'
+import ExpansionPanelItem from 'components/expansion-panel-item/ExpansionPanelItem'
 
 interface StatsViewProps {
   onEdit: boolean
@@ -524,77 +525,50 @@ class StatsView extends Component<
                   ? StatsUtils.getProficiency(level, pgClass)
                   : 0)
               return (
-                <ExpansionPanel
+                <ExpansionPanelItem
                   key={ability.type}
-                  square
                   expanded={abilityExpanded === ability.type}
-                  onChange={() =>
+                  id={ability.type}
+                  name={ability.type}
+                  checked={this.hasProficiency(ability.type)}
+                  onChangeCheckbox={(id: string, checked: boolean) =>
+                    onChangeAbilityCheck(id as AbilitiesEnum, checked)
+                  }
+                  checkbox={this.isAbilityEnabled(ability)}
+                  extra={TextUtils.getValueWithSign(totValue).toString()}
+                  checkboxDisabled={
+                    this.missingAbilitiesToSelect() === 0 &&
+                    !this.hasProficiency(ability.type)
+                  }
+                  onEdit={onEdit}
+                  onExpand={() =>
                     ability.type === abilityExpanded
                       ? this.setState({ abilityExpanded: undefined })
                       : this.setState({ abilityExpanded: ability.type })
                   }
-                  className={classes.abilityPanel}
                 >
-                  <ExpansionPanelSummary
-                    className={
-                      this.hasProficiency(ability.type)
-                        ? classes.abilityHighlight
-                        : undefined
-                    }
-                  >
-                    <div className={classes.tsPanelTitle}>
-                      <div className={classes.abilityCheckbox}>
-                        {onEdit &&
-                          (this.isAbilityEnabled(ability) ? (
-                            <Checkbox
-                              checked={this.hasProficiency(ability.type)}
-                              onChange={(
-                                event: React.ChangeEvent<HTMLInputElement>,
-                                checked: boolean
-                              ) => onChangeAbilityCheck(ability.type, checked)}
-                              disabled={
-                                !onEdit ||
-                                (this.missingAbilitiesToSelect() === 0 &&
-                                  !this.hasProficiency(ability.type))
-                              }
-                              onClick={e => e.stopPropagation()}
-                            />
-                          ) : (
-                            <div className={classes.noCheckbox} />
-                          ))}
-                        <Typography variant={'subtitle1'}>
-                          {ability.type}
-                        </Typography>
-                      </div>
-                      <Typography variant={'subtitle1'}>
-                        {TextUtils.getValueWithSign(totValue)}
-                      </Typography>
-                    </div>
-                  </ExpansionPanelSummary>
-                  <ExpansionPanelDetails>
-                    <MixedInput
-                      inputInfo={{
-                        type: 'Extra',
-                        value: this.getAbilityPoints(ability.type)
-                      }}
-                      inputPos={InputPosition.End}
-                      modifiers={[
-                        {
-                          type: `${TextUtils.getSmallStatsType(ability.stat)}${
-                            this.hasProficiency(ability.type) ? '+ Comp' : ''
-                          }`,
-                          value: totValue
-                        }
-                      ]}
-                      onChange={(value: number) => {
-                        onChangeAbilityPoints(ability.type, value)
-                      }}
-                      onEdit={onEdit}
-                      // label={ability.type}
-                      labelOnTop
-                    />
-                  </ExpansionPanelDetails>
-                </ExpansionPanel>
+                  <MixedInput
+                    inputInfo={{
+                      type: 'Extra',
+                      value: this.getAbilityPoints(ability.type)
+                    }}
+                    inputPos={InputPosition.End}
+                    modifiers={[
+                      {
+                        type: `${TextUtils.getSmallStatsType(ability.stat)}${
+                          this.hasProficiency(ability.type) ? '+ Comp' : ''
+                        }`,
+                        value: totValue
+                      }
+                    ]}
+                    onChange={(value: number) => {
+                      onChangeAbilityPoints(ability.type, value)
+                    }}
+                    onEdit={onEdit}
+                    // label={ability.type}
+                    labelOnTop
+                  />
+                </ExpansionPanelItem>
               )
             })}
           </div>

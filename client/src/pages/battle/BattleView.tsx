@@ -19,14 +19,7 @@ import {
 } from '@material-ui/core'
 import StatsType from 'data/types/StatsEnum'
 import { useTheme } from '@material-ui/core/styles'
-import {
-  Close,
-  Check,
-  Remove,
-  Add,
-  ExpandMore,
-  Clear
-} from '@material-ui/icons'
+import { Close, Check, Remove, Add, Clear } from '@material-ui/icons'
 import TextFieldNumber from 'components/text-field-number/TextFieldNumber'
 import TextFieldString from 'components/text-field-string/TextFieldString'
 import PG from 'pages/stats/models/PG'
