@@ -26,7 +26,12 @@ const DashboardStyles = makeStyles((theme: Theme) =>
     emptyDescription: {
       margin: '20vh auto',
       maxWidth: 260,
-      textAlign: 'center'
+      textAlign: 'center',
+      '& svg': {
+        width: 160,
+        height: 160,
+        marginBottom: 24
+      }
     },
     skeletonContainer: {
       display: 'flex',

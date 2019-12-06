@@ -59,7 +59,9 @@ const EquipmentView: React.FC<EquipmentViewProps> = (
     pg.equipment.backpack.forEach(item => {
       value += item.weight * item.quantity
     })
-    //TODO add armor
+    pg.armors.forEach(armorInfo => {
+      value += armorInfo.armor.weight
+    })
     pg.weapons.forEach(weaponInfo => {
       if (weaponInfo.weapon.weight) {
         value += weaponInfo.weapon.weight
@@ -124,6 +126,7 @@ const EquipmentView: React.FC<EquipmentViewProps> = (
           min={0}
         />
       </div>
+      {/* //TODO expansion panel item */}
       <Typography variant="subtitle2">Oggetti:</Typography>
       {pg.equipment.backpack.length > 0 && (
         <Grid container className={styles.equipmentHeader}>

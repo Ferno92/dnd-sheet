@@ -86,7 +86,7 @@ const ExpansionPanelItem: React.FC<ExpansionPanelItemProps> = (
           {children}
         </ExpansionPanelDetails>
       </ExpansionPanel>
-      {onEdit && RightIconButton}
+      {RightIconButton}
     </div>
   )
 }

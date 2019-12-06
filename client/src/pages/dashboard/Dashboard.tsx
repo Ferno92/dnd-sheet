@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react'
 import Dexie from 'dexie'
 import PG from 'pages/stats/models/PG'
 import { Add, Delete } from '@material-ui/icons'
+import { ReactComponent as OrcIcon } from 'assets/images/orc.svg'
 import {
   Typography,
   Fab,
@@ -115,9 +116,12 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
             </ListItem>
           ))}
           {pgs.length === 0 && (
-            <Typography variant="body1" className={classes.emptyDescription}>
-              Non hai ancora dei personaggi, creane subito uno
-            </Typography>
+            <div className={classes.emptyDescription}>
+              <OrcIcon />
+              <Typography variant="body1">
+                Non hai ancora dei personaggi, creane subito uno!
+              </Typography>
+            </div>
           )}
 
           <Fab

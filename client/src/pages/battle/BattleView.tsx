@@ -84,6 +84,7 @@ function BattleView(props: BattleViewProps) {
   const [privilegeExpanded, setPrivilegeExpanded] = useState<string>()
   const [privileges, setPrivileges] = useState<Privileges[]>()
   const [armorExpanded, setArmorExpanded] = useState<string>()
+  const [weaponExpanded, setWeaponExpanded] = useState<string>()
   const theme = useTheme()
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
   let defaultModifiers = [
@@ -380,14 +381,16 @@ function BattleView(props: BattleViewProps) {
             checkboxDisabled={false}
             onEdit={onEdit}
             RightIconButton={
-              <Tooltip title="Rimuovi">
-                <IconButton
-                  color="primary"
-                  onClick={() => onRemoveArmor(index)}
-                >
-                  <Clear />
-                </IconButton>
-              </Tooltip>
+              onEdit && (
+                <Tooltip title="Rimuovi">
+                  <IconButton
+                    color="primary"
+                    onClick={() => onRemoveArmor(index)}
+                  >
+                    <Clear />
+                  </IconButton>
+                </Tooltip>
+              )
             }
             onExpand={() =>
               armorExpanded === armorInfo.armor.id
@@ -483,90 +486,100 @@ function BattleView(props: BattleViewProps) {
       />
 
       {/* ________________ Weapon sections _____________ */}
-      <Typography variant="h5" className={classes.weaponTitle}>
-        Armi
-      </Typography>
-      {pg.weapons.length > 0 && (
-        <Grid container className={classes.weaponHeader}>
-          <Grid item xs={3}>
-            <Typography variant="subtitle2">Nome</Typography>
-          </Grid>
-          <Grid item xs={2}>
-            <Typography variant="subtitle2">TPC</Typography>
-          </Grid>
-          <Grid item xs={3}>
-            <Typography variant="subtitle2">Danno</Typography>
-          </Grid>
-          <Grid item xs={3}>
-            <Typography variant="subtitle2">Tipologia</Typography>
-          </Grid>
-        </Grid>
-      )}
+      <div className={classes.armorTitle}>
+        <Typography variant="h5">Armi</Typography>
+        <Tooltip title="Aggiungi armi">
+          <IconButton onClick={() => setWeaponDialogOpen(!weaponDialogOpen)}>
+            <Add />
+          </IconButton>
+        </Tooltip>
+      </div>
 
-      <Grid container>
-        {pg.weapons.map((weaponInfo: WeaponInfo, index: number) => {
-          return (
-            <React.Fragment key={index}>
-              <Grid
-                item
-                xs={3}
-                className={clsx(classes.weaponGridItem, classes.weaponName)}
-              >
-                <Typography variant="caption">
-                  {`${weaponInfo.weapon.name}${
-                    weaponInfo.bonus ? `(+${weaponInfo.bonus})` : ''
-                  }`}
-                </Typography>
-              </Grid>
-              <Grid item xs={2} className={classes.weaponGridItem}>
-                <Typography variant="caption">
+      {pg.weapons.map((weaponInfo: WeaponInfo, index: number) => {
+        const weaponDamageBonus = getWeaponDamageBonus(weaponInfo)
+        return (
+          <ExpansionPanelItem
+            key={`${weaponInfo.weapon.id}_${index}`}
+            id={weaponInfo.weapon.id}
+            name={`${weaponInfo.weapon.name}${
+              weaponInfo.bonus ? `(+${weaponInfo.bonus})` : ''
+            }`}
+            expanded={weaponExpanded === weaponInfo.weapon.id}
+            checked={false}
+            checkbox={false}
+            checkboxDisabled={true}
+            onEdit={onEdit}
+            RightIconButton={
+              onEdit && (
+                <Tooltip title="Rimuovi">
+                  <IconButton
+                    color="primary"
+                    onClick={() => onRemoveWeapon(index)}
+                  >
+                    <Clear />
+                  </IconButton>
+                </Tooltip>
+              )
+            }
+            onChangeCheckbox={() => {}}
+            onExpand={() =>
+              weaponExpanded === weaponInfo.weapon.id
+                ? setWeaponExpanded(undefined)
+                : setWeaponExpanded(weaponInfo.weapon.id)
+            }
+          >
+            <React.Fragment>
+              <div className={classes.armorLabel}>
+                <Typography
+                  variant={'subtitle1'}
+                  className={classes.armorDetailTitle}
+                >{`Tiro per colpire: `}</Typography>
+                <Typography variant={'body2'}>
                   {getWeaponTPC(weaponInfo)}
                 </Typography>
-              </Grid>
-              <Grid item xs={3} className={classes.weaponGridItem}>
-                <Typography variant="caption">
-                  {`${weaponInfo.weapon.damage}+${getWeaponDamageBonus(
-                    weaponInfo
-                  )}`}
+              </div>
+              <div className={classes.armorLabel}>
+                <Typography
+                  variant={'subtitle1'}
+                  className={classes.armorDetailTitle}
+                >{`Danno: `}</Typography>
+                <Typography variant={'body2'}>
+                  {`${weaponInfo.weapon.damage}${
+                    weaponDamageBonus >= 0 ? '+' : ''
+                  }${weaponDamageBonus}`}
                 </Typography>
-              </Grid>
-              <Grid item xs={3} className={classes.weaponGridItem}>
-                <Typography variant="caption">
+              </div>
+              <div className={classes.armorLabel}>
+                <Typography
+                  variant={'subtitle1'}
+                  className={classes.armorDetailTitle}
+                >{`Tipologia: `}</Typography>
+                <Typography variant={'body2'}>
                   {weaponInfo.weapon.damageType}
                 </Typography>
-              </Grid>
-
-              <Grid item xs={1} className={classes.weaponGridItem}>
-                <IconButton
-                  size="small"
-                  color="secondary"
-                  onClick={() => onRemoveWeapon(index)}
-                >
-                  <Close className={classes.weaponInfoButton} />
-                </IconButton>
-              </Grid>
-              <Grid
-                item
-                xs={12}
-                className={clsx(classes.weaponGridItem, classes.weaponInfo)}
-              >
-                {weaponInfo.notes && (
-                  <Typography variant="caption">{weaponInfo.notes}</Typography>
-                )}
-                <Typography variant="caption">
+              </div>
+              <div className={classes.armorLabel}>
+                <Typography
+                  variant={'subtitle1'}
+                  className={classes.armorDetailTitle}
+                >{`Proprietà: `}</Typography>
+                <Typography variant={'body2'}>
                   {weaponInfo.weapon.property.map(property => property)}
                 </Typography>
-              </Grid>
+              </div>
+              {weaponInfo.notes && (
+                <React.Fragment>
+                  <Typography
+                    variant={'subtitle1'}
+                    className={classes.armorDetailTitle}
+                  >{`Note: `}</Typography>
+                  <Typography variant={'body2'}>{weaponInfo.notes}</Typography>
+                </React.Fragment>
+              )}
             </React.Fragment>
-          )
-        })}
-      </Grid>
-      <Button
-        className={classes.dialogActionButton}
-        onClick={() => setWeaponDialogOpen(!weaponDialogOpen)}
-      >
-        <Add /> Aggiungi arma
-      </Button>
+          </ExpansionPanelItem>
+        )
+      })}
 
       {/* ________________ Abilità speciali di razza _____________ */}
       <Typography variant="subtitle1" className={classes.weaponTitle}>

@@ -4,10 +4,6 @@ import useStyles from './SpellsView.styles'
 import {
   Typography,
   IconButton,
-  ExpansionPanel,
-  ExpansionPanelSummary,
-  Checkbox,
-  ExpansionPanelDetails,
   useMediaQuery,
   Theme,
   Tooltip,
@@ -25,6 +21,7 @@ import SpellDialog from 'components/spell-dialog/SpellDialog'
 import { useTheme } from '@material-ui/styles'
 import { ReactComponent as MagicWand } from 'assets/images/magic-wand.svg'
 import { JobsEnum } from 'data/types/JobsEnum'
+import ExpansionPanelItem from 'components/expansion-panel-item/ExpansionPanelItem'
 
 interface SpellsViewProps {
   onEdit: boolean
@@ -222,135 +219,110 @@ const SpellsView: React.FC<SpellsViewProps> = (props: SpellsViewProps) => {
               {spellByLevel &&
                 spellByLevel.spells.map(spell => {
                   return (
-                    // <EspansionPanelItem
-                    // id={spell.id}
-                    // name={}
-                    // >
-
-                    // </EspansionPanelItem>
-                    <div key={spell.id} className={styles.spellContainer}>
-                      <Checkbox
-                        checked={spell.prepared}
-                        onChange={(
-                          event: React.ChangeEvent<HTMLInputElement>,
-                          checked: boolean
-                        ) => onChangeSpellChecked(spell)}
-                        disabled={!onEdit || !canPrepareSpells()}
-                        className={styles.checkbox}
-                        style={{
-                          visibility:
-                            spell.prepared || (onEdit && canPrepareSpells())
-                              ? 'visible'
-                              : 'hidden'
-                        }}
-                      />
-                      <ExpansionPanel
-                        square
-                        expanded={spellExpanded === spell.id}
-                        onChange={() =>
-                          setSpellExpanded(
-                            spellExpanded === spell.id ? undefined : spell.id
-                          )
-                        }
-                        className={styles.spellExpansionPanel}
-                      >
-                        <ExpansionPanelSummary
-                          expandIcon={<ExpandMore />}
-                          className={styles.expansionPanelSummary}
-                        >
-                          <div className={styles.spellSummary}>
-                            <Typography variant={'body1'}>
-                              {spell.name}
-                            </Typography>
-                          </div>
-                        </ExpansionPanelSummary>
-                        <ExpansionPanelDetails className={styles.spellDetails}>
-                          <Typography
-                            variant={'body2'}
-                          >{`${spell.type} di ${spell.level}° livello`}</Typography>
-                          <div className={styles.spellLabel}>
-                            <Typography
-                              variant={'subtitle1'}
-                              className={styles.spellDetailTitle}
-                            >{`Tempo di lancio: `}</Typography>
-                            <Typography variant={'body2'}>
-                              {spell.tempoDiLancio}
-                            </Typography>
-                          </div>
-                          <div className={styles.spellLabel}>
-                            <Typography
-                              variant={'subtitle1'}
-                              className={styles.spellDetailTitle}
-                            >{`Gittata: `}</Typography>
-                            <Typography variant={'body2'}>
-                              {spell.gittata}
-                            </Typography>
-                          </div>
-                          <div className={styles.spellLabel}>
-                            <Typography
-                              variant={'subtitle1'}
-                              className={styles.spellDetailTitle}
-                            >{`Componenti: `}</Typography>
-                            <Typography variant={'body2'}>
-                              {spell.componenti.map(
-                                (material: string, index: number) =>
-                                  `${index === 0 ? '' : ', '}${material}`
-                              )}
-                            </Typography>
-                          </div>
-                          <div className={styles.spellLabel}>
-                            <Typography
-                              variant={'subtitle1'}
-                              className={styles.spellDetailTitle}
-                            >{`Durata: `}</Typography>
-                            <Typography variant={'body2'}>
-                              {spell.durata}
-                            </Typography>
-                          </div>
-                          <Typography variant={'subtitle1'}>
-                            {'Descrizione:'}
-                          </Typography>
-                          <Typography variant={'body2'}>
-                            {spell.description}
-                          </Typography>
-                        </ExpansionPanelDetails>
-                      </ExpansionPanel>
-                      {onEdit ? (
-                        <Tooltip title="Rimuovi">
-                          <IconButton
-                            className={styles.magicWand}
-                            color="primary"
-                            onClick={() => onRemoveSpell(spell)}
-                          >
-                            <Clear />
-                          </IconButton>
-                        </Tooltip>
-                      ) : (
-                        <Tooltip title="Lancia magia">
-                          <div>
+                    <ExpansionPanelItem
+                      key={spell.id}
+                      id={spell.id}
+                      name={spell.name}
+                      expanded={spellExpanded === spell.id}
+                      checked={spell.prepared}
+                      checkbox={
+                        spell.prepared || (onEdit && canPrepareSpells())
+                      }
+                      checkboxDisabled={!canPrepareSpells()}
+                      onEdit={onEdit}
+                      RightIconButton={
+                        onEdit ? (
+                          <Tooltip title="Rimuovi">
                             <IconButton
                               className={styles.magicWand}
-                              onClick={() => onUseSlot(spell.level)}
-                              disabled={
-                                getSpellSlotSpent(spellInfo.level) >=
-                                spellInfo.slot
-                              }
-                              style={{
-                                visibility:
+                              color="primary"
+                              onClick={() => onRemoveSpell(spell)}
+                            >
+                              <Clear />
+                            </IconButton>
+                          </Tooltip>
+                        ) : (
+                          <Tooltip title="Lancia magia">
+                            <div>
+                              <IconButton
+                                className={styles.magicWand}
+                                onClick={() => onUseSlot(spell.level)}
+                                disabled={
                                   getSpellSlotSpent(spellInfo.level) >=
                                   spellInfo.slot
-                                    ? 'hidden'
-                                    : canPrepareSpells() && !spell.prepared
-                                    ? 'hidden'
-                                    : 'visible'
-                              }}
-                            >
-                              <MagicWand />
-                            </IconButton>
-                          </div>
-                        </Tooltip>
-                      )}
-                    </div>
+                                }
+                                style={{
+                                  visibility:
+                                    getSpellSlotSpent(spellInfo.level) >=
+                                    spellInfo.slot
+                                      ? 'hidden'
+                                      : canPrepareSpells() && !spell.prepared
+                                      ? 'hidden'
+                                      : 'visible'
+                                }}
+                              >
+                                <MagicWand />
+                              </IconButton>
+                            </div>
+                          </Tooltip>
+                        )
+                      }
+                      onExpand={() =>
+                        setSpellExpanded(
+                          spellExpanded === spell.id ? undefined : spell.id
+                        )
+                      }
+                      onChangeCheckbox={() => onChangeSpellChecked(spell)}
+                    >
+                      <Typography
+                        variant={'body2'}
+                      >{`${spell.type} di ${spell.level}° livello`}</Typography>
+                      <div className={styles.spellLabel}>
+                        <Typography
+                          variant={'subtitle1'}
+                          className={styles.spellDetailTitle}
+                        >{`Tempo di lancio: `}</Typography>
+                        <Typography variant={'body2'}>
+                          {spell.tempoDiLancio}
+                        </Typography>
+                      </div>
+                      <div className={styles.spellLabel}>
+                        <Typography
+                          variant={'subtitle1'}
+                          className={styles.spellDetailTitle}
+                        >{`Gittata: `}</Typography>
+                        <Typography variant={'body2'}>
+                          {spell.gittata}
+                        </Typography>
+                      </div>
+                      <div className={styles.spellLabel}>
+                        <Typography
+                          variant={'subtitle1'}
+                          className={styles.spellDetailTitle}
+                        >{`Componenti: `}</Typography>
+                        <Typography variant={'body2'}>
+                          {spell.componenti.map(
+                            (material: string, index: number) =>
+                              `${index === 0 ? '' : ', '}${material}`
+                          )}
+                        </Typography>
+                      </div>
+                      <div className={styles.spellLabel}>
+                        <Typography
+                          variant={'subtitle1'}
+                          className={styles.spellDetailTitle}
+                        >{`Durata: `}</Typography>
+                        <Typography variant={'body2'}>
+                          {spell.durata}
+                        </Typography>
+                      </div>
+                      <Typography variant={'subtitle1'}>
+                        {'Descrizione:'}
+                      </Typography>
+                      <Typography variant={'body2'}>
+                        {spell.description}
+                      </Typography>
+                    </ExpansionPanelItem>
                   )
                 })}
             </div>

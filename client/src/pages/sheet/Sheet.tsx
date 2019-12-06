@@ -16,7 +16,7 @@ import { ReactComponent as FightIcon } from 'assets/images/swords.svg'
 import { ReactComponent as ProfileIcon } from 'assets/images/viking.svg'
 import { ReactComponent as BackpackIcon } from 'assets/images/backpack.svg'
 import { ReactComponent as BookIcon } from 'assets/images/spellbook.svg'
-import { Edit, Done, ArrowBack, MoreHoriz, Info } from '@material-ui/icons'
+import { Edit, Done, MoreHoriz, People } from '@material-ui/icons'
 import SwipeableViews from 'react-swipeable-views'
 import StatsView from 'pages/stats/StatsView'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
@@ -63,11 +63,19 @@ class Sheet extends Component<
 > {
   actions = [
     {
-      icon: <ArrowBack />,
-      name: 'Back',
+      icon: <People />,
+      name: 'Torna a selezione personaggi',
       onClick: () => {
         //go back
         this.props.history.goBack()
+      }
+    },
+    {
+      icon: <People />,
+      name: 'Condividi personaggio',
+      onClick: () => {
+        //go back
+        alert('Funzionalità in arrivo')
       }
     }
     // {
