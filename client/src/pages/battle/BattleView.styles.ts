@@ -172,6 +172,27 @@ const BattleViewStyles = makeStyles((theme: Theme) => ({
   },
   armorPanel: {
     flex: 1
+  },
+  armorPanelSummary: {
+    '& .MuiExpansionPanelSummary-content': {
+      alignItems: 'center'
+    }
+  },
+  armorCheckBox: {
+    padding: 4,
+    marginRight: 8
+  },
+  armorTitle: {
+    marginTop: 16,
+    display: 'flex',
+    alignItems: 'center',
+    width: '100%',
+    marginBottom: 8,
+    justifyContent: 'space-between'
+  },
+  abilityHighlight: {
+    border: 'solid 1px',
+    borderRadius: 3
   }
 }))
 

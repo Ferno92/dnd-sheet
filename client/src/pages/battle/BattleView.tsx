@@ -110,17 +110,22 @@ function BattleView(props: BattleViewProps) {
   const getCA = useCallback(() => {
     let count = 0
     const { armors } = props.pg
+    let wearing = false
     armors.forEach(armorInfo => {
-      //TODO if armor missing add 10
-      count += armorInfo.armor.ca + armorInfo.bonus
-      if (armorInfo.armor.addDes) {
-        count += StatsUtils.getStatModifier(
-          pg.stats.find(stat => stat.type === StatsType.Destrezza)!,
-          pg
-        )
+      if (armorInfo.isWearing) {
+        count += armorInfo.armor.ca + armorInfo.bonus
+        if (armorInfo.armor.ca >= 10) {
+          wearing = true
+        }
+        if (armorInfo.armor.addDes) {
+          count += StatsUtils.getStatModifier(
+            pg.stats.find(stat => stat.type === StatsType.Destrezza)!,
+            pg
+          )
+        }
       }
     })
-    if (armors.length === 0) {
+    if (!wearing) {
       count += StatsUtils.getStatModifier(
         pg.stats.find(stat => stat.type === StatsType.Destrezza)!,
         pg
@@ -360,21 +365,25 @@ function BattleView(props: BattleViewProps) {
       </Grid>
       {/* ________________ Armor sections _____________ */}
 
-      <Typography variant="subtitle1" className={classes.weaponTitle}>
-        Armature e scudi
-      </Typography>
+      <div className={classes.armorTitle}>
+        <Typography variant="h5">Armature e scudi</Typography>
+        <Tooltip title="Aggiungi armatura o scudo">
+          <IconButton onClick={() => setArmorDialogOpen(!armorDialogOpen)}>
+            <Add />
+          </IconButton>
+        </Tooltip>
+      </div>
 
       {pg.armors.map((armorInfo: ArmorInfo, index: number) => {
         return (
           <div
             className={classes.armorItem}
             key={`${armorInfo.armor.id}_${index}`}
+            style={{
+              alignItems:
+                armorExpanded === armorInfo.armor.id ? 'flex-start' : 'center'
+            }}
           >
-            <Checkbox
-              checked={armorInfo.isWearing || false}
-              onClick={() => onSelectArmor(index)}
-              disabled={!onEdit}
-            />
             <ExpansionPanel
               square
               expanded={armorExpanded === armorInfo.armor.id}
@@ -385,8 +394,23 @@ function BattleView(props: BattleViewProps) {
               }
               className={classes.armorPanel}
             >
-              <ExpansionPanelSummary expandIcon={<ExpandMore />}>
-                <Typography variant="subtitle2" itemType="span">
+              <ExpansionPanelSummary
+                expandIcon={<ExpandMore />}
+                className={clsx(
+                  classes.armorPanelSummary,
+                  armorInfo.isWearing ? classes.abilityHighlight : undefined
+                )}
+              >
+                {onEdit && (
+                  <Checkbox
+                    checked={armorInfo.isWearing || false}
+                    onChange={() => onSelectArmor(index)}
+                    disabled={!onEdit}
+                    className={classes.armorCheckBox}
+                    onClick={e => e.stopPropagation()}
+                  />
+                )}
+                <Typography variant="subtitle1" itemType="span">
                   {armorInfo.armor.name}
                 </Typography>
               </ExpansionPanelSummary>
@@ -480,13 +504,6 @@ function BattleView(props: BattleViewProps) {
       {pg.armors.length === 0 && (
         <Typography variant="body2">Nessuna armatura o scudo</Typography>
       )}
-
-      <Button
-        className={classes.dialogActionButton}
-        onClick={() => setArmorDialogOpen(!armorDialogOpen)}
-      >
-        <Add /> Aggiungi armatura o scudo
-      </Button>
 
       {/* ________________ Armor dialog _____________ */}
       <ArmorDialog
