@@ -25,7 +25,8 @@ class DataUtils {
         abilities: child.abilities,
         special: [],
         languages: [],
-        size: child.size
+        size: child.size,
+        vel: child.vel
       })
     })
     return races

@@ -29,7 +29,8 @@ export default [
         lv: 1,
         type: 'ira',
         name: 'Ira',
-        description: 'In battaglia un barbaro, ecc ecc',
+        description:
+          'In battaglia, un barbaro combatte animato da una ferocia primordiale. Nel suo turno può entrare in ira come azione bonus.',
         counter: 2,
         counterType: 'volte'
       },
@@ -37,7 +38,43 @@ export default [
         lv: 1,
         type: 'difesaSenzaArmatura',
         name: 'Difesa Senza Armatura',
-        description: 'Finchè un barbaro, ecc ecc'
+        description:
+          'Finché un barbaro non indossa alcuna armatura, la sua Classe Armatura è pari a 10 +il suo modificatore di Destrezza + il suo modificatore di Costituzione. Un barbaro può usare uno scudo e ottenere comunque questo beneficio.'
+      },
+      {
+        lv: 2,
+        type: 'attaccoIrruento',
+        name: 'Attacco Irruento',
+        description:
+          'Quando effettua il suo primo attacco nel suo turno, può decidere di sferrare un attacco irruento. Così facendo dispone di vantaggio ai tiri per colpire in mischia che usano Forza durante questo turno, ma i tiri per colpire contro di lui dispongono di vantaggio fino al suo turno successivo.'
+      },
+      {
+        lv: 2,
+        type: 'percezioneDelPericolo',
+        name: 'Percezione del Pericolo',
+        description:
+          'Un barbaro dispone di vantaggio ai tiri salvezza su Destrezza contro gli effetti che può vedere, come le trappole e gli incantesimi. Per ottenere questo beneficio il barbaro non deve essere accecato, assordato o incapacitato.'
+      },
+      {
+        lv: 3,
+        type: 'camminoPrimordiale',
+        name: 'Cammino Primordiale',
+        description:
+          'Un barbaro sceglie un cammino che definisce la natura della sua furia. Può scegliere il Cammino del Berserker o il Cammino del Combattente Totemico.'
+      },
+      {
+        lv: 5,
+        type: 'attaccoExtra',
+        name: 'Attacco Extra',
+        description:
+          "Un barbaro può attaccare due volte anziché una, ogni volta che effettua l'azione di Attacco nel proprio turno."
+      },
+      {
+        lv: 5,
+        type: 'movimentoVeloce',
+        name: 'Movimento Veloce',
+        description:
+          "La velocità del barbaro aumenta di 3 metri purché il barbaro non indossi un'armatura pesante."
       }
     ]
   },

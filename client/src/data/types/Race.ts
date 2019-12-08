@@ -10,5 +10,6 @@ interface Race extends SimpleSelectItem {
   special: any[]
   languages: any[]
   size: SizeEnum
+  vel: number
 }
 export default Race

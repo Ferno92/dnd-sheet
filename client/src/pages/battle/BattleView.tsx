@@ -154,12 +154,20 @@ function BattleView(props: BattleViewProps) {
     (weaponInfo: WeaponInfo) => {
       const { level, pgClass } = pg
       let tpc = weaponInfo.bonus + StatsUtils.getProficiency(level, pgClass)
+      const forza = StatsUtils.getStatModifierFromName(StatsType.Forza, pg)
+      const destrezza = StatsUtils.getStatModifierFromName(
+        StatsType.Destrezza,
+        pg
+      )
       if (
         weaponInfo.weapon.property.find(property => property === 'Accurata')
       ) {
-        //TODO get higher from Des or For
+        tpc += destrezza > forza ? destrezza : forza
       } else {
-        tpc += StatsUtils.getStatModifierFromName(StatsType.Forza, pg)
+        tpc +=
+          weaponInfo.weapon.weaponType.toLowerCase().indexOf('distanza') !== -1
+            ? destrezza
+            : forza
       }
       return `${tpc >= 0 ? '+' : '-'}${tpc}`
     },
@@ -169,12 +177,17 @@ function BattleView(props: BattleViewProps) {
   const getWeaponDamageBonus = useCallback(
     (weaponInfo: WeaponInfo) => {
       let damage = weaponInfo.bonus
+      const forza = StatsUtils.getStatModifierFromName(StatsType.Forza, pg)
       if (
         weaponInfo.weapon.property.find(property => property === 'Accurata')
       ) {
-        //TODO get higher from Des or For
+        const destrezza = StatsUtils.getStatModifierFromName(
+          StatsType.Destrezza,
+          pg
+        )
+        damage += destrezza > forza ? destrezza : forza
       } else {
-        damage += StatsUtils.getStatModifierFromName(StatsType.Forza, pg)
+        damage += forza
       }
       return damage
     },
