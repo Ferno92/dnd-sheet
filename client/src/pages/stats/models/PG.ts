@@ -1,8 +1,7 @@
 import Stats from './Stats'
 import { RacesEnum, SubRacesEnum } from 'data/types/RacesEnum'
-import { JobsEnum } from 'data/types/JobsEnum'
+import { JobsEnum, SubJobsEnum } from 'data/types/JobsEnum'
 import PGAbility from './PGAbility'
-import { Modifier } from 'pages/battle/BattleView'
 import WeaponInfo from 'data/types/WeaponInfo'
 import Equipment from 'pages/equipment/Equipment'
 import ArmorInfo from 'data/types/ArmorInfo'
@@ -15,6 +14,7 @@ interface PG {
   race: RacesEnum
   subRace?: SubRacesEnum
   pgClass?: JobsEnum
+  subClass?: SubJobsEnum
   level: number
   stats: Stats[]
   abilities: PGAbility[]

@@ -22,11 +22,12 @@ import TextUtils from 'utils/TextUtils'
 import { default as racesJSON } from 'data/json/RacesJSON'
 import { default as subRacesJSON } from 'data/json/SubRacesJSON'
 import { default as jobsJSON } from 'data/json/JobsJSON'
+import { default as subJobsJSON } from 'data/json/SubJobsJSON'
 import { default as abilitiesJSON } from 'data/json/AbilitiesJSON'
 import { RacesEnum, SubRacesEnum } from 'data/types/RacesEnum'
 import DataUtils from 'data/DataUtils'
 import SimpleSelect from 'components/simple-select/SimpleSelect'
-import { JobsEnum } from 'data/types/JobsEnum'
+import { JobsEnum, SubJobsEnum } from 'data/types/JobsEnum'
 import AbilitiesEnum from 'data/types/AbilitiesEnum'
 import {
   ExpandMore,
@@ -66,6 +67,12 @@ interface StatsViewProps {
       value: unknown
     }>
   ) => void
+  onChangeSubJob: (
+    event: React.ChangeEvent<{
+      name?: string | undefined
+      value: unknown
+    }>
+  ) => void
   onChangeAbilityCheck: (type: AbilitiesEnum, checked: boolean) => void
   onChangeAbilityPoints: (type: AbilitiesEnum, value: number) => void
   onChangeIspiration: (checked: boolean) => void
@@ -88,6 +95,7 @@ class StatsView extends Component<
   subRacesData = DataUtils.RaceMapper(subRacesJSON as any)
   jobsData = DataUtils.JobMapper(jobsJSON as any)
   abilitiesData = DataUtils.AbilityMapper(abilitiesJSON as any)
+  subJobsData = DataUtils.JobMapper(subJobsJSON as any)
 
   constructor(props: StatsViewProps & WithStyles<typeof StatsViewStyles>) {
     super(props)
@@ -189,6 +197,20 @@ class StatsView extends Component<
     return filtered
   }
 
+  getSubJobsData = () => {
+    const { pgClass } = this.props.pg
+    if (pgClass) {
+      const filtered = this.subJobsData.filter(
+        subJob =>
+          subJob.type.toLowerCase().indexOf(pgClass.toString().toLowerCase()) >=
+          0
+      )
+      return filtered
+    } else {
+      return []
+    }
+  }
+
   onEditAvatar = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event.stopPropagation()
 
@@ -232,7 +254,8 @@ class StatsView extends Component<
       stats,
       subRace,
       ispiration,
-      image
+      image,
+      subClass
     } = this.props.pg
     const {
       classes,
@@ -241,6 +264,7 @@ class StatsView extends Component<
       onChangeAbilityPoints,
       onChangeIspiration,
       onChangeJob,
+      onChangeSubJob,
       onChangeRace,
       onChangeSubRace,
       onEditName,
@@ -340,6 +364,15 @@ class StatsView extends Component<
                 onEdit={onEdit}
                 onChange={onChangeJob}
               />
+              {pgClass && (
+                <SimpleSelect<SubJobsEnum>
+                  label={'Specializzazione'}
+                  item={subClass}
+                  data={this.getSubJobsData()}
+                  onEdit={onEdit}
+                  onChange={onChangeSubJob}
+                />
+              )}
               <TextFieldNumber
                 label="Livello"
                 value={level}

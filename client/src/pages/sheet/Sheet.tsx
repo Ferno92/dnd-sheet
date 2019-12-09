@@ -25,7 +25,7 @@ import PG from 'pages/stats/models/PG'
 import { RacesEnum, SubRacesEnum } from 'data/types/RacesEnum'
 import StatsType from 'data/types/StatsEnum'
 import Dexie from 'dexie'
-import { JobsEnum } from 'data/types/JobsEnum'
+import { JobsEnum, SubJobsEnum } from 'data/types/JobsEnum'
 import AbilitiesEnum from 'data/types/AbilitiesEnum'
 import PGAbility from 'pages/stats/models/PGAbility'
 import StatsUtils from 'utils/StatsUtils'
@@ -193,7 +193,8 @@ class Sheet extends Component<
       armors,
       equipment,
       spellsByLevel,
-      image
+      image,
+      subClass
     } = this.state.pg
 
     if (this.pg) {
@@ -216,7 +217,8 @@ class Sheet extends Component<
             armors,
             equipment,
             spellsByLevel,
-            image
+            image,
+            subClass
           })
           .then(() => console.log('update done'))
           .catch(err => console.log('err: ', err))
@@ -240,7 +242,8 @@ class Sheet extends Component<
             armors,
             equipment,
             spellsByLevel,
-            image
+            image,
+            subClass
           })
           .then(() => console.log('create done'))
           .catch(err => console.log('err: ', err))
@@ -335,7 +338,20 @@ class Sheet extends Component<
   ) => {
     const { pg } = this.state
     const value = event.target.value as JobsEnum
-    this.setState({ pg: { ...pg, pgClass: value, abilities: [] } })
+    this.setState({
+      pg: { ...pg, pgClass: value, subClass: undefined, abilities: [] }
+    })
+  }
+
+  onChangeSubJob = (
+    event: React.ChangeEvent<{
+      name?: string | undefined
+      value: unknown
+    }>
+  ) => {
+    const { pg } = this.state
+    const value = event.target.value as SubJobsEnum
+    this.setState({ pg: { ...pg, subClass: value, abilities: [] } })
   }
 
   onChangeAbilityCheck = (type: AbilitiesEnum, checked: boolean) => {
@@ -710,6 +726,7 @@ class Sheet extends Component<
           onChangeAbilityPoints={this.onChangeAbilityPoints}
           onChangeIspiration={this.onChangeIspiration}
           onChangeJob={this.onChangeJob}
+          onChangeSubJob={this.onChangeSubJob}
           onChangeRace={this.onChangeRace}
           onChangeSubRace={this.onChangeSubRace}
           onEditName={this.onEditName}

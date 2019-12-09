@@ -12,3 +12,8 @@ export enum JobsEnum {
   Stregone = 'Stregone',
   Warlock = 'Warlock'
 }
+
+export enum SubJobsEnum {
+  Berserker = 'Barbaro_Berserker',
+  Totemico = 'Barbaro_Totemico'
+}

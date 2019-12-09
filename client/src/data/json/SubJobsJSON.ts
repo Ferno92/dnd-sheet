@@ -49,7 +49,7 @@ export default [
       },
       {
         lv: 6,
-        type: 'spiritoTotemico',
+        type: 'spiritoTotemico2',
         name: 'Spirito Totemico',
         description:
           "Aquila: Il barbaro ottiene la vista di un'aquila. Può vedere fino a 1,5 km di distanza senza difficoltà e discernere i dettagli come se osservasse qualcosa entro 30 metri da lui. Inoltre, la luce fioca non impone svantaggio alle sue prove di Saggezza (Percezione). <br>Lupo: li barbaro ottiene gli istinti cacciatori di un lupo. Può seguire le tracce delle altre creature mentre viaggia a passo veloce e può muoversi furtivamente mentre viaggia a passo normale.  <br>Orso: Il barbaro ottiene la potenza di un orso. La sua capacità di trasporto (incluso il carico massimo e il sollevamento massimo) raddoppia e il barbaro dispone di vantaggio alle prove di Forza effettuate per spingere, trascinare, sollevare o spezzare oggetti."

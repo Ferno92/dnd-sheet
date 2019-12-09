@@ -213,8 +213,10 @@ function BattleView(props: BattleViewProps) {
   }, [pg.race, pg.pgClass])
 
   useEffect(() => {
-    if (pg.level && pg.pgClass) {
-      setPrivileges(BattleUtils.getPrivileges(pg.level, pg.pgClass))
+    if (pg.level && pg.pgClass && pg.subClass) {
+      setPrivileges(
+        BattleUtils.getPrivileges(pg.level, pg.pgClass, pg.subClass)
+      )
     }
   }, [pg.level, pg.pgClass])
 
@@ -653,9 +655,11 @@ function BattleView(props: BattleViewProps) {
                   </Typography>
                 </ExpansionPanelSummary>
                 <ExpansionPanelDetails>
-                  <Typography variant="body2" itemType="span">
-                    {privilege.description}
-                  </Typography>
+                  <Typography
+                    variant="body2"
+                    itemType="span"
+                    dangerouslySetInnerHTML={{ __html: privilege.description }}
+                  />
                 </ExpansionPanelDetails>
               </ExpansionPanel>
             )
