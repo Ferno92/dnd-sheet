@@ -104,7 +104,6 @@ class StatsView extends Component<
   constructor(props: StatsViewProps & WithStyles<typeof StatsViewStyles>) {
     super(props)
 
-    console.log(props.pg.pe)
     this.state = {
       dialogInfoAbilitiesOpen: false,
       infoExpanded: false,
@@ -439,22 +438,6 @@ class StatsView extends Component<
                 </div>
               </Grid>
               <Grid item xs={6} className={classes.gridItem}>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={ispiration}
-                      onChange={(
-                        event: React.ChangeEvent<HTMLInputElement>,
-                        checked: boolean
-                      ) => onChangeIspiration(checked)}
-                      disabled={!onEdit}
-                      color="primary"
-                    />
-                  }
-                  label="Ispirazione"
-                />
-              </Grid>
-              <Grid item xs={6} className={classes.gridItem}>
                 <TextFieldNumber
                   disabled={!onEdit}
                   label={'PE'}
@@ -468,6 +451,22 @@ class StatsView extends Component<
                   }}
                   value={peFromState}
                   fullWidth
+                />
+              </Grid>
+              <Grid item xs={6} className={classes.gridItem}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={ispiration}
+                      onChange={(
+                        event: React.ChangeEvent<HTMLInputElement>,
+                        checked: boolean
+                      ) => onChangeIspiration(checked)}
+                      disabled={!onEdit}
+                      color="primary"
+                    />
+                  }
+                  label="Ispirazione"
                 />
               </Grid>
               <Grid item xs={12} className={classes.gridItem}>
