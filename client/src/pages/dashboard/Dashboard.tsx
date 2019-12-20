@@ -17,6 +17,7 @@ import { withRouter, RouteComponentProps } from 'react-router-dom'
 import DashboardStyles from './Dashboard.styles'
 import ConfirmDialog from 'components/confirm-dialog/ConfirmDialog'
 import Skeleton from '@material-ui/lab/Skeleton'
+import StatsUtils from 'utils/StatsUtils'
 
 interface DashboardProps {}
 
@@ -106,7 +107,9 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
               </ListItemIcon>
               <ListItemText
                 primary={pg.name}
-                secondary={`${pg.race} ${pg.pgClass} Lv.${pg.level}`}
+                secondary={`${pg.race} ${pg.pgClass} Lv.${StatsUtils.getPgLevel(
+                  pg
+                )}`}
               />
               <ListItemSecondaryAction>
                 <IconButton onClick={() => setPgToDelete(i)}>

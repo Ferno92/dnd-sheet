@@ -84,6 +84,11 @@ const StatsViewStyles = (theme: Theme) =>
     subTitle: {
       flex: 1
     },
+    taglia: {
+      height: '100%',
+      display: 'flex',
+      alignItems: 'center'
+    },
     ispiration: {
       flex: 1,
       fontSize: 24,
@@ -122,6 +127,15 @@ const StatsViewStyles = (theme: Theme) =>
     emptyImage: {
       height: 70,
       width: 70
+    },
+    peContainer: {
+      display: 'flex',
+      alignItems: 'center'
+    },
+    peProgress: {
+      flex: 1,
+      marginLeft: 16,
+      marginRight: 16
     }
   })
 

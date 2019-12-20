@@ -152,8 +152,10 @@ function BattleView(props: BattleViewProps) {
 
   const getWeaponTPC = useCallback(
     (weaponInfo: WeaponInfo) => {
-      const { level, pgClass } = pg
-      let tpc = weaponInfo.bonus + StatsUtils.getProficiency(level, pgClass)
+      const { pgClass } = pg
+      let tpc =
+        weaponInfo.bonus +
+        StatsUtils.getProficiency(StatsUtils.getPgLevel(pg), pgClass)
       const forza = StatsUtils.getStatModifierFromName(StatsType.Forza, pg)
       const destrezza = StatsUtils.getStatModifierFromName(
         StatsType.Destrezza,
@@ -213,12 +215,16 @@ function BattleView(props: BattleViewProps) {
   }, [pg.race, pg.pgClass])
 
   useEffect(() => {
-    if (pg.level && pg.pgClass && pg.subClass) {
+    if (StatsUtils.getPgLevel(pg) && pg.pgClass && pg.subClass) {
       setPrivileges(
-        BattleUtils.getPrivileges(pg.level, pg.pgClass, pg.subClass)
+        BattleUtils.getPrivileges(
+          StatsUtils.getPgLevel(pg),
+          pg.pgClass,
+          pg.subClass
+        )
       )
     }
-  }, [pg.level, pg.pgClass])
+  }, [pg])
 
   const raceAbilities = getRaceAbilities(pg.race, pg.subRace)
   return (

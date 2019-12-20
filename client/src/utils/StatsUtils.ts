@@ -9,7 +9,29 @@ import SizeEnum from 'data/types/SizeEnum'
 import Stats from 'pages/stats/models/Stats'
 import { JobsEnum } from 'data/types/JobsEnum'
 import SimpleSelectItem from 'data/types/SimpleSelectItem'
-import TextUtils from './TextUtils'
+
+const levels = [
+  { lv: 1, pe: 0 },
+  { lv: 2, pe: 300 },
+  { lv: 3, pe: 900 },
+  { lv: 4, pe: 2700 },
+  { lv: 5, pe: 6500 },
+  { lv: 6, pe: 14000 },
+  { lv: 7, pe: 23000 },
+  { lv: 8, pe: 34000 },
+  { lv: 9, pe: 48000 },
+  { lv: 10, pe: 64000 },
+  { lv: 11, pe: 85000 },
+  { lv: 12, pe: 100000 },
+  { lv: 13, pe: 120000 },
+  { lv: 14, pe: 140000 },
+  { lv: 15, pe: 165000 },
+  { lv: 16, pe: 195000 },
+  { lv: 17, pe: 225000 },
+  { lv: 18, pe: 265000 },
+  { lv: 19, pe: 305000 },
+  { lv: 20, pe: 355000 }
+]
 
 class StatsUtils {
   static getStatModifier = (stat: Stats, pg: PG) => {
@@ -173,6 +195,46 @@ class StatsUtils {
       }
     }
     return text
+  }
+
+  static getPgLevel = (pg: PG, next?: boolean) => {
+    const { pe } = pg
+    const level = StatsUtils.getLevelPgFromPE(pe)
+    return next ? level + 1 : level
+  }
+
+  static getLevelPgFromPE = (pe: number): number => {
+    let level = 1
+    let stop = false
+    levels
+      .slice()
+      .reverse()
+      .forEach(item => {
+        if (pe >= item.pe && !stop) {
+          stop = true
+          level = item.lv
+        }
+      })
+
+    return level
+  }
+
+  static getPercLevelFromPE = (pe: number): number => {
+    let stop = false
+    let prevPE = 0
+    let nextPE = 0
+    for (let i = 0; i < levels.length - 1; i++) {
+      if (levels[i].pe <= pe && !stop) {
+        prevPE = levels[i].pe
+      } else if (!stop) {
+        stop = true
+        nextPE = levels[i].pe
+      }
+    }
+    const diff = nextPE - prevPE
+    const result = (100 * (pe - prevPE)) / diff
+    console.log('result', result)
+    return result
   }
 }
 

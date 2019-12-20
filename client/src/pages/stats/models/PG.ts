@@ -15,7 +15,6 @@ interface PG {
   subRace?: SubRacesEnum
   pgClass?: JobsEnum
   subClass?: SubJobsEnum
-  level: number
   stats: Stats[]
   abilities: PGAbility[]
   ispiration: boolean
@@ -27,6 +26,7 @@ interface PG {
   armors: ArmorInfo[]
   equipment: Equipment
   spellsByLevel: SpellsByLevel[]
+  pe: number
 }
 
 export default PG

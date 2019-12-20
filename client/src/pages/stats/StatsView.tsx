@@ -10,7 +10,9 @@ import {
   ExpansionPanel,
   ExpansionPanelSummary,
   ExpansionPanelDetails,
-  Avatar
+  Avatar,
+  FormControlLabel,
+  LinearProgress
 } from '@material-ui/core'
 import StatsViewStyles from './StatsView.styles'
 import TextFieldString from 'components/text-field-string/TextFieldString'
@@ -47,7 +49,7 @@ interface StatsViewProps {
   pg: PG
   exist: boolean
   onEditName: (value: string) => void
-  onEditLevel: (event: React.ChangeEvent<HTMLInputElement>) => void
+  onEditLevel: (lv: number) => void
   onEditStats: (value: string, prop: number) => void
   onChangeRace: (
     event: React.ChangeEvent<{
@@ -77,6 +79,7 @@ interface StatsViewProps {
   onChangeAbilityPoints: (type: AbilitiesEnum, value: number) => void
   onChangeIspiration: (checked: boolean) => void
   onChangeImage: (url: string) => void
+  onChangePE: (value: number) => void
 }
 
 interface StatsViewState {
@@ -107,7 +110,7 @@ class StatsView extends Component<
   }
 
   getTSProficiency = (type: StatsType) => {
-    const { pgClass, level } = this.props.pg
+    const { pgClass } = this.props.pg
     let hasProficiency = false
     if (pgClass) {
       this.jobsData.forEach(job => {
@@ -116,7 +119,9 @@ class StatsView extends Component<
         }
       })
     }
-    return hasProficiency ? StatsUtils.getProficiency(level, pgClass) : 0
+    return hasProficiency
+      ? StatsUtils.getProficiency(StatsUtils.getPgLevel(this.props.pg), pgClass)
+      : 0
   }
 
   hasProficiency = (type: AbilitiesEnum): boolean => {
@@ -245,17 +250,22 @@ class StatsView extends Component<
     reader.readAsDataURL(file)
   }
 
+  getPePerc = () => {
+    const { pe } = this.props.pg
+    return StatsUtils.getPercLevelFromPE(pe)
+  }
+
   render() {
     const {
       name,
       race,
       pgClass,
-      level,
       stats,
       subRace,
       ispiration,
       image,
-      subClass
+      subClass,
+      pe
     } = this.props.pg
     const {
       classes,
@@ -269,7 +279,8 @@ class StatsView extends Component<
       onChangeSubRace,
       onEditName,
       onEditLevel,
-      onEditStats
+      onEditStats,
+      onChangePE
     } = this.props
     const {
       dialogInfoAbilitiesOpen,
@@ -329,7 +340,7 @@ class StatsView extends Component<
                   <Typography variant="body2">{`${StatsUtils.getInfoName(
                     `${pgClass}`,
                     this.jobsData
-                  )} Lv. ${level}`}</Typography>
+                  )} Lv. ${StatsUtils.getPgLevel(this.props.pg)}`}</Typography>
                 </div>
               </div>
             </ExpansionPanelSummary>
@@ -373,28 +384,31 @@ class StatsView extends Component<
                   onChange={onChangeSubJob}
                 />
               )}
-              <TextFieldNumber
+              {/* <TextFieldNumber
                 label="Livello"
                 value={level}
                 onChange={onEditLevel}
                 fullWidth
                 disabled={!onEdit}
-              />
+              /> */}
             </ExpansionPanelDetails>
           </ExpansionPanel>
 
           <div className={classes.gridContainer}>
             <Grid container spacing={3}>
-              <Grid item xs={6} className={classes.gridItem}>
+              <Grid item xs={4} className={classes.gridItem}>
                 <TextFieldNumber
                   label="Competenza"
-                  value={StatsUtils.getProficiency(level, pgClass)}
+                  value={StatsUtils.getProficiency(
+                    StatsUtils.getPgLevel(this.props.pg),
+                    pgClass
+                  )}
                   onChange={() => {}}
                   disabled={true}
                   fullWidth
                 />
               </Grid>
-              <Grid item xs={6} className={classes.gridItem}>
+              <Grid item xs={4} className={classes.gridItem}>
                 <TextFieldNumber
                   label="Perc passiva"
                   value={StatsUtils.getStatModifierFromName(
@@ -406,27 +420,61 @@ class StatsView extends Component<
                   fullWidth
                 />
               </Grid>
-            </Grid>
-          </div>
-
-          <div className={classes.stat}>
-            <Typography
-              variant="body1"
-              className={classes.subTitle}
-            >{`Taglia: ${StatsUtils.getRaceSize(this.props.pg)}`}</Typography>
-            <div className={classes.ispiration}>
-              <Typography variant="body1">Ispirazione</Typography>
-              <div>
-                <Checkbox
-                  checked={ispiration}
-                  onChange={(
-                    event: React.ChangeEvent<HTMLInputElement>,
-                    checked: boolean
-                  ) => onChangeIspiration(checked)}
-                  disabled={!onEdit}
+              <Grid item xs={4} className={classes.gridItem}>
+                <div className={classes.taglia}>
+                  <Typography variant="body1">{`Taglia: ${StatsUtils.getRaceSize(
+                    this.props.pg
+                  )}`}</Typography>
+                </div>
+              </Grid>
+              <Grid item xs={6} className={classes.gridItem}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={ispiration}
+                      onChange={(
+                        event: React.ChangeEvent<HTMLInputElement>,
+                        checked: boolean
+                      ) => onChangeIspiration(checked)}
+                      disabled={!onEdit}
+                      color="primary"
+                    />
+                  }
+                  label="Ispirazione"
                 />
-              </div>
-            </div>
+              </Grid>
+              <Grid item xs={6} className={classes.gridItem}>
+                <TextFieldNumber
+                  disabled={!onEdit}
+                  label={'PE'}
+                  step={'1'}
+                  min={0}
+                  max={355000}
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                    onChangePE(parseInt(event.target.value))
+                  }}
+                  value={pe}
+                  fullWidth
+                />
+              </Grid>
+              <Grid item xs={12} className={classes.gridItem}>
+                <div className={classes.peContainer}>
+                  <Typography variant="body1">{`Lv. ${StatsUtils.getPgLevel(
+                    this.props.pg
+                  )}`}</Typography>
+                  <LinearProgress
+                    value={this.getPePerc()}
+                    variant="determinate"
+                    color="primary"
+                    className={classes.peProgress}
+                  />
+                  <Typography variant="body1">{`Lv. ${StatsUtils.getPgLevel(
+                    this.props.pg,
+                    true
+                  )}`}</Typography>
+                </div>
+              </Grid>
+            </Grid>
           </div>
           <Divider className={classes.divider} />
           <Typography variant="h6" className={classes.title}>
@@ -555,7 +603,10 @@ class StatsView extends Component<
                   this.props.pg
                 ) +
                 (this.hasProficiency(ability.type)
-                  ? StatsUtils.getProficiency(level, pgClass)
+                  ? StatsUtils.getProficiency(
+                      StatsUtils.getPgLevel(this.props.pg),
+                      pgClass
+                    )
                   : 0)
               return (
                 <ExpansionPanelItem

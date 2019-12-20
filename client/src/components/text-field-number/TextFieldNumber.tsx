@@ -6,7 +6,7 @@ import clsx from 'clsx'
 
 interface TextFieldNumberProps {
   label: string
-  value: number
+  value: number | undefined
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void
   disabled: boolean
   fullWidth?: boolean
@@ -54,9 +54,7 @@ class TextFieldNumber extends Component<
       <TextField
         variant="outlined"
         label={label}
-        value={
-          value === undefined || value.toString() === 'NaN' ? undefined : value
-        }
+        value={value === undefined || value.toString() === 'NaN' ? '' : value}
         onChange={onChange}
         fullWidth={fullWidth}
         className={clsx(classes.textField, root)}

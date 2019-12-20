@@ -109,7 +109,6 @@ class Sheet extends Component<
         id: sheetId,
         name: '',
         race: RacesEnum.Umano,
-        level: 1,
         stats: [
           { type: StatsType.Forza, value: 10 },
           { type: StatsType.Destrezza, value: 10 },
@@ -131,7 +130,8 @@ class Sheet extends Component<
           backpack: []
         },
         spellsByLevel: [],
-        image: ''
+        image: '',
+        pe: 0
       },
       exist: false
     }
@@ -181,7 +181,6 @@ class Sheet extends Component<
       pgClass,
       race,
       subRace,
-      level,
       stats,
       abilities,
       ispiration,
@@ -194,7 +193,8 @@ class Sheet extends Component<
       equipment,
       spellsByLevel,
       image,
-      subClass
+      subClass,
+      pe
     } = this.state.pg
 
     if (this.pg) {
@@ -205,7 +205,6 @@ class Sheet extends Component<
             pgClass,
             race,
             subRace,
-            level,
             stats,
             abilities,
             ispiration,
@@ -218,7 +217,8 @@ class Sheet extends Component<
             equipment,
             spellsByLevel,
             image,
-            subClass
+            subClass,
+            pe
           })
           .then(() => console.log('update done'))
           .catch(err => console.log('err: ', err))
@@ -230,7 +230,6 @@ class Sheet extends Component<
             pgClass,
             race,
             subRace,
-            level,
             stats,
             abilities,
             ispiration,
@@ -243,7 +242,8 @@ class Sheet extends Component<
             equipment,
             spellsByLevel,
             image,
-            subClass
+            subClass,
+            pe
           })
           .then(() => console.log('create done'))
           .catch(err => console.log('err: ', err))
@@ -288,9 +288,9 @@ class Sheet extends Component<
     this.setState({ pg: { ...pg, name: value } })
   }
 
-  onEditLevel = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { pg } = this.state
-    this.setState({ pg: { ...pg, level: parseInt(event.target.value) } })
+  onEditLevel = (lv: number) => {
+    // const { pg } = this.state
+    // this.setState({ pg: { ...pg, level: parseInt(event.target.value) } })
   }
 
   onEditStats = (value: string, prop: number) => {
@@ -685,6 +685,16 @@ class Sheet extends Component<
     })
   }
 
+  onChangePE = (value: number) => {
+    const { pg } = this.state
+    this.setState({
+      pg: {
+        ...pg,
+        pe: value
+      }
+    })
+  }
+
   onSelectArmor = (i: number) => {
     const { pg } = this.state
     const armorsCopy = [...pg.armors]
@@ -733,6 +743,7 @@ class Sheet extends Component<
           onEditLevel={this.onEditLevel}
           onEditStats={this.onEditStats}
           onChangeImage={this.onChangeImage}
+          onChangePE={this.onChangePE}
         />
       </div>,
       <div key={'slide2'}>
