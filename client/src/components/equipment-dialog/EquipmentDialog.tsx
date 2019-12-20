@@ -80,7 +80,7 @@ const EquipmentDialog: React.FC<EquipmentDialogProps> = (
             <TextFieldNumber
               label="Peso unitario(kg)"
               onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                setWeight(parseInt(event.currentTarget.value))
+                setWeight(parseFloat(event.currentTarget.value))
               }
               min={0}
               step={'0.1'}

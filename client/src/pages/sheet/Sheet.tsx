@@ -38,6 +38,7 @@ import ArmorInfo from 'data/types/ArmorInfo'
 import SpellsView from 'pages/spells/SpellsView'
 import Spell from 'data/types/Spell'
 import SpellsByLevel from 'data/types/SpellsByLevel'
+import _ from 'lodash'
 
 interface SheetProps {
   id: number
@@ -164,6 +165,8 @@ class Sheet extends Component<
       // }).catch((err) => {
       //   console.error(err.stack || err);
     })
+
+    this.onChangePE = _.debounce(this.onChangePE, 800)
   }
 
   componentDidUpdate(prevProps: SheetProps, prevState: SheetState) {

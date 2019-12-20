@@ -1,14 +1,15 @@
-import { createStyles } from "@material-ui/core";
-import Theme from "assets/styles/Theme";
+import Theme from 'assets/styles/Theme'
+import { makeStyles } from '@material-ui/styles'
+import { TextFieldNumberProps } from './TextFieldNumber'
 
-const TextFieldNumberStyles = (theme: Theme) => createStyles({
-    textField: {
-        marginBottom: 10,
-        '& .MuiInputBase-input': {
-            textAlign: 'center',
-            width: 50
-        }
+const useStyles = makeStyles((theme: Theme) => ({
+  textField: (props: TextFieldNumberProps) => ({
+    marginBottom: 10,
+    '& .MuiInputBase-input': {
+      textAlign: 'center',
+      width: props.fullWidth ? '100%' : 50
     }
-});
+  })
+}))
 
-export default TextFieldNumberStyles;
+export default useStyles

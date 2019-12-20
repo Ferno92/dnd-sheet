@@ -87,6 +87,7 @@ interface StatsViewState {
   infoExpanded: boolean
   tsExpanded?: string
   abilityExpanded?: string
+  peFromState: number
 }
 
 class StatsView extends Component<
@@ -103,9 +104,18 @@ class StatsView extends Component<
   constructor(props: StatsViewProps & WithStyles<typeof StatsViewStyles>) {
     super(props)
 
+    console.log(props.pg.pe)
     this.state = {
       dialogInfoAbilitiesOpen: false,
-      infoExpanded: false
+      infoExpanded: false,
+      peFromState: props.pg.pe
+    }
+  }
+
+  componentWillReceiveProps(newProps: StatsViewProps) {
+    const { peFromState } = this.state
+    if (newProps.pg.pe !== peFromState) {
+      this.setState({ peFromState: newProps.pg.pe })
     }
   }
 
@@ -286,7 +296,8 @@ class StatsView extends Component<
       dialogInfoAbilitiesOpen,
       tsExpanded,
       abilityExpanded,
-      infoExpanded
+      infoExpanded,
+      peFromState
     } = this.state
     const currentRaceObj = StatsUtils.getCurrentRace(race)
     return (
@@ -451,9 +462,11 @@ class StatsView extends Component<
                   min={0}
                   max={355000}
                   onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                    onChangePE(parseInt(event.target.value))
+                    const newPE = parseInt(event.target.value)
+                    this.setState({ peFromState: newPE })
+                    onChangePE(newPE)
                   }}
-                  value={pe}
+                  value={peFromState}
                   fullWidth
                 />
               </Grid>

@@ -233,7 +233,6 @@ class StatsUtils {
     }
     const diff = nextPE - prevPE
     const result = (100 * (pe - prevPE)) / diff
-    console.log('result', result)
     return result
   }
 }
