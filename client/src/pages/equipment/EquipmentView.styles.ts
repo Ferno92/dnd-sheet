@@ -54,6 +54,10 @@ const useEquipmentViewStyles = makeStyles((theme: Theme) => ({
   },
   capacityTot: {
     display: 'inline'
+  },
+  divider: {
+    margin: '20px 0 10px 0',
+    width: '100%'
   }
 }))
 

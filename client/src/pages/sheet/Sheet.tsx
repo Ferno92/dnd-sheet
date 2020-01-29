@@ -71,20 +71,13 @@ class Sheet extends Component<
         //go back
         this.props.history.goBack()
       }
-    },
-    {
-      icon: <People />,
-      name: 'Condividi personaggio',
-      onClick: () => {
-        //go back
-        alert('Funzionalità in arrivo')
-      }
     }
     // {
-    //   icon: <Edit />,
-    //   name: 'Edit',
+    //   icon: <People />,
+    //   name: 'Condividi personaggio',
     //   onClick: () => {
-    //     this.onChangeEditMode()
+    //     //go back
+    //     alert('Funzionalità in arrivo')
     //   }
     // }
   ]
@@ -742,7 +735,10 @@ class Sheet extends Component<
     const armorsCopy = [...pg.armors]
     armorsCopy[i].isWearing = !armorsCopy[i].isWearing
     armorsCopy.forEach((info: ArmorInfo, index: number) => {
-      if (index !== i) {
+      const prevType =
+        index > 0 ? armorsCopy[index - 1].armor.armorType.split(' ')[0] : ''
+      const currentType = info.armor.armorType.split(' ')[0]
+      if (index !== i && currentType === prevType) {
         info.isWearing = false
       }
     })

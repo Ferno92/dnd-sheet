@@ -7,7 +7,8 @@ import {
   useMediaQuery,
   Theme,
   Tooltip,
-  Button
+  Button,
+  Divider
 } from '@material-ui/core'
 import StatsUtils from 'utils/StatsUtils'
 import MixedInput, { InputPosition } from 'components/mixed-input/MixedInput'
@@ -89,6 +90,7 @@ const SpellsView: React.FC<SpellsViewProps> = (props: SpellsViewProps) => {
       <Typography variant="body1" itemType="span">
         {TextUtils.getFullStatsType(StatsUtils.getMainSpellStat(pg.pgClass))}
       </Typography>
+      <Divider className={styles.divider} />
       <Typography variant="subtitle1" itemType="span">
         CD Tiro Salvezza Incantesimi:
       </Typography>
@@ -127,6 +129,7 @@ const SpellsView: React.FC<SpellsViewProps> = (props: SpellsViewProps) => {
         }}
         sign={false}
       />
+      <Divider className={styles.divider} />
       <Typography variant="subtitle1" itemType="span">
         Bonus di Attacco Incantesimi:
       </Typography>
@@ -162,6 +165,7 @@ const SpellsView: React.FC<SpellsViewProps> = (props: SpellsViewProps) => {
         }}
       />
 
+      <Divider className={styles.divider} />
       <Typography variant="subtitle1" itemType="span">
         Incantesimi
       </Typography>
@@ -338,6 +342,7 @@ const SpellsView: React.FC<SpellsViewProps> = (props: SpellsViewProps) => {
           )
         })}
 
+      <Divider className={styles.divider} />
       {/* ________________ Spell dialog _____________ */}
 
       <SpellDialog

@@ -15,7 +15,8 @@ import {
   ExpansionPanel,
   ExpansionPanelSummary,
   ExpansionPanelDetails,
-  Tooltip
+  Tooltip,
+  Divider
 } from '@material-ui/core'
 import StatsType from 'data/types/StatsEnum'
 import { useTheme } from '@material-ui/core/styles'
@@ -356,6 +357,7 @@ function BattleView(props: BattleViewProps) {
         </Grid>
 
         <Grid item xs={12} className={classes.gridItem}>
+          <Divider className={classes.divider} />
           <Typography variant="subtitle2">PF Attuali</Typography>
           <div className={classes.pfContainer}>
             <IconButton disabled={onEdit} onClick={() => onChangeCurrentPf(-1)}>
@@ -381,6 +383,7 @@ function BattleView(props: BattleViewProps) {
       </Grid>
       {/* ________________ Armor sections _____________ */}
 
+      <Divider className={classes.divider} />
       <div className={classes.armorTitle}>
         <Typography variant="h5">Armature e scudi</Typography>
         <Tooltip title="Aggiungi armatura o scudo">
@@ -506,6 +509,7 @@ function BattleView(props: BattleViewProps) {
         onAddArmor={onAddArmor}
       />
 
+      <Divider className={classes.divider} />
       {/* ________________ Weapon sections _____________ */}
       <div className={classes.armorTitle}>
         <Typography variant="h5">Armi</Typography>
@@ -602,8 +606,9 @@ function BattleView(props: BattleViewProps) {
         )
       })}
 
+      <Divider className={classes.divider} />
       {/* ________________ Abilità speciali di razza _____________ */}
-      <Typography variant="subtitle1" className={classes.weaponTitle}>
+      <Typography variant="subtitle1" className={classes.specialAbilityTitle}>
         Abilità razziali
       </Typography>
 
@@ -636,10 +641,14 @@ function BattleView(props: BattleViewProps) {
         )
       })}
 
+      <Divider className={classes.divider} />
       {/* ________________ Privilegi di classe _____________ */}
       {privileges && (
         <React.Fragment>
-          <Typography variant="subtitle1" className={classes.weaponTitle}>
+          <Typography
+            variant="subtitle1"
+            className={classes.specialAbilityTitle}
+          >
             Privilegi di classe
           </Typography>
 
@@ -655,9 +664,17 @@ function BattleView(props: BattleViewProps) {
                     : setPrivilegeExpanded(privilege.type)
                 }
               >
-                <ExpansionPanelSummary>
+                <ExpansionPanelSummary className={classes.privilegeSummary}>
                   <Typography variant="subtitle2" itemType="span">
                     {privilege.name}:
+                  </Typography>
+                  <Typography variant="subtitle2" itemType="span">
+                    {privilege.counter !== undefined ||
+                    privilege.counterType !== undefined
+                      ? `${privilege.counter ? privilege.counter : ''} ${
+                          privilege.counterType ? privilege.counterType : ''
+                        }`
+                      : undefined}
                   </Typography>
                 </ExpansionPanelSummary>
                 <ExpansionPanelDetails>
@@ -673,6 +690,7 @@ function BattleView(props: BattleViewProps) {
           {privileges.length === 0 && (
             <Typography variant="body2">Nessun privilegio</Typography>
           )}
+          <Divider className={classes.divider} />
         </React.Fragment>
       )}
 
@@ -702,39 +720,54 @@ function BattleView(props: BattleViewProps) {
               <Close />
             </IconButton>
           </DialogTitle>
-          <List>
+          <Grid container>
             {pg.armors.map((armorInfo: ArmorInfo, index: number) => {
               return (
-                <ListItem key={index} className={classes.listItem}>
-                  <Typography variant="subtitle1" itemType="span">
-                    {armorInfo.armor.name}
-                  </Typography>
-                  <Typography variant="body1" itemType="span">
-                    {armorInfo.armor.ca + armorInfo.bonus}
-                  </Typography>
-                  <Typography variant="body1" itemType="span">
-                    +
-                  </Typography>
-                </ListItem>
+                armorInfo.isWearing && (
+                  <React.Fragment key={index}>
+                    <Grid item xs={8}>
+                      <Typography variant="subtitle1" itemType="span">
+                        {armorInfo.armor.name}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={2} className={classes.gridItem}>
+                      <Typography variant="body1" itemType="span">
+                        {armorInfo.armor.ca + armorInfo.bonus}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={2} className={classes.gridItem}>
+                      <Typography variant="body1" itemType="span">
+                        +
+                      </Typography>
+                    </Grid>
+                  </React.Fragment>
+                )
               )
             })}
 
-            <ListItem className={classes.listItem}>
+            <Grid item xs={8}>
               <Typography variant="subtitle1" itemType="span">
                 Destrezza
               </Typography>
+            </Grid>
+            <Grid item xs={2} className={classes.gridItem}>
               <Typography variant="body1" itemType="span">
                 {StatsUtils.getStatModifier(
                   pg.stats.find(stat => stat.type === StatsType.Destrezza)!,
                   pg
                 )}
               </Typography>
-            </ListItem>
-            <ListItem className={classes.listItem}>
+            </Grid>
+            <Divider className={classes.divider} />
+            <Grid item xs={8}>
               <Typography variant="body1">TOT</Typography>
-              <Typography variant="body1">{getCA()}</Typography>
-            </ListItem>
-          </List>
+            </Grid>
+            <Grid item xs={2}>
+              <Typography variant="body1" className={classes.gridItem}>
+                {getCA()}
+              </Typography>
+            </Grid>
+          </Grid>
         </DialogContent>
       </Dialog>
     </div>

@@ -7,7 +7,8 @@ import {
   Button,
   IconButton,
   useMediaQuery,
-  TextField
+  TextField,
+  Divider
 } from '@material-ui/core'
 import { useTheme } from '@material-ui/core/styles'
 import PG from 'pages/stats/models/PG'
@@ -126,7 +127,7 @@ const EquipmentView: React.FC<EquipmentViewProps> = (
           min={0}
         />
       </div>
-      {/* //TODO expansion panel item */}
+      <Divider className={styles.divider} />
       <Typography variant="subtitle2">Oggetti:</Typography>
       {pg.equipment.backpack.length > 0 && (
         <Grid container className={styles.equipmentHeader}>
@@ -204,6 +205,7 @@ const EquipmentView: React.FC<EquipmentViewProps> = (
         <Add /> Aggiungi oggetto
       </Button>
 
+      <Divider className={styles.divider} />
       <Typography variant="subtitle2">
         Peso trasportato / Peso massimo{' '}
       </Typography>
@@ -223,6 +225,7 @@ const EquipmentView: React.FC<EquipmentViewProps> = (
         >{`/${getMaxCapacity()}kg`}</Typography>
       </div>
 
+      <Divider className={styles.divider} />
       {/* ________________ Equipment dialog _____________ */}
 
       <EquipmentDialog

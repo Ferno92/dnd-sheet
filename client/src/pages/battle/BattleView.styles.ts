@@ -193,6 +193,18 @@ const BattleViewStyles = makeStyles((theme: Theme) => ({
   abilityHighlight: {
     border: 'solid 1px',
     borderRadius: 3
+  },
+  privilegeSummary: {
+    '& .MuiExpansionPanelSummary-content': {
+      justifyContent: 'space-between'
+    }
+  },
+  divider: {
+    margin: '20px 0 10px 0',
+    width: '100%'
+  },
+  specialAbilityTitle: {
+    marginBottom: 8
   }
 }))
 

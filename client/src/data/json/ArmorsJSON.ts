@@ -28,5 +28,25 @@ export default [
     weight: 27.5,
     minFor: 13,
     addDes: false
+  },
+  {
+    name: 'Scudo',
+    id: 'scudo',
+    armorType: 'Scudo',
+    ca: 2,
+    property: [],
+    weight: 3,
+    minFor: 0,
+    addDes: true
+  },
+  {
+    name: 'Altro',
+    id: 'altro',
+    armorType: 'Altro',
+    ca: 0,
+    property: [],
+    weight: 0,
+    minFor: 0,
+    addDes: true
   }
 ]

@@ -79,6 +79,10 @@ const useStyles = makeStyles((theme: Theme) => ({
       height: 24,
       width: 24
     }
+  },
+  divider: {
+    margin: '20px 0 10px 0',
+    width: '100%'
   }
 }))
 

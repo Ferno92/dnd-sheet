@@ -4,7 +4,8 @@ import {
   InputLabel,
   Select,
   OutlinedInput,
-  MenuItem
+  MenuItem,
+  ListSubheader
 } from '@material-ui/core'
 import { createRef, useState, useEffect } from 'react'
 import SimpleSelectStyles from './SimpleSelect.styles'
@@ -58,7 +59,11 @@ function SimpleSelect<T>(props: SimpleSelectProps<T>) {
         disabled={!onEdit}
       >
         {dataList.map(data => {
-          return (
+          return data.type === 'SubHeader' ? (
+            <ListSubheader key={data.type + data.value}>
+              {data.value}
+            </ListSubheader>
+          ) : (
             <MenuItem key={data.type} value={data.type}>
               {`${data.value}${data.extra ? ` (${data.extra})` : ''}`}
             </MenuItem>
