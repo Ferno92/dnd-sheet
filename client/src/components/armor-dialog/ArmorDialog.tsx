@@ -133,7 +133,7 @@ const ArmorDialog: React.FC<ArmorDialogProps> = (props: ArmorDialogProps) => {
         />
         {armor && (
           <React.Fragment>
-            {armor.armorType !== 'altro' ? (
+            {armor.armorType.toLowerCase() !== 'altro' ? (
               <Typography variant="h5" className={styles.armorName}>
                 {armor.name}
               </Typography>
@@ -156,7 +156,7 @@ const ArmorDialog: React.FC<ArmorDialogProps> = (props: ArmorDialogProps) => {
                 <Typography variant="body1" className={styles.itemTitle}>
                   CA
                 </Typography>
-                {armor.armorType !== 'altro' ? (
+                {armor.armorType.toLowerCase() !== 'altro' ? (
                   <Typography variant="body1">{armor.ca}</Typography>
                 ) : (
                   <TextFieldNumber
@@ -170,7 +170,7 @@ const ArmorDialog: React.FC<ArmorDialogProps> = (props: ArmorDialogProps) => {
                   />
                 )}
               </Grid>
-              {armor.armorType !== 'altro' && (
+              {armor.armorType.toLowerCase() !== 'altro' && (
                 <React.Fragment>
                   <Grid item xs={6} className={styles.gridItem}>
                     <Typography variant="body1" className={styles.itemTitle}>
@@ -209,7 +209,7 @@ const ArmorDialog: React.FC<ArmorDialogProps> = (props: ArmorDialogProps) => {
                 <Typography variant="body1" className={styles.itemTitle}>
                   Peso
                 </Typography>
-                {armor.armorType !== 'altro' ? (
+                {armor.armorType.toLowerCase() !== 'altro' ? (
                   <Typography variant="body1">{`${armor.weight} kg`}</Typography>
                 ) : (
                   <TextFieldNumber
