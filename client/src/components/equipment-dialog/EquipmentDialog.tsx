@@ -21,7 +21,7 @@ interface EquipmentDialogProps {
   open: boolean
   fullScreen: boolean
   onClose: () => void
-  onAddEquipment: (equipment: EquipmentObject) => void
+  onAddEquipment: (equipments: EquipmentObject[]) => void
 }
 
 const EquipmentDialog: React.FC<EquipmentDialogProps> = (
@@ -39,7 +39,7 @@ const EquipmentDialog: React.FC<EquipmentDialogProps> = (
   }
 
   const addEquipment = useCallback(() => {
-    onAddEquipment({ id: shortid.generate(), quantity, name, weight, info })
+    onAddEquipment([{ id: shortid.generate(), quantity, name, weight, info }])
     onClose()
   }, [info, name, onAddEquipment, onClose, quantity, weight])
   return (

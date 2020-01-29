@@ -1,14 +1,14 @@
-import React from "react"
+import React from 'react'
 import {
   FormControl,
   InputLabel,
   Select,
   OutlinedInput,
   MenuItem
-} from "@material-ui/core"
-import { createRef, useState, useEffect } from "react"
-import SimpleSelectStyles from "./SimpleSelect.styles"
-import SimpleSelectItem from "data/types/SimpleSelectItem"
+} from '@material-ui/core'
+import { createRef, useState, useEffect } from 'react'
+import SimpleSelectStyles from './SimpleSelect.styles'
+import SimpleSelectItem from 'data/types/SimpleSelectItem'
 
 interface SimpleSelectProps<T> {
   item?: T
@@ -45,7 +45,7 @@ function SimpleSelect<T>(props: SimpleSelectProps<T>) {
         {label}
       </InputLabel>
       <Select
-        value={item !== undefined ? item : ""}
+        value={item !== undefined ? item : ''}
         onChange={onChange}
         input={
           <OutlinedInput
@@ -60,7 +60,7 @@ function SimpleSelect<T>(props: SimpleSelectProps<T>) {
         {dataList.map(data => {
           return (
             <MenuItem key={data.type} value={data.type}>
-              {`${data.value}${data.extra ? ` (${data.extra})` : ""}`}
+              {`${data.value}${data.extra ? ` (${data.extra})` : ''}`}
             </MenuItem>
           )
         })}

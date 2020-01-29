@@ -39,6 +39,7 @@ import SpellsView from 'pages/spells/SpellsView'
 import Spell from 'data/types/Spell'
 import SpellsByLevel from 'data/types/SpellsByLevel'
 import _ from 'lodash'
+import Background from 'data/types/Background'
 
 interface SheetProps {
   id: number
@@ -132,7 +133,8 @@ class Sheet extends Component<
         },
         spellsByLevel: [],
         image: '',
-        pe: 0
+        pe: 0,
+        background: ''
       },
       exist: false
     }
@@ -197,7 +199,8 @@ class Sheet extends Component<
       spellsByLevel,
       image,
       subClass,
-      pe
+      pe,
+      background
     } = this.state.pg
 
     if (this.pg) {
@@ -221,7 +224,8 @@ class Sheet extends Component<
             spellsByLevel,
             image,
             subClass,
-            pe
+            pe,
+            background
           })
           .then(() => console.log('update done'))
           .catch(err => console.log('err: ', err))
@@ -246,7 +250,8 @@ class Sheet extends Component<
             spellsByLevel,
             image,
             subClass,
-            pe
+            pe,
+            background
           })
           .then(() => console.log('create done'))
           .catch(err => console.log('err: ', err))
@@ -515,22 +520,40 @@ class Sheet extends Component<
     )
   }
 
-  onAddEquipment = (equipment: EquipmentObject) => {
+  onAddEquipment = (equipments: EquipmentObject[]) => {
     const { pg } = this.state
     let tempBackpack = pg.equipment.backpack ? [...pg.equipment.backpack] : []
-    const index = tempBackpack.findIndex(item => item.id === equipment.id)
-    if (index !== -1) {
-      tempBackpack[index] = equipment
-    } else {
-      tempBackpack.push(equipment)
-    }
+    let tempMoneys = [...pg.equipment.moneys]
+    equipments.forEach(equipment => {
+      if (equipment.name.indexOf('{1}') !== -1) {
+        const index =
+          equipment.id === 'mr'
+            ? 0
+            : equipment.id === 'ma'
+            ? 1
+            : equipment.id === 'me'
+            ? 2
+            : equipment.id === 'mo'
+            ? 3
+            : 4
+        tempMoneys[index] = tempMoneys[index] + equipment.quantity
+      } else {
+        const index = tempBackpack.findIndex(item => item.id === equipment.id)
+        if (index !== -1) {
+          tempBackpack[index] = equipment
+        } else {
+          tempBackpack.push(equipment)
+        }
+      }
+    })
     this.setState(
       {
         pg: {
           ...pg,
           equipment: {
             ...pg.equipment,
-            backpack: tempBackpack
+            backpack: tempBackpack,
+            moneys: tempMoneys
           }
         }
       },
@@ -698,6 +721,22 @@ class Sheet extends Component<
     })
   }
 
+  onChangeBackground = (
+    event: React.ChangeEvent<{
+      name?: string | undefined
+      value: unknown
+    }>
+  ) => {
+    const { pg } = this.state
+    const background = event.target.value as string
+    this.setState({
+      pg: {
+        ...pg,
+        background: background
+      }
+    })
+  }
+
   onSelectArmor = (i: number) => {
     const { pg } = this.state
     const armorsCopy = [...pg.armors]
@@ -747,6 +786,8 @@ class Sheet extends Component<
           onEditStats={this.onEditStats}
           onChangeImage={this.onChangeImage}
           onChangePE={this.onChangePE}
+          onChangeBackground={this.onChangeBackground}
+          onAddEquipment={this.onAddEquipment}
         />
       </div>,
       <div key={'slide2'}>

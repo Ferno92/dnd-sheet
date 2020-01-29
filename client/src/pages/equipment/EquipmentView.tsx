@@ -24,7 +24,7 @@ interface EquipmentViewProps {
   pg: PG
   onChangeMoney: (index: number, value: number) => void
   onRemoveEquipment: (index: number) => void
-  onAddEquipment: (equipment: EquipmentObject) => void
+  onAddEquipment: (equipments: EquipmentObject[]) => void
 }
 
 const EquipmentView: React.FC<EquipmentViewProps> = (
@@ -38,7 +38,7 @@ const EquipmentView: React.FC<EquipmentViewProps> = (
 
   const onChangeItemQuantity = (value: number, item: EquipmentObject) => {
     item.quantity = value
-    onAddEquipment(item)
+    onAddEquipment([item])
   }
 
   const getMaxCapacity = useCallback(() => {

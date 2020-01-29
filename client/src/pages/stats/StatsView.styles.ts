@@ -136,6 +136,24 @@ const StatsViewStyles = (theme: Theme) =>
       flex: 1,
       marginLeft: 16,
       marginRight: 16
+    },
+    quantity: {
+      width: 16,
+      textAlign: 'center',
+      marginRight: 4
+    },
+    invisibleQuantity: {
+      visibility: 'hidden'
+    },
+    backgroundEqListItem: {
+      display: 'flex',
+      marginBottom: 8
+    },
+    bgTitle: {
+      padding: 24
+    },
+    bgContent: {
+      padding: '0 24px'
     }
   })
 

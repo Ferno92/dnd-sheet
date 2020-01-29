@@ -5,6 +5,7 @@ import Job from './types/Job'
 import Ability from './types/Ability'
 import Weapon from './types/Weapon'
 import Armor from './types/Armor'
+import Background from './types/Background'
 
 class DataUtils {
   static RaceMapper(json: any): Race[] {
@@ -97,6 +98,21 @@ class DataUtils {
       })
     })
     return armors
+  }
+
+  static BackgroundMapper(json: any): Background[] {
+    let backgrounds: Background[] = []
+    json.forEach((child: any) => {
+      backgrounds.push({
+        type: child.type,
+        value: child.value,
+        abilities: child.abilities,
+        languages: child.languages,
+        privileges: child.privileges,
+        equip: child.equip
+      })
+    })
+    return backgrounds
   }
 }
 

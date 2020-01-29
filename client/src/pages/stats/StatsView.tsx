@@ -12,7 +12,13 @@ import {
   ExpansionPanelDetails,
   Avatar,
   FormControlLabel,
-  LinearProgress
+  LinearProgress,
+  Dialog,
+  Button,
+  DialogActions,
+  DialogTitle,
+  DialogContent,
+  DialogContentText
 } from '@material-ui/core'
 import StatsViewStyles from './StatsView.styles'
 import TextFieldString from 'components/text-field-string/TextFieldString'
@@ -26,6 +32,7 @@ import { default as subRacesJSON } from 'data/json/SubRacesJSON'
 import { default as jobsJSON } from 'data/json/JobsJSON'
 import { default as subJobsJSON } from 'data/json/SubJobsJSON'
 import { default as abilitiesJSON } from 'data/json/AbilitiesJSON'
+import { default as backgroundJSON } from 'data/json/BackgroundJSON'
 import { RacesEnum, SubRacesEnum } from 'data/types/RacesEnum'
 import DataUtils from 'data/DataUtils'
 import SimpleSelect from 'components/simple-select/SimpleSelect'
@@ -42,6 +49,8 @@ import StatsUtils from 'utils/StatsUtils'
 import Ability from 'data/types/Ability'
 import ImageCompressor from 'image-compressor.js'
 import ExpansionPanelItem from 'components/expansion-panel-item/ExpansionPanelItem'
+import EquipmentObject from 'pages/equipment/EquipmentObject'
+import clsx from 'clsx'
 
 interface StatsViewProps {
   onEdit: boolean
@@ -75,11 +84,18 @@ interface StatsViewProps {
       value: unknown
     }>
   ) => void
+  onChangeBackground: (
+    event: React.ChangeEvent<{
+      name?: string | undefined
+      value: unknown
+    }>
+  ) => void
   onChangeAbilityCheck: (type: AbilitiesEnum, checked: boolean) => void
   onChangeAbilityPoints: (type: AbilitiesEnum, value: number) => void
   onChangeIspiration: (checked: boolean) => void
   onChangeImage: (url: string) => void
   onChangePE: (value: number) => void
+  onAddEquipment: (equipments: EquipmentObject[]) => void
 }
 
 interface StatsViewState {
@@ -88,6 +104,8 @@ interface StatsViewState {
   tsExpanded?: string
   abilityExpanded?: string
   peFromState: number
+  backgroundFromState: string
+  showBackgroundItems: boolean
 }
 
 class StatsView extends Component<
@@ -98,6 +116,7 @@ class StatsView extends Component<
   racesData = DataUtils.RaceMapper(racesJSON as any)
   subRacesData = DataUtils.RaceMapper(subRacesJSON as any)
   jobsData = DataUtils.JobMapper(jobsJSON as any)
+  backgroundData = DataUtils.BackgroundMapper(backgroundJSON as any)
   abilitiesData = DataUtils.AbilityMapper(abilitiesJSON as any)
   subJobsData = DataUtils.JobMapper(subJobsJSON as any)
 
@@ -107,14 +126,19 @@ class StatsView extends Component<
     this.state = {
       dialogInfoAbilitiesOpen: false,
       infoExpanded: false,
-      peFromState: props.pg.pe
+      peFromState: props.pg.pe,
+      backgroundFromState: props.pg.background,
+      showBackgroundItems: false
     }
   }
 
   componentWillReceiveProps(newProps: StatsViewProps) {
-    const { peFromState } = this.state
+    const { peFromState, backgroundFromState } = this.state
     if (newProps.pg.pe !== peFromState) {
       this.setState({ peFromState: newProps.pg.pe })
+    }
+    if (newProps.pg.background !== backgroundFromState) {
+      this.setState({ backgroundFromState: newProps.pg.background })
     }
   }
 
@@ -136,8 +160,13 @@ class StatsView extends Component<
   hasProficiency = (type: AbilitiesEnum): boolean => {
     const { abilities } = this.props.pg
     const filteredAbilities = abilities.filter(ability => ability.type === type)
-    return filteredAbilities.length > 0
-      ? filteredAbilities[0].hasProficiency
+    const abilitiesFromBG = this.getAbilitiesListFromBackground()
+    let fromBG = false
+    if (abilitiesFromBG.find(ab => ab === type)) {
+      fromBG = true
+    }
+    return fromBG || filteredAbilities.length > 0
+      ? fromBG || filteredAbilities[0].hasProficiency
       : false
   }
 
@@ -173,6 +202,40 @@ class StatsView extends Component<
     return abilitiesList
   }
 
+  getAbilitiesListFromBackground = (): AbilitiesEnum[] => {
+    const { background } = this.props.pg
+    let abilitiesList: AbilitiesEnum[] = []
+    if (background) {
+      this.backgroundData.forEach(data => {
+        if (data.type === background) {
+          abilitiesList = data.abilities
+        }
+      })
+    }
+    return abilitiesList
+  }
+
+  getEquipListFromBackground = (): EquipmentObject[] => {
+    const { background } = this.props.pg
+    let eqList: EquipmentObject[] = []
+    if (background) {
+      this.backgroundData.forEach(data => {
+        if (data.type === background) {
+          eqList = data.equip
+        }
+      })
+    }
+    return eqList
+  }
+
+  addItemFromBG = () => {
+    const { onAddEquipment } = this.props
+    const items = this.getEquipListFromBackground()
+    onAddEquipment(items)
+
+    this.setState({ showBackgroundItems: false })
+  }
+
   getAbilitiesCountFromClass = (): number => {
     const { pgClass } = this.props.pg
     let count = 0
@@ -199,8 +262,15 @@ class StatsView extends Component<
 
   isAbilityEnabled = (ability: Ability) => {
     const abilities = this.getAbilitiesListFromClass()
-    const found = abilities.find(item => item === ability.type)
-    return found !== undefined
+    const abilitiesFromBG = this.getAbilitiesListFromBackground()
+    let found = false
+    if (
+      !abilitiesFromBG.find(item => item === ability.type) &&
+      abilities.find(item => item === ability.type)
+    ) {
+      found = true
+    }
+    return found
   }
 
   getSubRacesData = () => {
@@ -273,8 +343,7 @@ class StatsView extends Component<
       subRace,
       ispiration,
       image,
-      subClass,
-      pe
+      subClass
     } = this.props.pg
     const {
       classes,
@@ -286,6 +355,7 @@ class StatsView extends Component<
       onChangeSubJob,
       onChangeRace,
       onChangeSubRace,
+      onChangeBackground,
       onEditName,
       onEditLevel,
       onEditStats,
@@ -296,7 +366,9 @@ class StatsView extends Component<
       tsExpanded,
       abilityExpanded,
       infoExpanded,
-      peFromState
+      peFromState,
+      backgroundFromState,
+      showBackgroundItems
     } = this.state
     const currentRaceObj = StatsUtils.getCurrentRace(race)
     return (
@@ -394,6 +466,16 @@ class StatsView extends Component<
                   onChange={onChangeSubJob}
                 />
               )}
+              <SimpleSelect<string>
+                label={'Background'}
+                item={backgroundFromState}
+                data={this.backgroundData}
+                onEdit={onEdit}
+                onChange={event => {
+                  this.setState({ showBackgroundItems: true })
+                  onChangeBackground(event)
+                }}
+              />
               {/* <TextFieldNumber
                 label="Livello"
                 value={level}
@@ -679,6 +761,57 @@ class StatsView extends Component<
             onClose={this.closeInfoAbilitiesDialog}
           />
         )}
+        <Dialog
+          open={showBackgroundItems}
+          onClose={() => {
+            this.setState({ showBackgroundItems: false })
+          }}
+          fullScreen={/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+            navigator.userAgent
+          )}
+        >
+          <DialogTitle className={classes.bgTitle}>
+            Oggetti di background
+          </DialogTitle>
+          <DialogContent className={classes.bgContent}>
+            <DialogContentText>
+              Il background che hai selezionato comprende questi oggetti per
+              partire. Vuoi aggiungerli al tuo zaino?
+            </DialogContentText>
+            {this.getEquipListFromBackground().map((eq, index) => {
+              return (
+                <div className={classes.backgroundEqListItem} key={index}>
+                  <Typography
+                    variant="body2"
+                    className={clsx(
+                      classes.quantity,
+                      eq.quantity === 1 || eq.name.indexOf('{0}') !== -1
+                        ? classes.invisibleQuantity
+                        : undefined
+                    )}
+                  >
+                    {eq.quantity}
+                  </Typography>
+                  <Typography variant={'body2'}>
+                    {eq.name
+                      .replace('{0}', eq.quantity.toString())
+                      .replace('{1}', eq.id)}
+                  </Typography>
+                </div>
+              )
+            })}
+          </DialogContent>
+          <DialogActions>
+            <Button
+              onClick={() => {
+                this.setState({ showBackgroundItems: false })
+              }}
+            >
+              No
+            </Button>
+            <Button onClick={this.addItemFromBG}>Aggiungi</Button>
+          </DialogActions>
+        </Dialog>
       </div>
     )
   }

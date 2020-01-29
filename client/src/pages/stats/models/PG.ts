@@ -27,6 +27,7 @@ interface PG {
   equipment: Equipment
   spellsByLevel: SpellsByLevel[]
   pe: number
+  background: string
 }
 
 export default PG

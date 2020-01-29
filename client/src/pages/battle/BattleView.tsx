@@ -215,7 +215,6 @@ function BattleView(props: BattleViewProps) {
   }, [pg.race, pg.pgClass])
 
   useEffect(() => {
-    console.log('pg', pg.pgClass, pg.subClass)
     if (pg.pgClass && pg.subClass) {
       setPrivileges(
         BattleUtils.getPrivileges(
