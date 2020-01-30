@@ -229,11 +229,12 @@ function BattleView(props: BattleViewProps) {
         BattleUtils.getPrivileges(
           StatsUtils.getPgLevel(pg),
           pg.pgClass,
-          pg.subClass
+          pg.subClass,
+          pg.background
         )
       )
     }
-  }, [pg])
+  }, [pg, pg.pgClass, pg.subClass, pg.background])
 
   const raceAbilities = getRaceAbilities(pg.race, pg.subRace)
   return (
