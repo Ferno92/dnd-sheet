@@ -94,7 +94,8 @@ class DataUtils {
         noFurtivity: child.noFurtivity,
         // extra: child.damage,
         weight: child.weight,
-        addDes: child.addDes
+        addDes: child.addDes,
+        minFor: child.minFor
       })
     })
     return armors

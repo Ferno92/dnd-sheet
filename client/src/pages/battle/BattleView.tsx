@@ -7,8 +7,6 @@ import {
   DialogTitle,
   DialogContent,
   useMediaQuery,
-  ListItem,
-  List,
   IconButton,
   Grid,
   Checkbox,
@@ -211,6 +209,16 @@ function BattleView(props: BattleViewProps) {
     []
   )
 
+  const isArmorDisabled = useCallback(
+    (armorInfo: ArmorInfo): boolean => {
+      const des = StatsUtils.getStatValue(StatsType.Destrezza, pg)
+      return (
+        armorInfo.armor.minFor !== undefined && armorInfo.armor.minFor > des
+      )
+    },
+    [pg]
+  )
+
   useEffect(() => {
     setDV(BattleUtils.getDV(pg.pgClass))
   }, [pg.race, pg.pgClass])
@@ -225,7 +233,7 @@ function BattleView(props: BattleViewProps) {
         )
       )
     }
-  }, [pg.pgClass, pg.subClass])
+  }, [pg])
 
   const raceAbilities = getRaceAbilities(pg.race, pg.subRace)
   return (
@@ -402,7 +410,7 @@ function BattleView(props: BattleViewProps) {
             expanded={armorExpanded === armorInfo.armor.id}
             checked={armorInfo.isWearing || false}
             checkbox
-            checkboxDisabled={false}
+            checkboxDisabled={isArmorDisabled(armorInfo)}
             onEdit={onEdit}
             RightIconButton={
               onEdit && (

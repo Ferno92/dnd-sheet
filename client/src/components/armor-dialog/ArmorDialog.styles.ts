@@ -42,6 +42,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     '& .MuiInputBase-input': {
       width: '140px !important'
     }
+  },
+  content: {
+    paddingTop: 8
   }
 }))
 

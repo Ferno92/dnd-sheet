@@ -33,13 +33,12 @@ const ArmorDialog: React.FC<ArmorDialogProps> = (props: ArmorDialogProps) => {
   const [notes, setNotes] = useState('')
   const styles = useStyles()
 
-  const getArmorsData = () => {
+  const getArmorsData = useCallback(() => {
     const armorsData = DataUtils.ArmorsMapper(armorsJSON as any)
     const armorsDataTemp: Armor[] = []
     armorsData.forEach((item, index) => {
-      const prevType =
-        index > 0 ? armorsData[index - 1].armorType.split(' ')[0] : ''
-      const currentType = item.armorType.split(' ')[0]
+      const prevType = index > 0 ? armorsData[index - 1].armorType : ''
+      const currentType = item.armorType
       if (currentType !== prevType) {
         armorsDataTemp.push({
           name: currentType,
@@ -56,7 +55,7 @@ const ArmorDialog: React.FC<ArmorDialogProps> = (props: ArmorDialogProps) => {
       armorsDataTemp.push(item)
     })
     return armorsDataTemp
-  }
+  }, [])
 
   const onChangeArmor = useCallback(
     (
@@ -81,6 +80,9 @@ const ArmorDialog: React.FC<ArmorDialogProps> = (props: ArmorDialogProps) => {
   const addArmor = useCallback(() => {
     onAddArmor(bonus, notes, armor)
     onClose()
+    setArmor(undefined)
+    setBonus(0)
+    setNotes('')
   }, [bonus, notes, onAddArmor, onClose, armor])
 
   const onChangeOtherName = useCallback(
@@ -123,7 +125,7 @@ const ArmorDialog: React.FC<ArmorDialogProps> = (props: ArmorDialogProps) => {
           <Close />
         </IconButton>
       </DialogTitle>
-      <DialogContent>
+      <DialogContent className={styles.content}>
         <SimpleSelect<ArmorEnum>
           label={'Armatura o scudo'}
           item={armor ? armor.id : undefined}
@@ -135,7 +137,7 @@ const ArmorDialog: React.FC<ArmorDialogProps> = (props: ArmorDialogProps) => {
           <React.Fragment>
             {armor.armorType.toLowerCase() !== 'altro' ? (
               <Typography variant="h5" className={styles.armorName}>
-                {armor.name}
+                {armor.name + (armor.minFor ? ` (For ${armor.minFor})` : '')}
               </Typography>
             ) : (
               <TextField

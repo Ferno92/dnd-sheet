@@ -59,7 +59,7 @@ function SimpleSelect<T>(props: SimpleSelectProps<T>) {
         disabled={!onEdit}
       >
         {dataList.map(data => {
-          return data.type === 'SubHeader' ? (
+          return data.type.toString() === 'SubHeader' ? (
             <ListSubheader key={data.type + data.value}>
               {data.value}
             </ListSubheader>

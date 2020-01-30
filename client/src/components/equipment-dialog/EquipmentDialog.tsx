@@ -34,14 +34,11 @@ const EquipmentDialog: React.FC<EquipmentDialogProps> = (
   const [name, setName] = useState('')
   const styles = useEquipmentDialogStyles()
 
-  const onChangeInfo = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInfo(e.currentTarget.value)
-  }
-
   const addEquipment = useCallback(() => {
     onAddEquipment([{ id: shortid.generate(), quantity, name, weight, info }])
     onClose()
   }, [info, name, onAddEquipment, onClose, quantity, weight])
+
   return (
     <Dialog
       fullScreen={fullScreen}

@@ -1,5 +1,3 @@
-import Theme from 'assets/styles/Theme'
-
 interface RgbColor {
   r: number
   g: number

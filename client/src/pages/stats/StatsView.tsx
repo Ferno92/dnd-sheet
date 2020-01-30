@@ -334,6 +334,14 @@ class StatsView extends Component<
     return StatsUtils.getPercLevelFromPE(pe)
   }
 
+  isArmorHeavy = (): boolean => {
+    const { armors } = this.props.pg
+    return (
+      armors.find(armor => armor.isWearing && armor.armor.noFurtivity) !==
+      undefined
+    )
+  }
+
   render() {
     const {
       name,
@@ -357,7 +365,6 @@ class StatsView extends Component<
       onChangeSubRace,
       onChangeBackground,
       onEditName,
-      onEditLevel,
       onEditStats,
       onChangePE
     } = this.props
@@ -707,7 +714,13 @@ class StatsView extends Component<
                   key={ability.type}
                   expanded={abilityExpanded === ability.type}
                   id={ability.type}
-                  name={ability.type}
+                  name={
+                    ability.type +
+                    (ability.type === AbilitiesEnum.Furtivita &&
+                    this.isArmorHeavy()
+                      ? ' (Svantaggio)'
+                      : '')
+                  }
                   checked={this.hasProficiency(ability.type)}
                   onChangeCheckbox={(id: string, checked: boolean) =>
                     onChangeAbilityCheck(id as AbilitiesEnum, checked)

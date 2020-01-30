@@ -39,7 +39,6 @@ import SpellsView from 'pages/spells/SpellsView'
 import Spell from 'data/types/Spell'
 import SpellsByLevel from 'data/types/SpellsByLevel'
 import _ from 'lodash'
-import Background from 'data/types/Background'
 
 interface SheetProps {
   id: number
@@ -752,15 +751,7 @@ class Sheet extends Component<
 
   render() {
     const { classes, theme } = this.props
-    const {
-      pageIndex,
-      onEdit,
-      open,
-      direction,
-      sheetId,
-      pg,
-      exist
-    } = this.state
+    const { pageIndex, onEdit, sheetId, pg, exist } = this.state
 
     let swipeableViews = [
       <div key={'slide1'}>
