@@ -4,7 +4,8 @@ import { makeStyles } from '@material-ui/styles'
 const BattleViewStyles = makeStyles((theme: Theme) => ({
   container: {
     height: 'calc(100vh - 95px)',
-    padding: 10
+    padding: 10,
+    marginBottom: 84
   },
   title: {
     textAlign: 'center',

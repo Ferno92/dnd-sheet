@@ -36,6 +36,29 @@ const WeaponDialog: React.FC<WeaponDialogProps> = (
   const styles = useWeaponDialogStyles()
   const weaponsData = DataUtils.WeaponsMapper(weaponsJSON as any)
 
+  const getWeaponsData = useCallback(() => {
+    const weaponsDataTemp: Weapon[] = []
+    weaponsData.forEach((item, index) => {
+      const prevType = index > 0 ? weaponsData[index - 1].weaponType : ''
+      const currentType = item.weaponType
+      if (currentType !== prevType) {
+        weaponsDataTemp.push({
+          name: currentType,
+          value: currentType,
+          id: WeaponEnum.SubHeader,
+          type: WeaponEnum.SubHeader,
+          weaponType: '',
+          damage: '',
+          damageType: '',
+          property: [],
+          weight: 0
+        })
+      }
+      weaponsDataTemp.push(item)
+    })
+    return weaponsDataTemp
+  }, [])
+
   const onChangeWeapon = useCallback(
     (
       event: React.ChangeEvent<{
@@ -77,7 +100,7 @@ const WeaponDialog: React.FC<WeaponDialogProps> = (
         <SimpleSelect<WeaponEnum>
           label={'Arma'}
           item={weapon ? weapon.id : undefined}
-          data={weaponsData}
+          data={getWeaponsData()}
           onEdit={true}
           onChange={onChangeWeapon}
         />
