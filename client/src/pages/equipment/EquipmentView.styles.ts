@@ -3,7 +3,11 @@ import { makeStyles } from '@material-ui/styles'
 
 const useEquipmentViewStyles = makeStyles((theme: Theme) => ({
   root: {
-    padding: 16
+    padding: 16,
+    height: 'calc(100vh - 75px)'
+  },
+  inputContainer: {
+    paddingBottom: 86
   },
   moneys: {
     display: 'flex',

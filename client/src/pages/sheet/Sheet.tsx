@@ -883,7 +883,6 @@ class Sheet extends Component<
             )}
           </Fab>
         </Tooltip>
-
         <SwipeableViews
           axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
           index={pageIndex}

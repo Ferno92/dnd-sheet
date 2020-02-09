@@ -73,166 +73,168 @@ const EquipmentView: React.FC<EquipmentViewProps> = (
 
   return (
     <div className={styles.root}>
-      <Typography variant="h5">Equipaggiamento</Typography>
-      <div className={styles.moneys}>
-        <TextFieldNumber
-          label="MR"
-          value={pg.equipment.moneys[0]}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-            onChangeMoney(0, parseInt(event.currentTarget.value))
-          }
-          disabled={onEdit}
-          max={9999}
-          min={0}
-        />
-        <TextFieldNumber
-          label="MA"
-          value={pg.equipment.moneys[1]}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-            onChangeMoney(1, parseInt(event.currentTarget.value))
-          }
-          disabled={onEdit}
-          max={9999}
-          min={0}
-        />
-        <TextFieldNumber
-          label="ME"
-          value={pg.equipment.moneys[2]}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-            onChangeMoney(2, parseInt(event.currentTarget.value))
-          }
-          disabled={onEdit}
-          max={9999}
-          min={0}
-        />
-        <TextFieldNumber
-          label="MO"
-          value={pg.equipment.moneys[3]}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-            onChangeMoney(3, parseInt(event.currentTarget.value))
-          }
-          disabled={onEdit}
-          max={9999}
-          min={0}
-        />
-        <TextFieldNumber
-          label="MP"
-          value={pg.equipment.moneys[4]}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-            onChangeMoney(4, parseInt(event.currentTarget.value))
-          }
-          disabled={onEdit}
-          max={9999}
-          min={0}
-        />
-      </div>
-      <Divider className={styles.divider} />
-      <Typography variant="subtitle2">Oggetti:</Typography>
-      {pg.equipment.backpack.length > 0 && (
-        <Grid container className={styles.equipmentHeader}>
-          <Grid item xs={3}>
-            <Typography variant="subtitle2">Quantità</Typography>
+      <div className={styles.inputContainer}>
+        <Typography variant="h5">Equipaggiamento</Typography>
+        <div className={styles.moneys}>
+          <TextFieldNumber
+            label="MR"
+            value={pg.equipment.moneys[0]}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+              onChangeMoney(0, parseInt(event.currentTarget.value))
+            }
+            disabled={onEdit}
+            max={9999}
+            min={0}
+          />
+          <TextFieldNumber
+            label="MA"
+            value={pg.equipment.moneys[1]}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+              onChangeMoney(1, parseInt(event.currentTarget.value))
+            }
+            disabled={onEdit}
+            max={9999}
+            min={0}
+          />
+          <TextFieldNumber
+            label="ME"
+            value={pg.equipment.moneys[2]}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+              onChangeMoney(2, parseInt(event.currentTarget.value))
+            }
+            disabled={onEdit}
+            max={9999}
+            min={0}
+          />
+          <TextFieldNumber
+            label="MO"
+            value={pg.equipment.moneys[3]}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+              onChangeMoney(3, parseInt(event.currentTarget.value))
+            }
+            disabled={onEdit}
+            max={9999}
+            min={0}
+          />
+          <TextFieldNumber
+            label="MP"
+            value={pg.equipment.moneys[4]}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+              onChangeMoney(4, parseInt(event.currentTarget.value))
+            }
+            disabled={onEdit}
+            max={9999}
+            min={0}
+          />
+        </div>
+        <Divider className={styles.divider} />
+        <Typography variant="subtitle2">Oggetti:</Typography>
+        {pg.equipment.backpack.length > 0 && (
+          <Grid container className={styles.equipmentHeader}>
+            <Grid item xs={3}>
+              <Typography variant="subtitle2">Quantità</Typography>
+            </Grid>
+            <Grid item xs={5}>
+              <Typography variant="subtitle2">Nome</Typography>
+            </Grid>
+            <Grid item xs={2}>
+              <Typography variant="subtitle2">Peso(kg)</Typography>
+            </Grid>
+            <Grid item xs={2}></Grid>
           </Grid>
-          <Grid item xs={5}>
-            <Typography variant="subtitle2">Nome</Typography>
-          </Grid>
-          <Grid item xs={2}>
-            <Typography variant="subtitle2">Peso(kg)</Typography>
-          </Grid>
-          <Grid item xs={2}></Grid>
+        )}
+
+        <Grid container>
+          {pg.equipment.backpack.map((item: EquipmentObject, index: number) => {
+            return (
+              <React.Fragment key={index}>
+                <Grid item xs={3} className={styles.gridItem}>
+                  <TextFieldNumber
+                    value={item.quantity}
+                    min={0}
+                    max={999}
+                    label=""
+                    disabled={onEdit}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                      onChangeItemQuantity(
+                        parseInt(event.currentTarget.value),
+                        item
+                      )
+                    }
+                  ></TextFieldNumber>
+                </Grid>
+                <Grid
+                  item
+                  xs={5}
+                  className={clsx(styles.gridItem, styles.equipmentName)}
+                >
+                  <Typography variant="caption">{item.name}</Typography>
+                </Grid>
+                <Grid item xs={2} className={styles.gridItem}>
+                  <Typography
+                    variant="caption"
+                    className={styles.centerGridValue}
+                  >
+                    {item.weight * item.quantity}
+                  </Typography>
+                </Grid>
+                <Grid item xs={2} className={styles.gridItem}>
+                  <IconButton
+                    size="small"
+                    color="secondary"
+                    onClick={() => onRemoveEquipment(index)}
+                  >
+                    <CloseOutlined className={styles.itemInfoButton} />
+                  </IconButton>
+                </Grid>
+                <Grid
+                  item
+                  xs={12}
+                  className={clsx(styles.gridItem, styles.equipmentInfo)}
+                >
+                  <Typography variant="caption">{item.info}</Typography>
+                </Grid>
+              </React.Fragment>
+            )
+          })}
         </Grid>
-      )}
-
-      <Grid container>
-        {pg.equipment.backpack.map((item: EquipmentObject, index: number) => {
-          return (
-            <React.Fragment key={index}>
-              <Grid item xs={3} className={styles.gridItem}>
-                <TextFieldNumber
-                  value={item.quantity}
-                  min={0}
-                  max={999}
-                  label=""
-                  disabled={onEdit}
-                  onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                    onChangeItemQuantity(
-                      parseInt(event.currentTarget.value),
-                      item
-                    )
-                  }
-                ></TextFieldNumber>
-              </Grid>
-              <Grid
-                item
-                xs={5}
-                className={clsx(styles.gridItem, styles.equipmentName)}
-              >
-                <Typography variant="caption">{item.name}</Typography>
-              </Grid>
-              <Grid item xs={2} className={styles.gridItem}>
-                <Typography
-                  variant="caption"
-                  className={styles.centerGridValue}
-                >
-                  {item.weight * item.quantity}
-                </Typography>
-              </Grid>
-              <Grid item xs={2} className={styles.gridItem}>
-                <IconButton
-                  size="small"
-                  color="secondary"
-                  onClick={() => onRemoveEquipment(index)}
-                >
-                  <CloseOutlined className={styles.itemInfoButton} />
-                </IconButton>
-              </Grid>
-              <Grid
-                item
-                xs={12}
-                className={clsx(styles.gridItem, styles.equipmentInfo)}
-              >
-                <Typography variant="caption">{item.info}</Typography>
-              </Grid>
-            </React.Fragment>
-          )
-        })}
-      </Grid>
-      <Button
-        className={styles.dialogActionButton}
-        onClick={() => setEquipmentItemDialogOpen(!equipmentItemDialogOpen)}
-      >
-        <Add /> Aggiungi oggetto
-      </Button>
-
-      <Divider className={styles.divider} />
-      <Typography variant="subtitle2">
-        Peso trasportato / Peso massimo{' '}
-      </Typography>
-      <div className={styles.capacity}>
-        <Typography
-          variant="h2"
-          className={clsx(
-            styles.currentCapacity,
-            getCurrentCapacity() > getMaxCapacity() ? 'red' : undefined
-          )}
+        <Button
+          className={styles.dialogActionButton}
+          onClick={() => setEquipmentItemDialogOpen(!equipmentItemDialogOpen)}
         >
-          {getCurrentCapacity()}
+          <Add /> Aggiungi oggetto
+        </Button>
+
+        <Divider className={styles.divider} />
+        <Typography variant="subtitle2">
+          Peso trasportato / Peso massimo{' '}
         </Typography>
-        <Typography
-          variant="body2"
-          className={styles.capacityTot}
-        >{`/${getMaxCapacity()}kg`}</Typography>
+        <div className={styles.capacity}>
+          <Typography
+            variant="h2"
+            className={clsx(
+              styles.currentCapacity,
+              getCurrentCapacity() > getMaxCapacity() ? 'red' : undefined
+            )}
+          >
+            {getCurrentCapacity()}
+          </Typography>
+          <Typography
+            variant="body2"
+            className={styles.capacityTot}
+          >{`/${getMaxCapacity()}kg`}</Typography>
+        </div>
+
+        <Divider className={styles.divider} />
+        {/* ________________ Equipment dialog _____________ */}
+
+        <EquipmentDialog
+          open={equipmentItemDialogOpen}
+          fullScreen={fullScreen}
+          onClose={() => setEquipmentItemDialogOpen(false)}
+          onAddEquipment={onAddEquipment}
+        />
       </div>
-
-      <Divider className={styles.divider} />
-      {/* ________________ Equipment dialog _____________ */}
-
-      <EquipmentDialog
-        open={equipmentItemDialogOpen}
-        fullScreen={fullScreen}
-        onClose={() => setEquipmentItemDialogOpen(false)}
-        onAddEquipment={onAddEquipment}
-      />
     </div>
   )
 }

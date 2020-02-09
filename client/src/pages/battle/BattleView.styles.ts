@@ -7,6 +7,9 @@ const BattleViewStyles = makeStyles((theme: Theme) => ({
     padding: 10,
     marginBottom: 84
   },
+  inputContainer: {
+    paddingBottom: 86
+  },
   title: {
     textAlign: 'center',
     marginBottom: 10,

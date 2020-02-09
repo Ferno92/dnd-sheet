@@ -239,546 +239,560 @@ function BattleView(props: BattleViewProps) {
   const raceAbilities = getRaceAbilities(pg.race, pg.subRace)
   return (
     <div className={classes.container}>
-      <Typography variant="h6" className={classes.title}>
-        Combattimento
-      </Typography>
-      <Grid container spacing={1}>
-        <Grid item xs={4} className={classes.gridItem}>
-          <Button
-            variant="outlined"
-            className={classes.caContainer}
-            onClick={showCAmodifiers}
-          >
-            <div className={classes.caTitle}>CA</div>
-            <div className={classes.caValue}>{getCA()}</div>
-          </Button>
-        </Grid>
-        <Grid item xs={3} className={classes.gridItem}>
-          <TextFieldNumber
-            disabled
-            label={'Iniziativa'}
-            value={StatsUtils.getStatValue(StatsType.Destrezza, pg)}
-            onChange={() => {}}
-          />
-        </Grid>
+      <div className={classes.inputContainer}>
+        <Typography variant="h6" className={classes.title}>
+          Combattimento
+        </Typography>
+        <Grid container spacing={1}>
+          <Grid item xs={4} className={classes.gridItem}>
+            <Button
+              variant="outlined"
+              className={classes.caContainer}
+              onClick={showCAmodifiers}
+            >
+              <div className={classes.caTitle}>CA</div>
+              <div className={classes.caValue}>{getCA()}</div>
+            </Button>
+          </Grid>
+          <Grid item xs={3} className={classes.gridItem}>
+            <TextFieldNumber
+              disabled
+              label={'Iniziativa'}
+              value={StatsUtils.getStatValue(StatsType.Destrezza, pg)}
+              onChange={() => {}}
+            />
+          </Grid>
 
-        <Grid item xs={5} className={clsx(classes.gridItem, classes.speed)}>
-          <TextFieldNumber
-            disabled={!onEdit}
-            label={'Velocità(m)'}
-            value={pg.speed && pg.speed !== '' ? parseFloat(pg.speed) : 0}
-            onChange={onChangeSpeed}
-            min={0}
-            max={150}
-            step={'1.5'}
-          />
-        </Grid>
-        <Grid item xs={4} className={classes.gridItem}>
-          <TextFieldNumber
-            disabled={!onEdit}
-            label={'PF Tot'}
-            value={pg.pfTot}
-            onChange={onChangePF}
-            min={0}
-            max={999}
-          />
-        </Grid>
+          <Grid item xs={5} className={clsx(classes.gridItem, classes.speed)}>
+            <TextFieldNumber
+              disabled={!onEdit}
+              label={'Velocità(m)'}
+              value={pg.speed && pg.speed !== '' ? parseFloat(pg.speed) : 0}
+              onChange={onChangeSpeed}
+              min={0}
+              max={150}
+              step={'1.5'}
+            />
+          </Grid>
+          <Grid item xs={4} className={classes.gridItem}>
+            <TextFieldNumber
+              disabled={!onEdit}
+              label={'PF Tot'}
+              value={pg.pfTot}
+              onChange={onChangePF}
+              min={0}
+              max={999}
+            />
+          </Grid>
 
-        <Grid item xs={3} className={classes.gridItem}>
-          <TextFieldString
-            disabled
-            label={'Dado vita'}
-            value={`d${dv}`}
-            onChange={() => {}}
-          />
-        </Grid>
+          <Grid item xs={3} className={classes.gridItem}>
+            <TextFieldString
+              disabled
+              label={'Dado vita'}
+              value={`d${dv}`}
+              onChange={() => {}}
+            />
+          </Grid>
 
-        <Grid item xs={5} className={classes.gridItem}>
-          <div className={classes.tsContainer}>
-            <Typography variant="body1" itemType="span">
-              TS vs Morte
-            </Typography>
-            <div className={classes.flexRow}>
-              <Typography
-                variant="body1"
-                itemType="span"
-                className={classes.tslabel}
-              >
-                S
+          <Grid item xs={5} className={classes.gridItem}>
+            <div className={classes.tsContainer}>
+              <Typography variant="body1" itemType="span">
+                TS vs Morte
               </Typography>
-              <div className={classes.checkboxContainer}>
-                <Checkbox
-                  className={classes.checkbox}
-                  checkedIcon={<Check />}
-                  checked={pg.tsMorte[0]}
-                  onChange={() => onChangeTsMorte(0)}
-                  disabled={onEdit}
-                />
-                <Checkbox
-                  className={classes.checkbox}
-                  checkedIcon={<Check />}
-                  checked={pg.tsMorte[1]}
-                  onChange={() => onChangeTsMorte(1)}
-                  disabled={onEdit}
-                />
-                <Checkbox
-                  className={classes.checkbox}
-                  checkedIcon={<Check />}
-                  checked={pg.tsMorte[2]}
-                  onChange={() => onChangeTsMorte(2)}
-                  disabled={onEdit}
-                />
+              <div className={classes.flexRow}>
+                <Typography
+                  variant="body1"
+                  itemType="span"
+                  className={classes.tslabel}
+                >
+                  S
+                </Typography>
+                <div className={classes.checkboxContainer}>
+                  <Checkbox
+                    className={classes.checkbox}
+                    checkedIcon={<Check />}
+                    checked={pg.tsMorte[0]}
+                    onChange={() => onChangeTsMorte(0)}
+                    disabled={onEdit}
+                  />
+                  <Checkbox
+                    className={classes.checkbox}
+                    checkedIcon={<Check />}
+                    checked={pg.tsMorte[1]}
+                    onChange={() => onChangeTsMorte(1)}
+                    disabled={onEdit}
+                  />
+                  <Checkbox
+                    className={classes.checkbox}
+                    checkedIcon={<Check />}
+                    checked={pg.tsMorte[2]}
+                    onChange={() => onChangeTsMorte(2)}
+                    disabled={onEdit}
+                  />
+                </div>
+              </div>
+              <div className={classes.flexRow}>
+                <Typography
+                  variant="body1"
+                  itemType="span"
+                  className={classes.tslabel}
+                >
+                  F
+                </Typography>
+                <div className={classes.checkboxContainer}>
+                  <Checkbox
+                    className={classes.checkbox}
+                    checkedIcon={<Close />}
+                    checked={pg.tsMorte[3]}
+                    onChange={() => onChangeTsMorte(3)}
+                    disabled={onEdit}
+                  />
+                  <Checkbox
+                    className={classes.checkbox}
+                    checkedIcon={<Close />}
+                    checked={pg.tsMorte[4]}
+                    onChange={() => onChangeTsMorte(4)}
+                    disabled={onEdit}
+                  />
+                  <Checkbox
+                    className={classes.checkbox}
+                    checkedIcon={<Close />}
+                    checked={pg.tsMorte[5]}
+                    onChange={() => onChangeTsMorte(5)}
+                    disabled={onEdit}
+                  />
+                </div>
               </div>
             </div>
-            <div className={classes.flexRow}>
-              <Typography
-                variant="body1"
-                itemType="span"
-                className={classes.tslabel}
-              >
-                F
-              </Typography>
-              <div className={classes.checkboxContainer}>
-                <Checkbox
-                  className={classes.checkbox}
-                  checkedIcon={<Close />}
-                  checked={pg.tsMorte[3]}
-                  onChange={() => onChangeTsMorte(3)}
-                  disabled={onEdit}
-                />
-                <Checkbox
-                  className={classes.checkbox}
-                  checkedIcon={<Close />}
-                  checked={pg.tsMorte[4]}
-                  onChange={() => onChangeTsMorte(4)}
-                  disabled={onEdit}
-                />
-                <Checkbox
-                  className={classes.checkbox}
-                  checkedIcon={<Close />}
-                  checked={pg.tsMorte[5]}
-                  onChange={() => onChangeTsMorte(5)}
-                  disabled={onEdit}
-                />
-              </div>
-            </div>
-          </div>
-        </Grid>
+          </Grid>
 
-        <Grid item xs={12} className={classes.gridItem}>
-          <Divider className={classes.divider} />
-          <Typography variant="subtitle2">PF Attuali</Typography>
-          <div className={classes.pfContainer}>
-            <IconButton disabled={onEdit} onClick={() => onChangeCurrentPf(-1)}>
-              <Remove />
-            </IconButton>
-            <div className={classes.pf}>
-              <Typography
-                variant="h2"
-                className={clsx(classes.currentPf, getPFColorClass())}
+          <Grid item xs={12} className={classes.gridItem}>
+            <Divider className={classes.divider} />
+            <Typography variant="subtitle2">PF Attuali</Typography>
+            <div className={classes.pfContainer}>
+              <IconButton
+                disabled={onEdit}
+                onClick={() => onChangeCurrentPf(-1)}
               >
-                {pg.currentPF}
-              </Typography>
-              <Typography
-                variant="body2"
-                className={clsx(classes.pfTot, getPFColorClass())}
-              >{`/${pg.pfTot}`}</Typography>
+                <Remove />
+              </IconButton>
+              <div className={classes.pf}>
+                <Typography
+                  variant="h2"
+                  className={clsx(classes.currentPf, getPFColorClass())}
+                >
+                  {pg.currentPF}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  className={clsx(classes.pfTot, getPFColorClass())}
+                >{`/${pg.pfTot}`}</Typography>
+              </div>
+              <IconButton
+                disabled={onEdit}
+                onClick={() => onChangeCurrentPf(1)}
+              >
+                <Add />
+              </IconButton>
             </div>
-            <IconButton disabled={onEdit} onClick={() => onChangeCurrentPf(1)}>
+          </Grid>
+        </Grid>
+        {/* ________________ Armor sections _____________ */}
+
+        <Divider className={classes.divider} />
+        <div className={classes.armorTitle}>
+          <Typography variant="h5">Armature e scudi</Typography>
+          <Tooltip title="Aggiungi armatura o scudo">
+            <IconButton onClick={() => setArmorDialogOpen(!armorDialogOpen)}>
               <Add />
             </IconButton>
-          </div>
-        </Grid>
-      </Grid>
-      {/* ________________ Armor sections _____________ */}
+          </Tooltip>
+        </div>
 
-      <Divider className={classes.divider} />
-      <div className={classes.armorTitle}>
-        <Typography variant="h5">Armature e scudi</Typography>
-        <Tooltip title="Aggiungi armatura o scudo">
-          <IconButton onClick={() => setArmorDialogOpen(!armorDialogOpen)}>
-            <Add />
-          </IconButton>
-        </Tooltip>
-      </div>
-
-      {pg.armors.map((armorInfo: ArmorInfo, index: number) => {
-        return (
-          <ExpansionPanelItem
-            key={`${armorInfo.armor.id}_${index}`}
-            id={armorInfo.armor.id}
-            name={armorInfo.armor.name}
-            expanded={armorExpanded === armorInfo.armor.id}
-            checked={armorInfo.isWearing || false}
-            checkbox
-            checkboxDisabled={isArmorDisabled(armorInfo)}
-            onEdit={onEdit}
-            RightIconButton={
-              onEdit && (
-                <Tooltip title="Rimuovi">
-                  <IconButton
-                    color="primary"
-                    onClick={() => onRemoveArmor(index)}
-                  >
-                    <Clear />
-                  </IconButton>
-                </Tooltip>
-              )
-            }
-            onExpand={() =>
-              armorExpanded === armorInfo.armor.id
-                ? setArmorExpanded(undefined)
-                : setArmorExpanded(armorInfo.armor.id)
-            }
-            onChangeCheckbox={() => onSelectArmor(index)}
-          >
-            <React.Fragment>
-              <div className={classes.armorLabel}>
-                <Typography
-                  variant={'subtitle1'}
-                  className={classes.armorDetailTitle}
-                >{`CA base: `}</Typography>
-                <Typography variant={'body2'}>{armorInfo.armor.ca}</Typography>
-              </div>
-              <div className={classes.armorLabel}>
-                <Typography
-                  variant={'subtitle1'}
-                  className={classes.armorDetailTitle}
-                >{`Aggiungi destrezza: `}</Typography>
-                <Typography variant={'body2'}>
-                  {armorInfo.armor.addDes ? 'Sì' : 'No'}
-                </Typography>
-              </div>
-              {armorInfo.armor.minFor && (
+        {pg.armors.map((armorInfo: ArmorInfo, index: number) => {
+          return (
+            <ExpansionPanelItem
+              key={`${armorInfo.armor.id}_${index}`}
+              id={armorInfo.armor.id}
+              name={armorInfo.armor.name}
+              expanded={armorExpanded === armorInfo.armor.id}
+              checked={armorInfo.isWearing || false}
+              checkbox
+              checkboxDisabled={isArmorDisabled(armorInfo)}
+              onEdit={onEdit}
+              RightIconButton={
+                onEdit && (
+                  <Tooltip title="Rimuovi">
+                    <IconButton
+                      color="primary"
+                      onClick={() => onRemoveArmor(index)}
+                    >
+                      <Clear />
+                    </IconButton>
+                  </Tooltip>
+                )
+              }
+              onExpand={() =>
+                armorExpanded === armorInfo.armor.id
+                  ? setArmorExpanded(undefined)
+                  : setArmorExpanded(armorInfo.armor.id)
+              }
+              onChangeCheckbox={() => onSelectArmor(index)}
+            >
+              <React.Fragment>
                 <div className={classes.armorLabel}>
                   <Typography
                     variant={'subtitle1'}
                     className={classes.armorDetailTitle}
-                  >{`Forza minima: `}</Typography>
+                  >{`CA base: `}</Typography>
                   <Typography variant={'body2'}>
-                    {armorInfo.armor.minFor}
+                    {armorInfo.armor.ca}
                   </Typography>
                 </div>
-              )}
-              <div className={classes.armorLabel}>
-                <Typography
-                  variant={'subtitle1'}
-                  className={classes.armorDetailTitle}
-                >{`Peso: `}</Typography>
-                <Typography variant={'body2'}>
-                  {`${armorInfo.armor.weight} Kg`}
-                </Typography>
-              </div>
-              {armorInfo.armor.noFurtivity && (
                 <div className={classes.armorLabel}>
                   <Typography
                     variant={'subtitle1'}
                     className={classes.armorDetailTitle}
-                  >{`Furtività: `}</Typography>
+                  >{`Aggiungi destrezza: `}</Typography>
                   <Typography variant={'body2'}>
-                    {armorInfo.armor.noFurtivity ? 'Svantaggio' : ''}
+                    {armorInfo.armor.addDes ? 'Sì' : 'No'}
                   </Typography>
                 </div>
-              )}
-              {armorInfo.bonus !== 0 && (
-                <div className={classes.armorLabel}>
-                  <Typography
-                    variant={'subtitle1'}
-                    className={classes.armorDetailTitle}
-                  >{`Bonus Magico: `}</Typography>
-                  <Typography variant={'body2'}>{`${
-                    armorInfo.bonus > 0 ? '+' : ''
-                  }${armorInfo.bonus}`}</Typography>
-                </div>
-              )}
-              {armorInfo.notes && (
-                <React.Fragment>
+                {armorInfo.armor.minFor && (
                   <div className={classes.armorLabel}>
                     <Typography
                       variant={'subtitle1'}
                       className={classes.armorDetailTitle}
-                    >{`Note: `}</Typography>
+                    >{`Forza minima: `}</Typography>
+                    <Typography variant={'body2'}>
+                      {armorInfo.armor.minFor}
+                    </Typography>
                   </div>
-                  <Typography variant={'body2'}>{armorInfo.notes}</Typography>
-                </React.Fragment>
-              )}
-            </React.Fragment>
-          </ExpansionPanelItem>
-        )
-      })}
-      {pg.armors.length === 0 && (
-        <Typography variant="body2">Nessuna armatura o scudo</Typography>
-      )}
-
-      {/* ________________ Armor dialog _____________ */}
-      <ArmorDialog
-        open={armorDialogOpen}
-        fullScreen={fullScreen}
-        onClose={() => setArmorDialogOpen(false)}
-        onAddArmor={onAddArmor}
-      />
-
-      <Divider className={classes.divider} />
-      {/* ________________ Weapon sections _____________ */}
-      <div className={classes.armorTitle}>
-        <Typography variant="h5">Armi</Typography>
-        <Tooltip title="Aggiungi armi">
-          <IconButton onClick={() => setWeaponDialogOpen(!weaponDialogOpen)}>
-            <Add />
-          </IconButton>
-        </Tooltip>
-      </div>
-
-      {pg.weapons.map((weaponInfo: WeaponInfo, index: number) => {
-        const weaponDamageBonus = getWeaponDamageBonus(weaponInfo)
-        return (
-          <ExpansionPanelItem
-            key={`${weaponInfo.weapon.id}_${index}`}
-            id={weaponInfo.weapon.id}
-            name={`${weaponInfo.weapon.name}${
-              weaponInfo.bonus ? `(+${weaponInfo.bonus})` : ''
-            }`}
-            expanded={weaponExpanded === weaponInfo.weapon.id}
-            checked={false}
-            checkbox={false}
-            checkboxDisabled={true}
-            onEdit={onEdit}
-            RightIconButton={
-              onEdit && (
-                <Tooltip title="Rimuovi">
-                  <IconButton
-                    color="primary"
-                    onClick={() => onRemoveWeapon(index)}
-                  >
-                    <Clear />
-                  </IconButton>
-                </Tooltip>
-              )
-            }
-            onChangeCheckbox={() => {}}
-            onExpand={() =>
-              weaponExpanded === weaponInfo.weapon.id
-                ? setWeaponExpanded(undefined)
-                : setWeaponExpanded(weaponInfo.weapon.id)
-            }
-          >
-            <React.Fragment>
-              <div className={classes.armorLabel}>
-                <Typography
-                  variant={'subtitle1'}
-                  className={classes.armorDetailTitle}
-                >{`Tiro per colpire: `}</Typography>
-                <Typography variant={'body2'}>
-                  {getWeaponTPC(weaponInfo)}
-                </Typography>
-              </div>
-              <div className={classes.armorLabel}>
-                <Typography
-                  variant={'subtitle1'}
-                  className={classes.armorDetailTitle}
-                >{`Danno: `}</Typography>
-                <Typography variant={'body2'}>
-                  {`${weaponInfo.weapon.damage}${
-                    weaponDamageBonus >= 0 ? '+' : ''
-                  }${weaponDamageBonus}`}
-                </Typography>
-              </div>
-              <div className={classes.armorLabel}>
-                <Typography
-                  variant={'subtitle1'}
-                  className={classes.armorDetailTitle}
-                >{`Tipologia: `}</Typography>
-                <Typography variant={'body2'}>
-                  {weaponInfo.weapon.damageType}
-                </Typography>
-              </div>
-              <div className={classes.armorLabel}>
-                <Typography
-                  variant={'subtitle1'}
-                  className={classes.armorDetailTitle}
-                >{`Proprietà: `}</Typography>
-                <Typography variant={'body2'}>
-                  {weaponInfo.weapon.property.map(property => property)}
-                </Typography>
-              </div>
-              {weaponInfo.notes && (
-                <React.Fragment>
+                )}
+                <div className={classes.armorLabel}>
                   <Typography
                     variant={'subtitle1'}
                     className={classes.armorDetailTitle}
-                  >{`Note: `}</Typography>
-                  <Typography variant={'body2'}>{weaponInfo.notes}</Typography>
-                </React.Fragment>
-              )}
-            </React.Fragment>
-          </ExpansionPanelItem>
-        )
-      })}
-
-      <Divider className={classes.divider} />
-      {/* ________________ Abilità speciali di razza _____________ */}
-      <Typography variant="subtitle1" className={classes.specialAbilityTitle}>
-        Abilità razziali
-      </Typography>
-
-      {raceAbilities.length === 0 && (
-        <Typography variant="body2">Nessuna abilità</Typography>
-      )}
-      {raceAbilities.map(raceAbility => {
-        return (
-          <ExpansionPanel
-            key={raceAbility.name}
-            square
-            expanded={abilityExpanded === raceAbility.name}
-            onChange={() =>
-              abilityExpanded === raceAbility.name
-                ? setAbilityExpanded(undefined)
-                : setAbilityExpanded(raceAbility.name)
-            }
-          >
-            <ExpansionPanelSummary>
-              <Typography variant="subtitle2" itemType="span">
-                {raceAbility.name}:
-              </Typography>
-            </ExpansionPanelSummary>
-            <ExpansionPanelDetails>
-              <Typography variant="body2" itemType="span">
-                {raceAbility.description}
-              </Typography>
-            </ExpansionPanelDetails>
-          </ExpansionPanel>
-        )
-      })}
-
-      <Divider className={classes.divider} />
-      {/* ________________ Privilegi di classe _____________ */}
-      {privileges && (
-        <React.Fragment>
-          <Typography
-            variant="subtitle1"
-            className={classes.specialAbilityTitle}
-          >
-            Privilegi di classe
-          </Typography>
-
-          {privileges.map(privilege => {
-            return (
-              <ExpansionPanel
-                key={privilege.type}
-                square
-                expanded={privilegeExpanded === privilege.type}
-                onChange={() =>
-                  privilegeExpanded === privilege.type
-                    ? setPrivilegeExpanded(undefined)
-                    : setPrivilegeExpanded(privilege.type)
-                }
-              >
-                <ExpansionPanelSummary className={classes.privilegeSummary}>
-                  <Typography variant="subtitle2" itemType="span">
-                    {privilege.name}:
+                  >{`Peso: `}</Typography>
+                  <Typography variant={'body2'}>
+                    {`${armorInfo.armor.weight} Kg`}
                   </Typography>
-                  <Typography variant="subtitle2" itemType="span">
-                    {privilege.counter !== undefined ||
-                    privilege.counterType !== undefined
-                      ? `${privilege.counter ? privilege.counter : ''} ${
-                          privilege.counterType ? privilege.counterType : ''
-                        }`
-                      : undefined}
-                  </Typography>
-                </ExpansionPanelSummary>
-                <ExpansionPanelDetails>
-                  <Typography
-                    variant="body2"
-                    itemType="span"
-                    dangerouslySetInnerHTML={{ __html: privilege.description }}
-                  />
-                </ExpansionPanelDetails>
-              </ExpansionPanel>
-            )
-          })}
-          {privileges.length === 0 && (
-            <Typography variant="body2">Nessun privilegio</Typography>
-          )}
-          <Divider className={classes.divider} />
-        </React.Fragment>
-      )}
-
-      {/* ________________ Weapon dialog _____________ */}
-      <WeaponDialog
-        open={weaponDialogOpen}
-        fullScreen={fullScreen}
-        onClose={() => setWeaponDialogOpen(false)}
-        onAddWeapon={onAddWeapon}
-      />
-
-      {/* ________________ CA dialog _____________ */}
-      <Dialog
-        fullScreen={fullScreen}
-        open={caModifiersOpen}
-        onClose={() => setCaModifiersOpen(false)}
-        aria-labelledby="responsive-dialog-title"
-        className={classes.dialogRoot}
-      >
-        <DialogContent>
-          <DialogTitle className={classes.dialogTitle}>
-            <Typography>Modificatori CA:</Typography>
-            <IconButton
-              className={classes.closeDialog}
-              onClick={() => setCaModifiersOpen(false)}
-            >
-              <Close />
-            </IconButton>
-          </DialogTitle>
-          <Grid container>
-            {pg.armors.map((armorInfo: ArmorInfo, index: number) => {
-              return (
-                armorInfo.isWearing && (
-                  <React.Fragment key={index}>
-                    <Grid item xs={8}>
-                      <Typography variant="subtitle1" itemType="span">
-                        {armorInfo.armor.name}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={2} className={classes.gridItem}>
-                      <Typography variant="body1" itemType="span">
-                        {armorInfo.armor.ca + armorInfo.bonus}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={2} className={classes.gridItem}>
-                      <Typography variant="body1" itemType="span">
-                        +
-                      </Typography>
-                    </Grid>
+                </div>
+                {armorInfo.armor.noFurtivity && (
+                  <div className={classes.armorLabel}>
+                    <Typography
+                      variant={'subtitle1'}
+                      className={classes.armorDetailTitle}
+                    >{`Furtività: `}</Typography>
+                    <Typography variant={'body2'}>
+                      {armorInfo.armor.noFurtivity ? 'Svantaggio' : ''}
+                    </Typography>
+                  </div>
+                )}
+                {armorInfo.bonus !== 0 && (
+                  <div className={classes.armorLabel}>
+                    <Typography
+                      variant={'subtitle1'}
+                      className={classes.armorDetailTitle}
+                    >{`Bonus Magico: `}</Typography>
+                    <Typography variant={'body2'}>{`${
+                      armorInfo.bonus > 0 ? '+' : ''
+                    }${armorInfo.bonus}`}</Typography>
+                  </div>
+                )}
+                {armorInfo.notes && (
+                  <React.Fragment>
+                    <div className={classes.armorLabel}>
+                      <Typography
+                        variant={'subtitle1'}
+                        className={classes.armorDetailTitle}
+                      >{`Note: `}</Typography>
+                    </div>
+                    <Typography variant={'body2'}>{armorInfo.notes}</Typography>
                   </React.Fragment>
+                )}
+              </React.Fragment>
+            </ExpansionPanelItem>
+          )
+        })}
+        {pg.armors.length === 0 && (
+          <Typography variant="body2">Nessuna armatura o scudo</Typography>
+        )}
+
+        {/* ________________ Armor dialog _____________ */}
+        <ArmorDialog
+          open={armorDialogOpen}
+          fullScreen={fullScreen}
+          onClose={() => setArmorDialogOpen(false)}
+          onAddArmor={onAddArmor}
+        />
+
+        <Divider className={classes.divider} />
+        {/* ________________ Weapon sections _____________ */}
+        <div className={classes.armorTitle}>
+          <Typography variant="h5">Armi</Typography>
+          <Tooltip title="Aggiungi armi">
+            <IconButton onClick={() => setWeaponDialogOpen(!weaponDialogOpen)}>
+              <Add />
+            </IconButton>
+          </Tooltip>
+        </div>
+
+        {pg.weapons.map((weaponInfo: WeaponInfo, index: number) => {
+          const weaponDamageBonus = getWeaponDamageBonus(weaponInfo)
+          return (
+            <ExpansionPanelItem
+              key={`${weaponInfo.weapon.id}_${index}`}
+              id={weaponInfo.weapon.id}
+              name={`${weaponInfo.weapon.name}${
+                weaponInfo.bonus ? `(+${weaponInfo.bonus})` : ''
+              }`}
+              expanded={weaponExpanded === weaponInfo.weapon.id}
+              checked={false}
+              checkbox={false}
+              checkboxDisabled={true}
+              onEdit={onEdit}
+              RightIconButton={
+                onEdit && (
+                  <Tooltip title="Rimuovi">
+                    <IconButton
+                      color="primary"
+                      onClick={() => onRemoveWeapon(index)}
+                    >
+                      <Clear />
+                    </IconButton>
+                  </Tooltip>
                 )
+              }
+              onChangeCheckbox={() => {}}
+              onExpand={() =>
+                weaponExpanded === weaponInfo.weapon.id
+                  ? setWeaponExpanded(undefined)
+                  : setWeaponExpanded(weaponInfo.weapon.id)
+              }
+            >
+              <React.Fragment>
+                <div className={classes.armorLabel}>
+                  <Typography
+                    variant={'subtitle1'}
+                    className={classes.armorDetailTitle}
+                  >{`Tiro per colpire: `}</Typography>
+                  <Typography variant={'body2'}>
+                    {getWeaponTPC(weaponInfo)}
+                  </Typography>
+                </div>
+                <div className={classes.armorLabel}>
+                  <Typography
+                    variant={'subtitle1'}
+                    className={classes.armorDetailTitle}
+                  >{`Danno: `}</Typography>
+                  <Typography variant={'body2'}>
+                    {`${weaponInfo.weapon.damage}${
+                      weaponDamageBonus >= 0 ? '+' : ''
+                    }${weaponDamageBonus}`}
+                  </Typography>
+                </div>
+                <div className={classes.armorLabel}>
+                  <Typography
+                    variant={'subtitle1'}
+                    className={classes.armorDetailTitle}
+                  >{`Tipologia: `}</Typography>
+                  <Typography variant={'body2'}>
+                    {weaponInfo.weapon.damageType}
+                  </Typography>
+                </div>
+                <div className={classes.armorLabel}>
+                  <Typography
+                    variant={'subtitle1'}
+                    className={classes.armorDetailTitle}
+                  >{`Proprietà: `}</Typography>
+                  <Typography variant={'body2'}>
+                    {weaponInfo.weapon.property.map(property => property)}
+                  </Typography>
+                </div>
+                {weaponInfo.notes && (
+                  <React.Fragment>
+                    <Typography
+                      variant={'subtitle1'}
+                      className={classes.armorDetailTitle}
+                    >{`Note: `}</Typography>
+                    <Typography variant={'body2'}>
+                      {weaponInfo.notes}
+                    </Typography>
+                  </React.Fragment>
+                )}
+              </React.Fragment>
+            </ExpansionPanelItem>
+          )
+        })}
+
+        <Divider className={classes.divider} />
+        {/* ________________ Abilità speciali di razza _____________ */}
+        <Typography variant="subtitle1" className={classes.specialAbilityTitle}>
+          Abilità razziali
+        </Typography>
+
+        {raceAbilities.length === 0 && (
+          <Typography variant="body2">Nessuna abilità</Typography>
+        )}
+        {raceAbilities.map(raceAbility => {
+          return (
+            <ExpansionPanel
+              key={raceAbility.name}
+              square
+              expanded={abilityExpanded === raceAbility.name}
+              onChange={() =>
+                abilityExpanded === raceAbility.name
+                  ? setAbilityExpanded(undefined)
+                  : setAbilityExpanded(raceAbility.name)
+              }
+            >
+              <ExpansionPanelSummary>
+                <Typography variant="subtitle2" itemType="span">
+                  {raceAbility.name}:
+                </Typography>
+              </ExpansionPanelSummary>
+              <ExpansionPanelDetails>
+                <Typography variant="body2" itemType="span">
+                  {raceAbility.description}
+                </Typography>
+              </ExpansionPanelDetails>
+            </ExpansionPanel>
+          )
+        })}
+
+        <Divider className={classes.divider} />
+        {/* ________________ Privilegi di classe _____________ */}
+        {privileges && (
+          <React.Fragment>
+            <Typography
+              variant="subtitle1"
+              className={classes.specialAbilityTitle}
+            >
+              Privilegi di classe
+            </Typography>
+
+            {privileges.map(privilege => {
+              return (
+                <ExpansionPanel
+                  key={privilege.type}
+                  square
+                  expanded={privilegeExpanded === privilege.type}
+                  onChange={() =>
+                    privilegeExpanded === privilege.type
+                      ? setPrivilegeExpanded(undefined)
+                      : setPrivilegeExpanded(privilege.type)
+                  }
+                >
+                  <ExpansionPanelSummary className={classes.privilegeSummary}>
+                    <Typography variant="subtitle2" itemType="span">
+                      {privilege.name}:
+                    </Typography>
+                    <Typography variant="subtitle2" itemType="span">
+                      {privilege.counter !== undefined ||
+                      privilege.counterType !== undefined
+                        ? `${privilege.counter ? privilege.counter : ''} ${
+                            privilege.counterType ? privilege.counterType : ''
+                          }`
+                        : undefined}
+                    </Typography>
+                  </ExpansionPanelSummary>
+                  <ExpansionPanelDetails>
+                    <Typography
+                      variant="body2"
+                      itemType="span"
+                      dangerouslySetInnerHTML={{
+                        __html: privilege.description
+                      }}
+                    />
+                  </ExpansionPanelDetails>
+                </ExpansionPanel>
               )
             })}
-
-            <Grid item xs={8}>
-              <Typography variant="subtitle1" itemType="span">
-                Destrezza
-              </Typography>
-            </Grid>
-            <Grid item xs={2} className={classes.gridItem}>
-              <Typography variant="body1" itemType="span">
-                {StatsUtils.getStatModifier(
-                  pg.stats.find(stat => stat.type === StatsType.Destrezza)!,
-                  pg
-                )}
-              </Typography>
-            </Grid>
+            {privileges.length === 0 && (
+              <Typography variant="body2">Nessun privilegio</Typography>
+            )}
             <Divider className={classes.divider} />
-            <Grid item xs={8}>
-              <Typography variant="body1">TOT</Typography>
+          </React.Fragment>
+        )}
+
+        {/* ________________ Weapon dialog _____________ */}
+        <WeaponDialog
+          open={weaponDialogOpen}
+          fullScreen={fullScreen}
+          onClose={() => setWeaponDialogOpen(false)}
+          onAddWeapon={onAddWeapon}
+        />
+
+        {/* ________________ CA dialog _____________ */}
+        <Dialog
+          fullScreen={fullScreen}
+          open={caModifiersOpen}
+          onClose={() => setCaModifiersOpen(false)}
+          aria-labelledby="responsive-dialog-title"
+          className={classes.dialogRoot}
+        >
+          <DialogContent>
+            <DialogTitle className={classes.dialogTitle}>
+              <Typography>Modificatori CA:</Typography>
+              <IconButton
+                className={classes.closeDialog}
+                onClick={() => setCaModifiersOpen(false)}
+              >
+                <Close />
+              </IconButton>
+            </DialogTitle>
+            <Grid container>
+              {pg.armors.map((armorInfo: ArmorInfo, index: number) => {
+                return (
+                  armorInfo.isWearing && (
+                    <React.Fragment key={index}>
+                      <Grid item xs={8}>
+                        <Typography variant="subtitle1" itemType="span">
+                          {armorInfo.armor.name}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={2} className={classes.gridItem}>
+                        <Typography variant="body1" itemType="span">
+                          {armorInfo.armor.ca + armorInfo.bonus}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={2} className={classes.gridItem}>
+                        <Typography variant="body1" itemType="span">
+                          +
+                        </Typography>
+                      </Grid>
+                    </React.Fragment>
+                  )
+                )
+              })}
+
+              <Grid item xs={8}>
+                <Typography variant="subtitle1" itemType="span">
+                  Destrezza
+                </Typography>
+              </Grid>
+              <Grid item xs={2} className={classes.gridItem}>
+                <Typography variant="body1" itemType="span">
+                  {StatsUtils.getStatModifier(
+                    pg.stats.find(stat => stat.type === StatsType.Destrezza)!,
+                    pg
+                  )}
+                </Typography>
+              </Grid>
+              <Divider className={classes.divider} />
+              <Grid item xs={8}>
+                <Typography variant="body1">TOT</Typography>
+              </Grid>
+              <Grid item xs={2}>
+                <Typography variant="body1" className={classes.gridItem}>
+                  {getCA()}
+                </Typography>
+              </Grid>
             </Grid>
-            <Grid item xs={2}>
-              <Typography variant="body1" className={classes.gridItem}>
-                {getCA()}
-              </Typography>
-            </Grid>
-          </Grid>
-        </DialogContent>
-      </Dialog>
+          </DialogContent>
+        </Dialog>
+      </div>
     </div>
   )
 }

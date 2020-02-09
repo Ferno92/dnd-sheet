@@ -345,7 +345,7 @@ export default [
         known: 2,
         spells: [
           { level: 0, slot: 2 },
-          { level: 1, slot: 0 }
+          { level: 1, slot: 2 }
         ],
         slot: 1
       },
@@ -354,7 +354,7 @@ export default [
         known: 3,
         spells: [
           { level: 0, slot: 2 },
-          { level: 1, slot: 0 }
+          { level: 1, slot: 2 }
         ],
         slot: 2
       },
@@ -363,8 +363,8 @@ export default [
         known: 4,
         spells: [
           { level: 0, slot: 2 },
-          { level: 1, slot: 0 },
-          { level: 2, slot: 0 }
+          { level: 1, slot: 2 },
+          { level: 2, slot: 2 }
         ],
         slot: 2
       },
@@ -373,8 +373,8 @@ export default [
         known: 5,
         spells: [
           { level: 0, slot: 3 },
-          { level: 1, slot: 0 },
-          { level: 2, slot: 0 }
+          { level: 1, slot: 2 },
+          { level: 2, slot: 2 }
         ],
         slot: 2
       },
@@ -383,9 +383,9 @@ export default [
         known: 6,
         spells: [
           { level: 0, slot: 5 },
-          { level: 1, slot: 0 },
-          { level: 2, slot: 0 },
-          { level: 3, slot: 0 }
+          { level: 1, slot: 2 },
+          { level: 2, slot: 2 },
+          { level: 3, slot: 2 }
         ],
         slot: 2
       },
@@ -394,9 +394,9 @@ export default [
         known: 7,
         spells: [
           { level: 0, slot: 5 },
-          { level: 1, slot: 0 },
-          { level: 2, slot: 0 },
-          { level: 3, slot: 0 }
+          { level: 1, slot: 2 },
+          { level: 2, slot: 2 },
+          { level: 3, slot: 2 }
         ],
         slot: 2
       }

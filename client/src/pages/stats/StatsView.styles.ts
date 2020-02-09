@@ -35,7 +35,8 @@ const StatsViewStyles = (theme: Theme) =>
       flexDirection: 'column'
     },
     inputContainer: {
-      padding: 10
+      padding: 10,
+      paddingBottom: 86
     },
     gridContainer: {
       width: 'calc(100% - 4px)',
