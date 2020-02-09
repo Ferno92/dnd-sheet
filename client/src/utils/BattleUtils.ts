@@ -41,8 +41,14 @@ class BattleUtils {
       if (job.type === pgClass) {
         job.privileges.forEach(privilege => {
           if (privilege.lv <= level) {
-            //TODO no duplicate
-            privileges.push(privilege)
+            const index = privileges.findIndex(
+              item => item.type === privilege.type
+            )
+            if (index < 0) {
+              privileges.push(privilege)
+            } else {
+              privileges[index] = privilege
+            }
           }
         })
       }
@@ -56,8 +62,14 @@ class BattleUtils {
       if (job.type === subClass) {
         job.privileges.forEach(privilege => {
           if (privilege.lv <= level) {
-            //TODO no duplicate
-            privileges.push(privilege)
+            const index = privileges.findIndex(
+              item => item.type === privilege.type
+            )
+            if (index < 0) {
+              privileges.push(privilege)
+            } else {
+              privileges[index] = privilege
+            }
           }
         })
       }

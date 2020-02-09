@@ -650,6 +650,39 @@ class Sheet extends Component<
     )
   }
 
+  onUpdateSpell = (spell: Spell) => {
+    const { pg } = this.state
+    const spellsByLevelCopy = [...pg.spellsByLevel]
+    let index = -1
+    let i = -1
+    spellsByLevelCopy.forEach((spellByLevel: SpellsByLevel, j: number) => {
+      spellByLevel.spells.forEach((item: Spell, k: number) => {
+        if (item.id === spell.id) {
+          index = j
+          i = k
+        }
+      })
+    })
+    if (index !== -1 && i !== -1) {
+      spellsByLevelCopy[index].spells[i] = spell
+
+      this.setState(
+        {
+          pg: {
+            ...pg,
+            spellsByLevel: spellsByLevelCopy
+          }
+        },
+        () => {
+          const { onEdit } = this.state
+          if (!onEdit) {
+            this.updateDB()
+          }
+        }
+      )
+    }
+  }
+
   onUseSlot = (lv: number, clear?: boolean) => {
     const { pg } = this.state
     const spellsByLevelCopy = [...pg.spellsByLevel]
@@ -814,6 +847,7 @@ class Sheet extends Component<
             pg={pg}
             onAddSpell={this.onAddSpell}
             onRemoveSpell={this.onRemoveSpell}
+            onUpdateSpell={this.onUpdateSpell}
             onUseSlot={this.onUseSlot}
           />
         </div>
