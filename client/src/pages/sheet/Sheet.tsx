@@ -80,7 +80,7 @@ class Sheet extends Component<
         const nav = navigator as any
         const pgEncoded = JSON.stringify(this.state.pg)
         const id = window.btoa(this.state.pg.name + this.props.match.params.id)
-        const url = `${window.location.hostname}/download/${id}`
+        const url = `https://${window.location.hostname}/download/${id}`
 
         firebase
           .app()
