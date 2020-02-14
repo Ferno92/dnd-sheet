@@ -278,7 +278,7 @@ class StatsView extends Component<
     const filtered = this.subRacesData.filter(
       subRace => subRace.type.indexOf(race.toString().toLowerCase()) >= 0
     )
-    return filtered
+    return filtered || ''
   }
 
   getSubJobsData = () => {
@@ -418,7 +418,7 @@ class StatsView extends Component<
                   )}
                 </div>
                 <div>
-                  <Typography variant="body1">{name}</Typography>
+                  <Typography variant="body1">{name || ''}</Typography>
                   <Typography variant="body2">{`${StatsUtils.getInfoName(
                     `${race}`,
                     this.racesData
@@ -426,10 +426,14 @@ class StatsView extends Component<
                     `${subRace}`,
                     this.getSubRacesData()
                   )}`}</Typography>
-                  <Typography variant="body2">{`${StatsUtils.getInfoName(
-                    `${pgClass}`,
-                    this.jobsData
-                  )} Lv. ${StatsUtils.getPgLevel(this.props.pg)}`}</Typography>
+                  <Typography variant="body2">
+                    {StatsUtils.getInfoName(`${pgClass}`, this.jobsData)
+                      ? `${StatsUtils.getInfoName(
+                          `${pgClass}`,
+                          this.jobsData
+                        )} Lv. ${StatsUtils.getPgLevel(this.props.pg)}`
+                      : ''}
+                  </Typography>
                 </div>
               </div>
             </ExpansionPanelSummary>

@@ -16,7 +16,7 @@ import { ReactComponent as FightIcon } from 'assets/images/swords.svg'
 import { ReactComponent as ProfileIcon } from 'assets/images/viking.svg'
 import { ReactComponent as BackpackIcon } from 'assets/images/backpack.svg'
 import { ReactComponent as BookIcon } from 'assets/images/spellbook.svg'
-import { Edit, Done, MoreHoriz, People } from '@material-ui/icons'
+import { Edit, Done, MoreHoriz, People, Share } from '@material-ui/icons'
 import SwipeableViews from 'react-swipeable-views'
 import StatsView from 'pages/stats/StatsView'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
@@ -39,6 +39,8 @@ import SpellsView from 'pages/spells/SpellsView'
 import Spell from 'data/types/Spell'
 import SpellsByLevel from 'data/types/SpellsByLevel'
 import _ from 'lodash'
+import firebase from 'firebase/app'
+import 'firebase/firestore'
 
 interface SheetProps {
   id: number
@@ -70,15 +72,39 @@ class Sheet extends Component<
         //go back
         this.props.history.goBack()
       }
+    },
+    {
+      icon: <Share />,
+      name: 'Condividi personaggio',
+      onClick: () => {
+        const nav = navigator as any
+        const pgEncoded = JSON.stringify(this.state.pg)
+        const id = window.btoa(this.state.pg.name + this.props.match.params.id)
+        const url = `${window.location.host}/download/${id}`
+
+        firebase
+          .app()
+          .firestore()
+          .collection('sharing')
+          .doc(id)
+          .set({ data: pgEncoded })
+          .then(() => {
+            console.log('url', url)
+            if (nav.share) {
+              nav.share({
+                title: 'Condividi il personaggio',
+                url: url
+              })
+            } else {
+              navigator.clipboard.writeText(url)
+              alert('URL copied to clipboard')
+            }
+          })
+          .catch(error => {
+            console.log('db upload err: ', error)
+          })
+      }
     }
-    // {
-    //   icon: <People />,
-    //   name: 'Condividi personaggio',
-    //   onClick: () => {
-    //     //go back
-    //     alert('Funzionalità in arrivo')
-    //   }
-    // }
   ]
 
   pg: Dexie.Table<PG, number> | undefined

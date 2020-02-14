@@ -161,7 +161,7 @@ class StatsUtils {
 
   static getInfoName = (type: string, dataList: SimpleSelectItem[]) => {
     const item = dataList.find(data => data.type === type)
-    return item ? item.value : undefined
+    return item ? item.value : ''
   }
 
   static getMainSpellStat = (job?: JobsEnum): StatsType => {

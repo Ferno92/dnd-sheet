@@ -7,6 +7,19 @@ import ThemeLight from './assets/styles/ThemeLight'
 import { Typography, Button, IconButton } from '@material-ui/core'
 import { HighlightOff } from '@material-ui/icons'
 import useStyles from 'App.styles'
+import firebase from 'firebase/app'
+import DownloadPG from 'pages/download/DownloadPG'
+
+export const firebaseConfig = {
+  apiKey: 'AIzaSyB1kmz-zbEFRX72gkvxWTHg8CW0I6Qk9As',
+  authDomain: 'dnd-sheet-f7049.firebaseapp.com',
+  databaseURL: 'https://dnd-sheet-f7049.firebaseio.com',
+  projectId: 'dnd-sheet-f7049',
+  storageBucket: 'dnd-sheet-f7049.appspot.com',
+  messagingSenderId: '301028242623',
+  appId: '1:301028242623:web:66f946f5d29caa2656420a',
+  measurementId: 'G-L2099R8SDB'
+}
 
 const App: React.FC = () => {
   const [showNewVersionBanner, setShowNewVersionBanner] = useState(false)
@@ -30,6 +43,10 @@ const App: React.FC = () => {
   }
 
   useEffect(() => {
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig)
+      // firebase.analytics()
+    }
     window.addEventListener('sw-installed', onNewServiceWorkerInstalled, false)
 
     return () => {
@@ -70,6 +87,7 @@ const App: React.FC = () => {
         <Switch>
           <Route exact path="/" component={Dashboard} />
           <Route exact path="/sheet/:id/:page" component={Sheet} />
+          <Route exact path="/download/:id" component={DownloadPG} />
         </Switch>
       </BrowserRouter>
     </MuiThemeProvider>
