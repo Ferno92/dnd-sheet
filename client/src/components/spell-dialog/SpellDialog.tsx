@@ -11,7 +11,8 @@ import {
   FormGroup,
   FormControlLabel,
   Checkbox,
-  TextField
+  TextField,
+  Snackbar
 } from '@material-ui/core'
 import useStyles from './SpellDialog.styles'
 import { Close } from '@material-ui/icons'
@@ -19,6 +20,7 @@ import TextFieldString from 'components/text-field-string/TextFieldString'
 import SimpleSelect from 'components/simple-select/SimpleSelect'
 import SpellType from 'data/types/SpellType'
 import SimpleSelectItem from 'data/types/SimpleSelectItem'
+import MuiAlert from '@material-ui/lab/Alert'
 
 interface SpellDialogProps {
   open: boolean
@@ -37,6 +39,7 @@ const SpellDialog: React.FC<SpellDialogProps> = (props: SpellDialogProps) => {
   const [description, setDescription] = useState<string>('')
   const [spellType, setSpellType] = useState<SpellType>()
   const [materials, setMaterials] = useState<string[]>([])
+  const [showErrorMessage, setShowErrorMessage] = useState(false)
   const styles = useStyles()
 
   const spellTypeList: SimpleSelectItem[] = Object.keys(SpellType).map(key => {
@@ -70,7 +73,7 @@ const SpellDialog: React.FC<SpellDialogProps> = (props: SpellDialogProps) => {
       })
       onClose()
     } else {
-      //TODO error
+      setShowErrorMessage(true)
     }
   }, [
     name,
@@ -209,6 +212,21 @@ const SpellDialog: React.FC<SpellDialogProps> = (props: SpellDialogProps) => {
           Aggiungi
         </Button>
       </DialogActions>
+
+      <Snackbar
+        open={showErrorMessage}
+        autoHideDuration={3000}
+        onClose={() => setShowErrorMessage(false)}
+      >
+        <MuiAlert
+          variant="filled"
+          elevation={6}
+          onClose={() => setShowErrorMessage(false)}
+          severity="error"
+        >
+          Dati mancanti!
+        </MuiAlert>
+      </Snackbar>
     </Dialog>
   )
 }

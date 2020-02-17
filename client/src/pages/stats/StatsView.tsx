@@ -157,12 +157,15 @@ class StatsView extends Component<
       : 0
   }
 
-  hasProficiency = (type: AbilitiesEnum): boolean => {
+  hasProficiency = (
+    type: AbilitiesEnum,
+    excludeBackground?: boolean
+  ): boolean => {
     const { abilities } = this.props.pg
     const filteredAbilities = abilities.filter(ability => ability.type === type)
     const abilitiesFromBG = this.getAbilitiesListFromBackground()
     let fromBG = false
-    if (abilitiesFromBG.find(ab => ab === type)) {
+    if (abilitiesFromBG.find(ab => ab === type) && !excludeBackground) {
       fromBG = true
     }
     return fromBG || filteredAbilities.length > 0
@@ -253,7 +256,7 @@ class StatsView extends Component<
     let count = 0
     const abilities = this.getAbilitiesListFromClass()
     abilities.forEach(ability => {
-      if (this.hasProficiency(ability)) {
+      if (this.hasProficiency(ability, true)) {
         count++
       }
     })

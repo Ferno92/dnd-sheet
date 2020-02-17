@@ -14,7 +14,8 @@ import {
   ExpansionPanelSummary,
   ExpansionPanelDetails,
   Tooltip,
-  Divider
+  Divider,
+  TextField
 } from '@material-ui/core'
 import StatsType from 'data/types/StatsEnum'
 import { useTheme } from '@material-ui/core/styles'
@@ -105,13 +106,15 @@ function BattleView(props: BattleViewProps) {
     let count = 0
     const { armors } = props.pg
     let wearing = false
+    let desAlreadyAdded = false
     armors.forEach(armorInfo => {
       if (armorInfo.isWearing) {
         count += armorInfo.armor.ca + armorInfo.bonus
         if (armorInfo.armor.ca >= 10) {
           wearing = true
         }
-        if (armorInfo.armor.addDes) {
+        if (armorInfo.armor.addDes && !desAlreadyAdded) {
+          desAlreadyAdded = true
           count += StatsUtils.getStatModifier(
             pg.stats.find(stat => stat.type === StatsType.Destrezza)!,
             pg
@@ -255,11 +258,16 @@ function BattleView(props: BattleViewProps) {
             </Button>
           </Grid>
           <Grid item xs={3} className={classes.gridItem}>
-            <TextFieldNumber
+            <TextField
+              className={classes.initiative}
               disabled
               label={'Iniziativa'}
-              value={StatsUtils.getStatValue(StatsType.Destrezza, pg)}
-              onChange={() => {}}
+              variant="outlined"
+              value={`${
+                StatsUtils.getStatModifierFromName(StatsType.Destrezza, pg) >= 0
+                  ? '+'
+                  : '-'
+              }${StatsUtils.getStatModifierFromName(StatsType.Destrezza, pg)}`}
             />
           </Grid>
 
@@ -540,14 +548,15 @@ function BattleView(props: BattleViewProps) {
 
         {pg.weapons.map((weaponInfo: WeaponInfo, index: number) => {
           const weaponDamageBonus = getWeaponDamageBonus(weaponInfo)
+          const id = `${weaponInfo.weapon.id}_${index}`
           return (
             <ExpansionPanelItem
-              key={`${weaponInfo.weapon.id}_${index}`}
-              id={weaponInfo.weapon.id}
+              key={id}
+              id={id}
               name={`${weaponInfo.weapon.name}${
                 weaponInfo.bonus ? `(+${weaponInfo.bonus})` : ''
               }`}
-              expanded={weaponExpanded === weaponInfo.weapon.id}
+              expanded={weaponExpanded === id}
               checked={false}
               checkbox={false}
               checkboxDisabled={true}
@@ -566,9 +575,9 @@ function BattleView(props: BattleViewProps) {
               }
               onChangeCheckbox={() => {}}
               onExpand={() =>
-                weaponExpanded === weaponInfo.weapon.id
+                weaponExpanded === id
                   ? setWeaponExpanded(undefined)
-                  : setWeaponExpanded(weaponInfo.weapon.id)
+                  : setWeaponExpanded(id)
               }
             >
               <React.Fragment>
@@ -608,6 +617,15 @@ function BattleView(props: BattleViewProps) {
                   >{`Proprietà: `}</Typography>
                   <Typography variant={'body2'}>
                     {weaponInfo.weapon.property.map(property => property)}
+                  </Typography>
+                </div>
+                <div className={classes.armorLabel}>
+                  <Typography
+                    variant={'subtitle1'}
+                    className={classes.armorDetailTitle}
+                  >{`Peso: `}</Typography>
+                  <Typography variant={'body2'}>
+                    {`${weaponInfo.weapon.weight} kg`}
                   </Typography>
                 </div>
                 {weaponInfo.notes && (
@@ -688,14 +706,32 @@ function BattleView(props: BattleViewProps) {
                     <Typography variant="subtitle2" itemType="span">
                       {privilege.name}:
                     </Typography>
-                    <Typography variant="subtitle2" itemType="span">
-                      {privilege.counter !== undefined ||
-                      privilege.counterType !== undefined
-                        ? `${privilege.counter ? privilege.counter : ''} ${
-                            privilege.counterType ? privilege.counterType : ''
-                          }`
-                        : undefined}
-                    </Typography>
+                    <div className={classes.counterContainer}>
+                      <Typography variant="subtitle2" itemType="span">
+                        {privilege.counter !== undefined ||
+                        privilege.counterType !== undefined
+                          ? `${
+                              privilege.counter
+                                ? `${privilege.counter}/${privilege.counter}`
+                                : ''
+                            } ${
+                              privilege.counterType ? privilege.counterType : ''
+                            }`
+                          : undefined}
+                      </Typography>
+                      {privilege.counter && (
+                        <Button
+                          variant="text"
+                          onClick={e => {
+                            e.stopPropagation()
+                            console.log('TODO')
+                          }}
+                          className={classes.counterButton}
+                        >
+                          <Typography variant="subtitle2">LANCIA</Typography>
+                        </Button>
+                      )}
+                    </div>
                   </ExpansionPanelSummary>
                   <ExpansionPanelDetails>
                     <Typography

@@ -209,6 +209,25 @@ const BattleViewStyles = makeStyles((theme: Theme) => ({
   },
   specialAbilityTitle: {
     marginBottom: 8
+  },
+  counterButton: {
+    padding: '2px 8px',
+    minHeight: 0,
+    minWidth: 0,
+    marginTop: -4,
+    marginBottom: -4,
+    marginRight: -8,
+    marginLeft: 8
+  },
+  counterContainer: {
+    display: 'flex',
+    alignItems: 'center'
+  },
+  initiative: {
+    '& .MuiInputBase-input': {
+      textAlign: 'center',
+      padding: '10.5px 14px'
+    }
   }
 }))
 
