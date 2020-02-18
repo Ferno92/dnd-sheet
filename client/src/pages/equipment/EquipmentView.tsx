@@ -128,6 +128,26 @@ const EquipmentView: React.FC<EquipmentViewProps> = (
           />
         </div>
         <Divider className={styles.divider} />
+        <Typography variant="subtitle2">
+          Peso trasportato / Peso massimo{' '}
+        </Typography>
+        <div className={styles.capacity}>
+          <Typography
+            variant="h2"
+            className={clsx(
+              styles.currentCapacity,
+              getCurrentCapacity() > getMaxCapacity() ? 'red' : undefined
+            )}
+          >
+            {getCurrentCapacity()}
+          </Typography>
+          <Typography
+            variant="body2"
+            className={styles.capacityTot}
+          >{`/${getMaxCapacity()}kg`}</Typography>
+        </div>
+
+        <Divider className={styles.divider} />
         <Typography variant="subtitle2">Oggetti:</Typography>
         {pg.equipment.backpack.length > 0 && (
           <Grid container className={styles.equipmentHeader}>
@@ -206,26 +226,7 @@ const EquipmentView: React.FC<EquipmentViewProps> = (
         </Button>
 
         <Divider className={styles.divider} />
-        <Typography variant="subtitle2">
-          Peso trasportato / Peso massimo{' '}
-        </Typography>
-        <div className={styles.capacity}>
-          <Typography
-            variant="h2"
-            className={clsx(
-              styles.currentCapacity,
-              getCurrentCapacity() > getMaxCapacity() ? 'red' : undefined
-            )}
-          >
-            {getCurrentCapacity()}
-          </Typography>
-          <Typography
-            variant="body2"
-            className={styles.capacityTot}
-          >{`/${getMaxCapacity()}kg`}</Typography>
-        </div>
 
-        <Divider className={styles.divider} />
         {/* ________________ Equipment dialog _____________ */}
 
         <EquipmentDialog

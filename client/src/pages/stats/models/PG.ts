@@ -6,6 +6,7 @@ import WeaponInfo from 'data/types/WeaponInfo'
 import Equipment from 'pages/equipment/Equipment'
 import ArmorInfo from 'data/types/ArmorInfo'
 import SpellsByLevel from 'data/types/SpellsByLevel'
+import PgGeneralInfo from 'data/types/PgGeneralInfo'
 
 interface PG {
   id: number
@@ -28,6 +29,7 @@ interface PG {
   spellsByLevel: SpellsByLevel[]
   pe: number
   background: string
+  generalInfo?: PgGeneralInfo
 }
 
 export default PG

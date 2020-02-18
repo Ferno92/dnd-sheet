@@ -18,7 +18,8 @@ import {
   DialogActions,
   DialogTitle,
   DialogContent,
-  DialogContentText
+  DialogContentText,
+  Tooltip
 } from '@material-ui/core'
 import StatsViewStyles from './StatsView.styles'
 import TextFieldString from 'components/text-field-string/TextFieldString'
@@ -42,7 +43,11 @@ import {
   ExpandMore,
   ErrorOutline,
   Edit,
-  AccountCircle
+  AccountCircle,
+  FitnessCenter,
+  Height,
+  Mood,
+  Translate
 } from '@material-ui/icons'
 import InfoDialog from 'components/info-dialog/InfoDialog'
 import StatsUtils from 'utils/StatsUtils'
@@ -51,6 +56,7 @@ import ImageCompressor from 'image-compressor.js'
 import ExpansionPanelItem from 'components/expansion-panel-item/ExpansionPanelItem'
 import EquipmentObject from 'pages/equipment/EquipmentObject'
 import clsx from 'clsx'
+import GeneralInfoDialog from 'components/general-info-dialog/GeneralInfoDialog'
 
 interface StatsViewProps {
   onEdit: boolean
@@ -106,6 +112,7 @@ interface StatsViewState {
   peFromState: number
   backgroundFromState: string
   showBackgroundItems: boolean
+  generalInfoDialogOpen: boolean
 }
 
 class StatsView extends Component<
@@ -128,7 +135,8 @@ class StatsView extends Component<
       infoExpanded: false,
       peFromState: props.pg.pe,
       backgroundFromState: props.pg.background,
-      showBackgroundItems: false
+      showBackgroundItems: false,
+      generalInfoDialogOpen: false
     }
   }
 
@@ -378,9 +386,13 @@ class StatsView extends Component<
       infoExpanded,
       peFromState,
       backgroundFromState,
-      showBackgroundItems
+      showBackgroundItems,
+      generalInfoDialogOpen
     } = this.state
     const currentRaceObj = StatsUtils.getCurrentRace(race)
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent
+    )
     return (
       <div className={classes.container}>
         <div className={classes.inputContainer}>
@@ -500,6 +512,40 @@ class StatsView extends Component<
             </ExpansionPanelDetails>
           </ExpansionPanel>
 
+          <div className={classes.generalInfo}>
+            <Typography variant="subtitle1">Info generali</Typography>
+            {onEdit && (
+              <Tooltip title="Modifica info generali">
+                <IconButton
+                  className={classes.generalInfoIcon}
+                  onClick={() => this.setState({ generalInfoDialogOpen: true })}
+                >
+                  <Edit />
+                </IconButton>
+              </Tooltip>
+            )}
+          </div>
+          <div className={classes.moreInfos}>
+            <div className={classes.moreInfo}>
+              <FitnessCenter className={classes.infoIcon} />
+              <Typography variant="body1">{'50 kg'}</Typography>
+            </div>
+            <div className={classes.moreInfo}>
+              <Height className={classes.infoIcon} />
+              <Typography variant="body1">{'1.50 m'}</Typography>
+            </div>
+            <div className={classes.moreInfo}>
+              <Mood className={classes.infoIcon} />
+              <Typography variant="body1">{'Caotico malvagio'}</Typography>
+            </div>
+            <div className={classes.moreInfo}>
+              <Translate className={classes.infoIcon} />
+              <Typography variant="body1">
+                {'Comune, Elfico, Nanico'}
+              </Typography>
+            </div>
+          </div>
+          <Divider className={classes.divider} />
           <div className={classes.gridContainer}>
             <Grid container spacing={3}>
               <Grid item xs={4} className={classes.gridItem}>
@@ -786,9 +832,7 @@ class StatsView extends Component<
           onClose={() => {
             this.setState({ showBackgroundItems: false })
           }}
-          fullScreen={/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-            navigator.userAgent
-          )}
+          fullScreen={isMobile}
         >
           <DialogTitle className={classes.bgTitle}>
             Oggetti di background
@@ -832,6 +876,12 @@ class StatsView extends Component<
             <Button onClick={this.addItemFromBG}>Aggiungi</Button>
           </DialogActions>
         </Dialog>
+        <GeneralInfoDialog
+          pg={this.props.pg}
+          open={generalInfoDialogOpen}
+          onClose={() => this.setState({ generalInfoDialogOpen: false })}
+          fullscreen={isMobile}
+        />
       </div>
     )
   }
