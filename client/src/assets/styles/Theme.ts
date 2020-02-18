@@ -1,4 +1,6 @@
 import { Theme } from '@material-ui/core/styles/createMuiTheme'
+import { Variant } from '@material-ui/core/styles/createTypography'
+import { Color } from '@material-ui/core'
 
 declare module '@material-ui/core/styles/createMuiTheme' {
   interface Theme {
@@ -35,9 +37,9 @@ declare module '@material-ui/core/styles/createPalette' {
   // Allow configuration using `createMuiTheme`
   interface PaletteOptions {
     backgroundSecondary?: TypeBackground
-    success?: PaletteColor
-    warning?: PaletteColor
-    info?: PaletteColor
+    success?: SimplePaletteColorOptions | Partial<Color>
+    warning?: SimplePaletteColorOptions | Partial<Color>
+    info?: SimplePaletteColorOptions | Partial<Color>
     icon?: PaletteColor
     picture?: PaletteColor
     border?: PaletteColor
@@ -48,7 +50,7 @@ declare module '@material-ui/core/styles/createPalette' {
 
 declare module '@material-ui/core/styles/createTypography' {
   interface Typography
-    extends Record<ThemeStyle, TypographyStyle>,
+    extends Record<Variant, TypographyStyle>,
       FontStyle,
       TypographyUtils {
     customTypography: {
@@ -60,7 +62,7 @@ declare module '@material-ui/core/styles/createTypography' {
   // Allow configuration using `createMuiTheme`
   interface TypographyOptions
     extends Partial<
-      Record<ThemeStyle, TypographyStyleOptions> & FontStyleOptions
+      Record<Variant, TypographyStyleOptions> & FontStyleOptions
     > {
     customTypography?: {
       fontSize?: number

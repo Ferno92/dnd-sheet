@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import {
   Dialog,
   DialogTitle,
@@ -9,17 +9,22 @@ import {
   MenuItem,
   Typography,
   IconButton,
-  TextField
+  TextField,
+  Snackbar
 } from '@material-ui/core'
 import PG from 'pages/stats/models/PG'
 import TextFieldNumber from 'components/text-field-number/TextFieldNumber'
-import { Add } from '@material-ui/icons'
+import { Add, Close, Delete } from '@material-ui/icons'
+import useStyles from './GeneralInfoDialog.styles'
+import PgGeneralInfo from 'data/types/PgGeneralInfo'
+import MuiAlert from '@material-ui/lab/Alert'
 
 interface GeneralInfoDialogProps {
   pg: PG
   open: boolean
   fullscreen: boolean
   onClose: () => void
+  onSave: (info: PgGeneralInfo) => void
 }
 
 enum Alignment {
@@ -37,7 +42,8 @@ enum Alignment {
 const GeneralInfoDialog: React.FC<GeneralInfoDialogProps> = (
   props: GeneralInfoDialogProps
 ) => {
-  const { pg, open, onClose, fullscreen } = props
+  const { pg, open, onClose, fullscreen, onSave } = props
+  console.log(pg.generalInfo)
   const [weight, setWeight] = useState<number | undefined>(
     pg.generalInfo ? pg.generalInfo.weight : undefined
   )
@@ -48,76 +54,165 @@ const GeneralInfoDialog: React.FC<GeneralInfoDialogProps> = (
     pg.generalInfo ? pg.generalInfo.alignment : undefined
   )
   const [languages, setLanguages] = useState<string[]>()
+  const [showErrorMessage, setShowErrorMessage] = useState(false)
   const alignmentTypes = Alignment as any
+  const styles = useStyles()
 
   const onAddLanguage = useCallback(() => {
-    if (languages) {
-      languages.push('')
-      setLanguages(languages)
+    if (languages !== undefined) {
+      const copy = languages.slice()
+      copy.push('')
+      setLanguages(copy)
     } else {
       setLanguages([''])
     }
-  }, [])
+  }, [languages])
 
-  const onChangeLanguage = useCallback((text: string, index: number) => {
-    if (languages) {
-      const copy = languages.slice()
-      copy[index] = text
-      setLanguages(copy)
+  const onChangeLanguage = useCallback(
+    (text: string, index: number) => {
+      if (languages) {
+        const copy = languages.slice()
+        copy[index] = text
+        setLanguages(copy)
+      }
+    },
+    [languages]
+  )
+
+  const removeLanguage = useCallback(
+    (index: number) => {
+      if (languages) {
+        const copy = languages.slice()
+        copy.splice(index, 1)
+        setLanguages(copy)
+      }
+    },
+    [languages]
+  )
+
+  const onSaveData = useCallback(() => {
+    if (alignment && height && weight && languages) {
+      onSave({
+        alignment,
+        height,
+        weight,
+        languages: languages.filter(item => item.trim() !== '')
+      })
+      onClose()
+    } else {
+      setShowErrorMessage(true)
     }
-  }, [])
+  }, [alignment, height, weight, languages, onClose, onSave])
+
+  useEffect(() => {
+    if (pg.generalInfo) {
+      setWeight(pg.generalInfo.weight)
+      setHeight(pg.generalInfo.height)
+      setAlignment(pg.generalInfo.alignment)
+      setLanguages(pg.generalInfo.languages)
+    }
+  }, [pg.generalInfo])
 
   return (
-    <Dialog open={open} onClose={onClose} fullScreen={fullscreen}>
-      <DialogTitle>Modifica Info Generali</DialogTitle>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      fullScreen={fullscreen}
+      className={styles.dialogRoot}
+    >
+      <DialogTitle className={styles.dialogTitle}>
+        <Typography>Modifica Info Generali</Typography>
+        <IconButton className={styles.closeDialog} onClick={() => onClose()}>
+          <Close />
+        </IconButton>
+      </DialogTitle>
       <DialogContent>
-        <div>
-          <TextFieldNumber
-            disabled={false}
-            label={'Peso'}
-            value={weight}
-            min={0}
-            onChange={e => setWeight(parseFloat(e.currentTarget.value))}
-            step={'1'}
-          />
-          <TextFieldNumber
-            disabled={false}
-            label={'Altezza'}
-            value={height}
-            min={0}
-            onChange={e => setHeight(parseFloat(e.currentTarget.value))}
-            step={'1'}
-          />
+        <div className={styles.flexContainer}>
+          <div className={styles.flexContainer}>
+            <TextFieldNumber
+              disabled={false}
+              label={'Peso'}
+              value={weight}
+              min={0}
+              onChange={e => setWeight(parseFloat(e.currentTarget.value))}
+              step={'1'}
+            />
+            <Typography variant="body1" className={styles.label}>
+              kg
+            </Typography>
+          </div>
+          <div className={styles.flexContainer}>
+            <TextFieldNumber
+              disabled={false}
+              label={'Altezza'}
+              value={height}
+              min={0}
+              onChange={e => setHeight(parseFloat(e.currentTarget.value))}
+              step={'1'}
+            />
+            <Typography variant="body1" className={styles.label}>
+              m
+            </Typography>
+          </div>
         </div>
-        <Select
-          variant={'outlined'}
-          title={'Allineamento'}
-          onChange={e => setAlignment(e.currentTarget.value as string)}
-          value={alignment}
-        >
-          {Object.keys(Alignment).map(i => (
-            <MenuItem key={i} value={alignmentTypes[i]}>
-              {alignmentTypes[i]}
-            </MenuItem>
-          ))}
-        </Select>
-        <div>
+        <div className={styles.alignmentContainer}>
+          <Select
+            variant={'outlined'}
+            title={'Allineamento'}
+            onChange={e => {
+              setAlignment(e.target.value as string)
+            }}
+            value={alignment}
+            className={styles.alignment}
+          >
+            {Object.keys(alignmentTypes).map(i => (
+              <MenuItem key={i} value={alignmentTypes[i]}>
+                {alignmentTypes[i]}
+              </MenuItem>
+            ))}
+          </Select>
+        </div>
+        <div className={styles.flexContainer}>
           <Typography variant="body1">Linguaggi</Typography>
           <IconButton onClick={onAddLanguage}>
             <Add />
           </IconButton>
         </div>
-        {languages?.map((item, index) => (
-          <TextField
-            key={index}
-            value={languages[index]}
-            onChange={e => onChangeLanguage(e.currentTarget.value, index)}
-          />
-        ))}
+        {languages &&
+          languages.map((item, index) => (
+            <div className={styles.flexContainer}>
+              <TextField
+                key={index}
+                value={languages[index]}
+                onChange={e => onChangeLanguage(e.currentTarget.value, index)}
+                autoFocus={languages[index] === ''}
+              />
+              <IconButton onClick={() => removeLanguage(index)}>
+                <Delete />
+              </IconButton>
+            </div>
+          ))}
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Chiudi</Button>
+        <Button className={styles.dialogActionButton} onClick={onSaveData}>
+          Salva
+        </Button>
       </DialogActions>
+
+      <Snackbar
+        open={showErrorMessage}
+        autoHideDuration={3000}
+        onClose={() => setShowErrorMessage(false)}
+      >
+        <MuiAlert
+          variant="filled"
+          elevation={6}
+          onClose={() => setShowErrorMessage(false)}
+          severity="error"
+        >
+          Dati mancanti!
+        </MuiAlert>
+      </Snackbar>
     </Dialog>
   )
 }

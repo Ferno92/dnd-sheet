@@ -57,6 +57,7 @@ import ExpansionPanelItem from 'components/expansion-panel-item/ExpansionPanelIt
 import EquipmentObject from 'pages/equipment/EquipmentObject'
 import clsx from 'clsx'
 import GeneralInfoDialog from 'components/general-info-dialog/GeneralInfoDialog'
+import PgGeneralInfo from 'data/types/PgGeneralInfo'
 
 interface StatsViewProps {
   onEdit: boolean
@@ -102,6 +103,7 @@ interface StatsViewProps {
   onChangeImage: (url: string) => void
   onChangePE: (value: number) => void
   onAddEquipment: (equipments: EquipmentObject[]) => void
+  onChangeGeneralInfo: (info: PgGeneralInfo) => void
 }
 
 interface StatsViewState {
@@ -362,7 +364,8 @@ class StatsView extends Component<
       subRace,
       ispiration,
       image,
-      subClass
+      subClass,
+      generalInfo
     } = this.props.pg
     const {
       classes,
@@ -528,20 +531,33 @@ class StatsView extends Component<
           <div className={classes.moreInfos}>
             <div className={classes.moreInfo}>
               <FitnessCenter className={classes.infoIcon} />
-              <Typography variant="body1">{'50 kg'}</Typography>
+              <Typography variant="body1">{`${
+                generalInfo ? generalInfo.weight : '__'
+              } kg`}</Typography>
             </div>
             <div className={classes.moreInfo}>
               <Height className={classes.infoIcon} />
-              <Typography variant="body1">{'1.50 m'}</Typography>
+              <Typography variant="body1">{`${
+                generalInfo ? generalInfo.height : '__'
+              } m`}</Typography>
             </div>
             <div className={classes.moreInfo}>
               <Mood className={classes.infoIcon} />
-              <Typography variant="body1">{'Caotico malvagio'}</Typography>
+              <Typography variant="body1">{`${
+                generalInfo ? generalInfo.alignment : 'Allineamento'
+              }`}</Typography>
             </div>
             <div className={classes.moreInfo}>
               <Translate className={classes.infoIcon} />
               <Typography variant="body1">
-                {'Comune, Elfico, Nanico'}
+                {generalInfo
+                  ? generalInfo.languages.map(
+                      (item, i) =>
+                        `${item}${
+                          i !== generalInfo.languages.length - 1 ? ', ' : ''
+                        }`
+                    )
+                  : 'Linguaggi'}
               </Typography>
             </div>
           </div>
@@ -880,7 +896,8 @@ class StatsView extends Component<
           pg={this.props.pg}
           open={generalInfoDialogOpen}
           onClose={() => this.setState({ generalInfoDialogOpen: false })}
-          fullscreen={isMobile}
+          fullscreen={true}
+          onSave={this.props.onChangeGeneralInfo}
         />
       </div>
     )

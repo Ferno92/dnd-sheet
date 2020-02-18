@@ -57,7 +57,7 @@ const WeaponDialog: React.FC<WeaponDialogProps> = (
       weaponsDataTemp.push(item)
     })
     return weaponsDataTemp
-  }, [])
+  }, [weaponsData])
 
   const onChangeWeapon = useCallback(
     (

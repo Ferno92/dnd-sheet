@@ -34,7 +34,14 @@ interface SpellsViewProps {
 }
 
 const SpellsView: React.FC<SpellsViewProps> = (props: SpellsViewProps) => {
-  const { onEdit, pg, onAddSpell, onRemoveSpell, onUseSlot, onUpdateSpell } = props
+  const {
+    onEdit,
+    pg,
+    onAddSpell,
+    onRemoveSpell,
+    onUseSlot,
+    onUpdateSpell
+  } = props
   const [spellByJobLevel, setSpellByJobLevel] = useState<SpellsByJobLevel>()
   const [spellExpanded, setSpellExpanded] = useState<string>()
   const [spellDialogOpen, setSpellDialogOpen] = useState<number>()
@@ -60,10 +67,13 @@ const SpellsView: React.FC<SpellsViewProps> = (props: SpellsViewProps) => {
     [pg]
   )
 
-  const onChangeSpellChecked = useCallback((spell: Spell) => {
-    spell.prepared = !spell.prepared
-    onUpdateSpell(spell)      
-  }, [])
+  const onChangeSpellChecked = useCallback(
+    (spell: Spell) => {
+      spell.prepared = !spell.prepared
+      onUpdateSpell(spell)
+    },
+    [onUpdateSpell]
+  )
 
   const canPrepareSpells = useCallback(() => {
     return (

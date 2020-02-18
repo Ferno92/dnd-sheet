@@ -62,7 +62,7 @@ const DownloadPG: React.FC<DownloadPGProps &
     return () => {
       didCancel = true
     }
-  }, [])
+  }, [id, props.history])
   return (
     <div>
       <CircularProgress size={48} />

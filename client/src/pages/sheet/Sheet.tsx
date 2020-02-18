@@ -41,6 +41,7 @@ import SpellsByLevel from 'data/types/SpellsByLevel'
 import _ from 'lodash'
 import firebase from 'firebase/app'
 import 'firebase/firestore'
+import PgGeneralInfo from 'data/types/PgGeneralInfo'
 
 interface SheetProps {
   id: number
@@ -218,7 +219,8 @@ class Sheet extends Component<
       image,
       subClass,
       pe,
-      background
+      background,
+      generalInfo
     } = this.state.pg
 
     if (this.pg) {
@@ -243,7 +245,8 @@ class Sheet extends Component<
             image,
             subClass,
             pe,
-            background
+            background,
+            generalInfo
           })
           .then(() => console.log('update done'))
           .catch(err => console.log('err: ', err))
@@ -269,7 +272,8 @@ class Sheet extends Component<
             image,
             subClass,
             pe,
-            background
+            background,
+            generalInfo
           })
           .then(() => console.log('create done'))
           .catch(err => console.log('err: ', err))
@@ -808,6 +812,16 @@ class Sheet extends Component<
     })
   }
 
+  onChangeGeneralInfo = (info: PgGeneralInfo) => {
+    const { pg } = this.state
+    this.setState({
+      pg: {
+        ...pg,
+        generalInfo: info
+      }
+    })
+  }
+
   render() {
     const { classes, theme } = this.props
     const { pageIndex, onEdit, sheetId, pg, exist } = this.state
@@ -834,6 +848,7 @@ class Sheet extends Component<
           onChangePE={this.onChangePE}
           onChangeBackground={this.onChangeBackground}
           onAddEquipment={this.onAddEquipment}
+          onChangeGeneralInfo={this.onChangeGeneralInfo}
         />
       </div>,
       <div key={'slide2'}>

@@ -1,5 +1,4 @@
 import AbilitiesEnum from 'data/types/AbilitiesEnum'
-import ArmorEnum from 'data/types/ArmorEnum'
 
 export default [
   {
