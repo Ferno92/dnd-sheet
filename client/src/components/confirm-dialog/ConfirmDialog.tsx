@@ -23,11 +23,11 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = (
 
   return (
     <Dialog open={open} onClose={noCallback}>
-      <DialogTitle>{title}</DialogTitle>
-      <DialogContent>
+      <DialogTitle style={{ padding: 16 }}>{title}</DialogTitle>
+      <DialogContent style={{ padding: '0 16px' }}>
         <Typography variant="body1">{description}</Typography>
       </DialogContent>
-      <DialogActions>
+      <DialogActions style={{ padding: 16 }}>
         <Button onClick={noCallback} color="primary">
           No
         </Button>

@@ -47,7 +47,9 @@ import {
   FitnessCenter,
   Height,
   Mood,
-  Translate
+  Translate,
+  DateRange,
+  AccessTime
 } from '@material-ui/icons'
 import InfoDialog from 'components/info-dialog/InfoDialog'
 import StatsUtils from 'utils/StatsUtils'
@@ -58,6 +60,7 @@ import EquipmentObject from 'pages/equipment/EquipmentObject'
 import clsx from 'clsx'
 import GeneralInfoDialog from 'components/general-info-dialog/GeneralInfoDialog'
 import PgGeneralInfo from 'data/types/PgGeneralInfo'
+import ConfirmDialog from 'components/confirm-dialog/ConfirmDialog'
 
 interface StatsViewProps {
   onEdit: boolean
@@ -66,7 +69,7 @@ interface StatsViewProps {
   exist: boolean
   onEditName: (value: string) => void
   onEditLevel: (lv: number) => void
-  onEditStats: (value: string, prop: number) => void
+  onEditStats: (prop: number, value?: string, temp?: boolean) => void
   onChangeRace: (
     event: React.ChangeEvent<{
       name?: string | undefined
@@ -115,6 +118,8 @@ interface StatsViewState {
   backgroundFromState: string
   showBackgroundItems: boolean
   generalInfoDialogOpen: boolean
+  tempStatMode: boolean
+  askDeleteTempStat: boolean
 }
 
 class StatsView extends Component<
@@ -138,17 +143,26 @@ class StatsView extends Component<
       peFromState: props.pg.pe,
       backgroundFromState: props.pg.background,
       showBackgroundItems: false,
-      generalInfoDialogOpen: false
+      generalInfoDialogOpen: false,
+      tempStatMode:
+        props.pg.stats.find(stat => stat.temp !== undefined) !== undefined,
+      askDeleteTempStat: false
     }
   }
 
   componentWillReceiveProps(newProps: StatsViewProps) {
-    const { peFromState, backgroundFromState } = this.state
+    const { peFromState, backgroundFromState, tempStatMode } = this.state
     if (newProps.pg.pe !== peFromState) {
       this.setState({ peFromState: newProps.pg.pe })
     }
     if (newProps.pg.background !== backgroundFromState) {
       this.setState({ backgroundFromState: newProps.pg.background })
+    }
+    if (
+      newProps.pg.stats.filter(stat => stat.temp === undefined).length !== 6 &&
+      !tempStatMode
+    ) {
+      this.setState({ tempStatMode: true })
     }
   }
 
@@ -355,6 +369,17 @@ class StatsView extends Component<
     )
   }
 
+  onChangeTempStatMode = () => {
+    const { tempStatMode } = this.state
+    if (tempStatMode) {
+      this.props.pg.stats.forEach((stat, index) => {
+        this.props.onEditStats(index, undefined, true)
+      })
+    }
+
+    this.setState({ tempStatMode: !tempStatMode, askDeleteTempStat: false })
+  }
+
   render() {
     const {
       name,
@@ -390,7 +415,9 @@ class StatsView extends Component<
       peFromState,
       backgroundFromState,
       showBackgroundItems,
-      generalInfoDialogOpen
+      generalInfoDialogOpen,
+      tempStatMode,
+      askDeleteTempStat
     } = this.state
     const currentRaceObj = StatsUtils.getCurrentRace(race)
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
@@ -542,6 +569,12 @@ class StatsView extends Component<
               } m`}</Typography>
             </div>
             <div className={classes.moreInfo}>
+              <DateRange className={classes.infoIcon} />
+              <Typography variant="body1">{`${
+                generalInfo ? generalInfo.age : '__'
+              } anni`}</Typography>
+            </div>
+            <div className={classes.moreInfo}>
               <Mood className={classes.infoIcon} />
               <Typography variant="body1">{`${
                 generalInfo ? generalInfo.alignment : 'Allineamento'
@@ -647,9 +680,38 @@ class StatsView extends Component<
             </Grid>
           </div>
           <Divider className={classes.divider} />
-          <Typography variant="h6" className={classes.title}>
-            Caratteristiche
-          </Typography>
+          <div className={classes.statTitleContainer}>
+            <Typography variant="h6" className={classes.title}>
+              Caratteristiche
+            </Typography>
+            {onEdit && (
+              <Tooltip title="Modifiche temporanee">
+                <IconButton
+                  onClick={() =>
+                    tempStatMode
+                      ? this.setState({ askDeleteTempStat: true })
+                      : this.onChangeTempStatMode()
+                  }
+                >
+                  <AccessTime
+                    className={clsx(
+                      classes.tempIcon,
+                      tempStatMode ? 'active' : undefined
+                    )}
+                  />
+                </IconButton>
+              </Tooltip>
+            )}
+            <ConfirmDialog
+              title={'Rimuovi modifiche temporanee'}
+              description={
+                'Sei sicuro di voler rimuovere le modifiche temporanee alle statistiche?'
+              }
+              noCallback={() => this.setState({ askDeleteTempStat: false })}
+              yesCallback={() => this.onChangeTempStatMode()}
+              open={askDeleteTempStat}
+            />
+          </div>
           <div className={classes.gridContainer}>
             <Grid container spacing={3}>
               {stats.map((stat, index) => {
@@ -664,28 +726,47 @@ class StatsView extends Component<
                     <div className={classes.stat}>
                       <TextFieldNumber
                         label={TextUtils.getSmallStatsType(stat.type)}
-                        value={stat.value}
+                        value={
+                          tempStatMode && stat.temp !== undefined
+                            ? stat.temp
+                            : stat.value
+                        }
                         onChange={(
                           event: React.ChangeEvent<HTMLInputElement>
                         ) => {
-                          onEditStats(event.target.value, index)
+                          onEditStats(index, event.target.value, tempStatMode)
                         }}
                         disabled={!onEdit}
+                        root={
+                          stat.temp
+                            ? stat.temp > stat.value
+                              ? classes.statPositive
+                              : stat.temp < stat.value
+                              ? classes.statNegative
+                              : undefined
+                            : undefined
+                        }
                       />
                       <Typography
                         variant="caption"
-                        className={classes.modifier}
+                        className={clsx(
+                          classes.modifier,
+                          stat.temp
+                            ? stat.temp > stat.value
+                              ? classes.statPositive
+                              : stat.temp < stat.value
+                              ? classes.statNegative
+                              : undefined
+                            : undefined
+                        )}
                       >
                         {`${
-                          StatsUtils.getStatModifier(stat, this.props.pg) === 0
+                          StatsUtils.getStatModifier(stat) === 0
                             ? ''
-                            : StatsUtils.getStatModifier(stat, this.props.pg) >
-                              0
+                            : StatsUtils.getStatModifier(stat) > 0
                             ? '+'
                             : '-'
-                        }${Math.abs(
-                          StatsUtils.getStatModifier(stat, this.props.pg)
-                        )}`}
+                        }${Math.abs(StatsUtils.getStatModifier(stat))}`}
                       </Typography>
                     </div>
                   </Grid>
@@ -717,7 +798,7 @@ class StatsView extends Component<
                       </Typography>
                       <Typography variant={'subtitle1'}>
                         {TextUtils.getValueWithSign(
-                          StatsUtils.getStatModifier(stat, this.props.pg) +
+                          StatsUtils.getStatModifier(stat) +
                             this.getTSProficiency(stat.type)
                         )}
                       </Typography>
@@ -734,7 +815,7 @@ class StatsView extends Component<
                         },
                         {
                           type: 'Mod',
-                          value: StatsUtils.getStatModifier(stat, this.props.pg)
+                          value: StatsUtils.getStatModifier(stat)
                         }
                       ]}
                       onChange={() => {}}

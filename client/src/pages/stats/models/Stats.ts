@@ -1,8 +1,9 @@
-import StatsType from "data/types/StatsEnum";
+import StatsType from 'data/types/StatsEnum'
 
 interface Stats {
-    type: StatsType
-    value: number
-  }
+  type: StatsType
+  value: number
+  temp?: number
+}
 
-  export default Stats
+export default Stats

@@ -91,8 +91,7 @@ function BattleView(props: BattleViewProps) {
     {
       type: StatsType.Destrezza as string,
       value: StatsUtils.getStatModifier(
-        pg.stats.find(stat => stat.type === StatsType.Destrezza)!,
-        pg
+        pg.stats.find(stat => stat.type === StatsType.Destrezza)!
       ),
       canDelete: false
     }
@@ -116,16 +115,14 @@ function BattleView(props: BattleViewProps) {
         if (armorInfo.armor.addDes && !desAlreadyAdded) {
           desAlreadyAdded = true
           count += StatsUtils.getStatModifier(
-            pg.stats.find(stat => stat.type === StatsType.Destrezza)!,
-            pg
+            pg.stats.find(stat => stat.type === StatsType.Destrezza)!
           )
         }
       }
     })
     if (!wearing) {
       count += StatsUtils.getStatModifier(
-        pg.stats.find(stat => stat.type === StatsType.Destrezza)!,
-        pg
+        pg.stats.find(stat => stat.type === StatsType.Destrezza)!
       )
     }
     return count < 10 ? count + 10 : count
@@ -811,8 +808,7 @@ function BattleView(props: BattleViewProps) {
               <Grid item xs={2} className={classes.gridItem}>
                 <Typography variant="body1" itemType="span">
                   {StatsUtils.getStatModifier(
-                    pg.stats.find(stat => stat.type === StatsType.Destrezza)!,
-                    pg
+                    pg.stats.find(stat => stat.type === StatsType.Destrezza)!
                   )}
                 </Typography>
               </Grid>

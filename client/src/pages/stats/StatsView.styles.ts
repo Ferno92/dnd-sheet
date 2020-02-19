@@ -178,6 +178,28 @@ const StatsViewStyles = (theme: Theme) =>
     },
     generalInfoIcon: {
       padding: 8
+    },
+    tempIcon: {
+      '&.active': {
+        color: theme.palette.primary.main
+      }
+    },
+    statTitleContainer: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between'
+    },
+    statPositive: {
+      borderColor: theme.palette.success.main,
+      '& .MuiOutlinedInput-notchedOutline': {
+        borderColor: `${theme.palette.success.main} !important`
+      }
+    },
+    statNegative: {
+      borderColor: theme.palette.warning.main,
+      '& .MuiOutlinedInput-notchedOutline': {
+        borderColor: `${theme.palette.warning.main} !important`
+      }
     }
   })
 

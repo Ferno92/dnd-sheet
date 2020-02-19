@@ -34,8 +34,8 @@ const levels = [
 ]
 
 class StatsUtils {
-  static getStatModifier = (stat: Stats, pg: PG) => {
-    const value = (stat.value - 10) / 2
+  static getStatModifier = (stat: Stats) => {
+    const value = ((stat.temp !== undefined ? stat.temp : stat.value) - 10) / 2
     return -Math.round(-value)
   }
 
@@ -44,7 +44,7 @@ class StatsUtils {
     let modifier = 0
     stats.forEach(stat => {
       if (stat.type === type) {
-        modifier = StatsUtils.getStatModifier(stat, pg)
+        modifier = StatsUtils.getStatModifier(stat)
       }
     })
     return modifier

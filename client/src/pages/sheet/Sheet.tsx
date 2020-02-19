@@ -323,11 +323,15 @@ class Sheet extends Component<
     // this.setState({ pg: { ...pg, level: parseInt(event.target.value) } })
   }
 
-  onEditStats = (value: string, prop: number) => {
+  onEditStats = (prop: number, value?: string, temp?: boolean) => {
     const { pg } = this.state
     const { stats } = pg
     const tempStats = stats.slice()
-    tempStats[prop].value = parseInt(value)
+    if (temp) {
+      tempStats[prop].temp = value !== undefined ? parseInt(value) : value
+    } else if (value !== undefined) {
+      tempStats[prop].value = parseInt(value)
+    }
     this.setState({ pg: { ...pg, stats: tempStats } })
   }
 

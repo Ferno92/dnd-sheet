@@ -43,16 +43,10 @@ const GeneralInfoDialog: React.FC<GeneralInfoDialogProps> = (
   props: GeneralInfoDialogProps
 ) => {
   const { pg, open, onClose, fullscreen, onSave } = props
-  console.log(pg.generalInfo)
-  const [weight, setWeight] = useState<number | undefined>(
-    pg.generalInfo ? pg.generalInfo.weight : undefined
-  )
-  const [height, setHeight] = useState<number | undefined>(
-    pg.generalInfo ? pg.generalInfo.height : undefined
-  )
-  const [alignment, setAlignment] = useState<string | undefined>(
-    pg.generalInfo ? pg.generalInfo.alignment : undefined
-  )
+  const [weight, setWeight] = useState<number>()
+  const [height, setHeight] = useState<number>()
+  const [alignment, setAlignment] = useState<string>()
+  const [age, setAge] = useState<number>()
   const [languages, setLanguages] = useState<string[]>()
   const [showErrorMessage, setShowErrorMessage] = useState(false)
   const alignmentTypes = Alignment as any
@@ -91,18 +85,19 @@ const GeneralInfoDialog: React.FC<GeneralInfoDialogProps> = (
   )
 
   const onSaveData = useCallback(() => {
-    if (alignment && height && weight && languages) {
+    if (alignment && height && weight && languages && age) {
       onSave({
         alignment,
         height,
         weight,
-        languages: languages.filter(item => item.trim() !== '')
+        languages: languages.filter(item => item.trim() !== ''),
+        age
       })
       onClose()
     } else {
       setShowErrorMessage(true)
     }
-  }, [alignment, height, weight, languages, onClose, onSave])
+  }, [alignment, height, weight, languages, onClose, onSave, age])
 
   useEffect(() => {
     if (pg.generalInfo) {
@@ -110,6 +105,7 @@ const GeneralInfoDialog: React.FC<GeneralInfoDialogProps> = (
       setHeight(pg.generalInfo.height)
       setAlignment(pg.generalInfo.alignment)
       setLanguages(pg.generalInfo.languages)
+      setAge(pg.generalInfo.age)
     }
   }, [pg.generalInfo])
 
@@ -154,6 +150,19 @@ const GeneralInfoDialog: React.FC<GeneralInfoDialogProps> = (
               m
             </Typography>
           </div>
+          <div className={styles.flexContainer}>
+            <TextFieldNumber
+              disabled={false}
+              label={'Età'}
+              value={age}
+              min={0}
+              onChange={e => setAge(parseFloat(e.currentTarget.value))}
+              step={'1'}
+            />
+            <Typography variant="body1" className={styles.label}>
+              anni
+            </Typography>
+          </div>
         </div>
         <div className={styles.alignmentContainer}>
           <Select
@@ -180,7 +189,7 @@ const GeneralInfoDialog: React.FC<GeneralInfoDialogProps> = (
         </div>
         {languages &&
           languages.map((item, index) => (
-            <div className={styles.flexContainer}>
+            <div className={styles.flexContainer} key={item + index}>
               <TextField
                 key={index}
                 value={languages[index]}
