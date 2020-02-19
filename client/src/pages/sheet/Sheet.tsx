@@ -19,7 +19,7 @@ import { ReactComponent as BookIcon } from 'assets/images/spellbook.svg'
 import { Edit, Done, MoreHoriz, People, Share } from '@material-ui/icons'
 import SwipeableViews from 'react-swipeable-views'
 import StatsView from 'pages/stats/StatsView'
-import { RouteComponentProps, withRouter } from 'react-router-dom'
+import { RouteComponentProps, withRouter, Prompt } from 'react-router-dom'
 import BattleView from 'pages/battle/BattleView'
 import PG from 'pages/stats/models/PG'
 import { RacesEnum, SubRacesEnum } from 'data/types/RacesEnum'
@@ -56,6 +56,7 @@ interface SheetState {
   sheetId: number
   pg: PG
   exist: boolean
+  initialPgJson: string
 }
 
 class Sheet extends Component<
@@ -155,7 +156,8 @@ class Sheet extends Component<
         pe: 0,
         background: ''
       },
-      exist: false
+      exist: false,
+      initialPgJson: ''
     }
     this.db = new Dexie('pg01_database')
     this.db.version(1).stores({
@@ -169,7 +171,11 @@ class Sheet extends Component<
       this.db.table('pg').each((pg: PG) => {
         if (pg.id === sheetId) {
           const mergedPG = Object.assign(this.state.pg, pg)
-          this.setState({ pg: mergedPG, exist: true })
+          this.setState({
+            pg: mergedPG,
+            exist: true,
+            initialPgJson: JSON.stringify(mergedPG)
+          })
         }
       })
       //   .then((pg: any) => {
@@ -248,7 +254,10 @@ class Sheet extends Component<
             background,
             generalInfo
           })
-          .then(() => console.log('update done'))
+          .then(() => {
+            console.log('update done')
+            this.setState({ initialPgJson: JSON.stringify(this.state.pg) })
+          })
           .catch(err => console.log('err: ', err))
       } else {
         this.pg
@@ -275,7 +284,10 @@ class Sheet extends Component<
             background,
             generalInfo
           })
-          .then(() => console.log('create done'))
+          .then(() => {
+            console.log('create done')
+            this.setState({ initialPgJson: JSON.stringify(this.state.pg) })
+          })
           .catch(err => console.log('err: ', err))
       }
     }
@@ -794,7 +806,8 @@ class Sheet extends Component<
     this.setState({
       pg: {
         ...pg,
-        background: background
+        background: background,
+        abilities: pg.background !== background ? [] : pg.abilities
       }
     })
   }
@@ -947,6 +960,15 @@ class Sheet extends Component<
     )
     return (
       <React.Fragment>
+        <Prompt
+          when={
+            this.state.onEdit &&
+            JSON.stringify(this.state.pg) !== this.state.initialPgJson
+          }
+          message={
+            'Ci sono dei dati che non hai salvato, sei sicuro di voler lasciare la pagina?'
+          }
+        />
         <Tooltip
           title={onEdit ? 'Salva' : 'Modifica'}
           aria-label={onEdit ? 'Save' : 'Edit'}
