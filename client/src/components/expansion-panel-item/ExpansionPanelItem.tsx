@@ -20,6 +20,9 @@ interface ExpansionPanelItemProps {
   onEdit: boolean
   children: React.ReactNode
   RightIconButton?: React.ReactNode
+  classes?: {
+    extra: string
+  }
   onExpand: () => void
   onChangeCheckbox: (id: string, checked: boolean) => void
 }
@@ -39,7 +42,8 @@ const ExpansionPanelItem: React.FC<ExpansionPanelItemProps> = (
     name,
     extra,
     children,
-    RightIconButton
+    RightIconButton,
+    classes
   } = props
 
   const styles = useStyles()
@@ -79,7 +83,12 @@ const ExpansionPanelItem: React.FC<ExpansionPanelItemProps> = (
                 ))}
               <Typography variant={'subtitle1'}>{name}</Typography>
             </div>
-            <Typography variant={'subtitle1'}>{extra}</Typography>
+            <Typography
+              variant={'subtitle1'}
+              className={classes ? classes.extra : undefined}
+            >
+              {extra}
+            </Typography>
           </div>
         </ExpansionPanelSummary>
         <ExpansionPanelDetails className={styles.details}>

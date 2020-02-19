@@ -43,6 +43,9 @@ const TextFieldNumber: React.FC<TextFieldNumberProps> = (
       margin="dense"
       type="number"
       inputProps={{ min: min, max: max, step: step }}
+      InputLabelProps={{
+        shrink: true
+      }}
       disabled={disabled}
       onFocus={event => {
         event.target.select()

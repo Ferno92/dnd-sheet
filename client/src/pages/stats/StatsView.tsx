@@ -69,7 +69,12 @@ interface StatsViewProps {
   exist: boolean
   onEditName: (value: string) => void
   onEditLevel: (lv: number) => void
-  onEditStats: (prop: number, value?: string, temp?: boolean) => void
+  onEditStats: (
+    prop: number,
+    value?: string,
+    temp?: boolean,
+    tsTemp?: boolean
+  ) => void
   onChangeRace: (
     event: React.ChangeEvent<{
       name?: string | undefined
@@ -796,17 +801,34 @@ class StatsView extends Component<
                       <Typography variant={'subtitle1'}>
                         {TextUtils.getFullStatsType(stat.type)}
                       </Typography>
-                      <Typography variant={'subtitle1'}>
+                      <Typography
+                        variant={'subtitle1'}
+                        className={
+                          stat.tsTemp !== undefined
+                            ? stat.tsTemp > 0
+                              ? classes.tsPositive
+                              : stat.tsTemp < 0
+                              ? classes.tsNegative
+                              : undefined
+                            : undefined
+                        }
+                      >
                         {TextUtils.getValueWithSign(
                           StatsUtils.getStatModifier(stat) +
-                            this.getTSProficiency(stat.type)
+                            this.getTSProficiency(stat.type) +
+                            (stat.tsTemp ? stat.tsTemp : 0)
                         )}
                       </Typography>
                     </div>
                   </ExpansionPanelSummary>
                   <ExpansionPanelDetails>
                     <MixedInput
-                      inputInfo={{ type: 'Temp', value: 0 }}
+                      inputInfo={{
+                        type: 'Temp',
+                        value: stat.tsTemp,
+                        min: -20,
+                        max: 20
+                      }}
                       inputPos={InputPosition.End}
                       modifiers={[
                         {
@@ -818,7 +840,9 @@ class StatsView extends Component<
                           value: StatsUtils.getStatModifier(stat)
                         }
                       ]}
-                      onChange={() => {}}
+                      onChange={value =>
+                        onEditStats(index, value.toString(), false, true)
+                      }
                       onEdit={onEdit}
                       label={TextUtils.getSmallStatsType(stat.type)}
                     />
@@ -858,7 +882,8 @@ class StatsView extends Component<
                       StatsUtils.getPgLevel(this.props.pg),
                       pgClass
                     )
-                  : 0)
+                  : 0) +
+                this.getAbilityPoints(ability.type)
               return (
                 <ExpansionPanelItem
                   key={ability.type}
@@ -887,11 +912,21 @@ class StatsView extends Component<
                       ? this.setState({ abilityExpanded: undefined })
                       : this.setState({ abilityExpanded: ability.type })
                   }
+                  classes={{
+                    extra:
+                      this.getAbilityPoints(ability.type) > 0
+                        ? classes.tsPositive
+                        : this.getAbilityPoints(ability.type) < 0
+                        ? classes.tsNegative
+                        : ''
+                  }}
                 >
                   <MixedInput
                     inputInfo={{
                       type: 'Extra',
-                      value: this.getAbilityPoints(ability.type)
+                      value: this.getAbilityPoints(ability.type),
+                      min: -20,
+                      max: 20
                     }}
                     inputPos={InputPosition.End}
                     modifiers={[
@@ -899,7 +934,17 @@ class StatsView extends Component<
                         type: `${TextUtils.getSmallStatsType(ability.stat)}${
                           this.hasProficiency(ability.type) ? '+ Comp' : ''
                         }`,
-                        value: totValue
+                        value:
+                          StatsUtils.getStatModifierFromName(
+                            ability.stat,
+                            this.props.pg
+                          ) +
+                          (this.hasProficiency(ability.type)
+                            ? StatsUtils.getProficiency(
+                                StatsUtils.getPgLevel(this.props.pg),
+                                pgClass
+                              )
+                            : 0)
                       }
                     ]}
                     onChange={(value: number) => {

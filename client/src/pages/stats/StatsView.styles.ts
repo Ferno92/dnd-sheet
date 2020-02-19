@@ -191,15 +191,25 @@ const StatsViewStyles = (theme: Theme) =>
     },
     statPositive: {
       borderColor: theme.palette.success.main,
+      borderWidth: 2,
       '& .MuiOutlinedInput-notchedOutline': {
+        borderWidth: 2,
         borderColor: `${theme.palette.success.main} !important`
       }
     },
     statNegative: {
+      borderWidth: 2,
       borderColor: theme.palette.warning.main,
       '& .MuiOutlinedInput-notchedOutline': {
+        borderWidth: 2,
         borderColor: `${theme.palette.warning.main} !important`
       }
+    },
+    tsPositive: {
+      color: theme.palette.success.main
+    },
+    tsNegative: {
+      color: theme.palette.warning.main
     }
   })
 

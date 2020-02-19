@@ -323,12 +323,19 @@ class Sheet extends Component<
     // this.setState({ pg: { ...pg, level: parseInt(event.target.value) } })
   }
 
-  onEditStats = (prop: number, value?: string, temp?: boolean) => {
+  onEditStats = (
+    prop: number,
+    value?: string,
+    temp?: boolean,
+    tsTemp?: boolean
+  ) => {
     const { pg } = this.state
     const { stats } = pg
     const tempStats = stats.slice()
     if (temp) {
       tempStats[prop].temp = value !== undefined ? parseInt(value) : value
+    } else if (tsTemp) {
+      tempStats[prop].tsTemp = value !== undefined ? parseInt(value) : value
     } else if (value !== undefined) {
       tempStats[prop].value = parseInt(value)
     }
@@ -423,11 +430,7 @@ class Sheet extends Component<
       }
     })
     if (index >= 0) {
-      if (abilities[index].hasProficiency || value > 0) {
-        abilities[index].points = value
-      } else if (value <= 0) {
-        abilities.splice(index, 1)
-      }
+      abilities[index].points = value
     } else {
       abilities.push({
         hasProficiency: false,

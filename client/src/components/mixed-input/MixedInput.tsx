@@ -6,7 +6,9 @@ import { Typography } from '@material-ui/core'
 
 interface Modifier {
   type: string
-  value: number
+  value?: number
+  min?: number
+  max?: number
 }
 
 export enum InputPosition {
@@ -41,10 +43,10 @@ function MixedInput(props: MixedInputProps) {
   const getTotal = () => {
     let count = 0
     modifiers.forEach(modifier => {
-      count += modifier.value
+      count += modifier.value ? modifier.value : 0
     })
     if (inputInfo) {
-      count += inputInfo.value
+      count += inputInfo.value ? inputInfo.value : 0
     }
 
     return `${count === 0 ? '' : sign ? (count > 0 ? '+' : '-') : ''}${Math.abs(
@@ -76,8 +78,9 @@ function MixedInput(props: MixedInputProps) {
                   onChange(parseInt(event.target.value))
                 }}
                 disabled={!onEdit}
-                min={0}
-                max={100}
+                min={inputInfo.min || 0}
+                max={inputInfo.max || 100}
+                step={'1'}
               />
             </div>
           )}
