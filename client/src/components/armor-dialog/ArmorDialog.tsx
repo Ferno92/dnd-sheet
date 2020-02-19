@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -18,16 +18,23 @@ import DataUtils from 'data/DataUtils'
 import Armor from 'data/types/Armor'
 import ArmorEnum from 'data/types/ArmorEnum'
 import TextFieldNumber from 'components/text-field-number/TextFieldNumber'
+import ArmorInfo from 'data/types/ArmorInfo'
 
 interface ArmorDialogProps {
   open: boolean
   fullScreen: boolean
+  armorSelected?: ArmorInfo
   onClose: () => void
-  onAddArmor: (bonus: number, notes: string, armor?: Armor) => void
+  onAddArmor: (
+    bonus: number,
+    notes: string,
+    armor?: Armor,
+    prevId?: string
+  ) => void
 }
 
 const ArmorDialog: React.FC<ArmorDialogProps> = (props: ArmorDialogProps) => {
-  const { open, onClose, fullScreen, onAddArmor } = props
+  const { open, onClose, fullScreen, onAddArmor, armorSelected } = props
   const [armor, setArmor] = useState<Armor>()
   const [bonus, setBonus] = useState(0)
   const [notes, setNotes] = useState('')
@@ -66,23 +73,34 @@ const ArmorDialog: React.FC<ArmorDialogProps> = (props: ArmorDialogProps) => {
     ) => {
       const id = event.target.value
       const found = getArmorsData().find(armorData => armorData.id === id)
-      setBonus(0)
-      setNotes('')
+      if (armorSelected === undefined) {
+        setBonus(0)
+        setNotes('')
+      }
       setArmor(found)
     },
-    [getArmorsData]
+    [getArmorsData, armorSelected]
   )
 
   const onChangeNotes = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNotes(e.currentTarget.value)
   }
 
-  const addArmor = useCallback(() => {
-    onAddArmor(bonus, notes, armor)
+  const clearDataAndClose = useCallback(() => {
     onClose()
     setArmor(undefined)
     setBonus(0)
     setNotes('')
+  }, [onClose])
+
+  const addArmor = useCallback(() => {
+    onAddArmor(
+      bonus,
+      notes,
+      armor,
+      armorSelected ? armorSelected.armor.id : undefined
+    )
+    clearDataAndClose()
   }, [bonus, notes, onAddArmor, onClose, armor])
 
   const onChangeOtherName = useCallback(
@@ -112,16 +130,28 @@ const ArmorDialog: React.FC<ArmorDialogProps> = (props: ArmorDialogProps) => {
     [armor]
   )
 
+  useEffect(() => {
+    console.log('effect', armorSelected)
+    if (armorSelected) {
+      setArmor(armorSelected.armor)
+      setBonus(armorSelected.bonus)
+      setNotes(armorSelected.notes)
+    }
+  }, [armorSelected])
+
   return (
     <Dialog
       fullScreen={fullScreen}
       open={open}
-      onClose={() => onClose()}
+      onClose={() => clearDataAndClose()}
       className={styles.dialogRoot}
     >
       <DialogTitle className={styles.dialogTitle}>
         <Typography>Scegli l'armatura o scudo</Typography>
-        <IconButton className={styles.closeDialog} onClick={() => onClose()}>
+        <IconButton
+          className={styles.closeDialog}
+          onClick={() => clearDataAndClose()}
+        >
           <Close />
         </IconButton>
       </DialogTitle>
@@ -242,7 +272,7 @@ const ArmorDialog: React.FC<ArmorDialogProps> = (props: ArmorDialogProps) => {
           color="primary"
           onClick={addArmor}
         >
-          Aggiungi
+          {armorSelected ? 'Salva' : 'Aggiungi'}
         </Button>
       </DialogActions>
     </Dialog>

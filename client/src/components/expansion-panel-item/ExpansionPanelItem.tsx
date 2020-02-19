@@ -19,7 +19,7 @@ interface ExpansionPanelItemProps {
   checkboxDisabled: boolean
   onEdit: boolean
   children: React.ReactNode
-  RightIconButton?: React.ReactNode
+  RightIconButtons?: React.ReactNode[]
   classes?: {
     extra: string
   }
@@ -42,7 +42,7 @@ const ExpansionPanelItem: React.FC<ExpansionPanelItemProps> = (
     name,
     extra,
     children,
-    RightIconButton,
+    RightIconButtons,
     classes
   } = props
 
@@ -95,7 +95,7 @@ const ExpansionPanelItem: React.FC<ExpansionPanelItemProps> = (
           {children}
         </ExpansionPanelDetails>
       </ExpansionPanel>
-      {RightIconButton}
+      {RightIconButtons && RightIconButtons.map(Button => Button)}
     </div>
   )
 }

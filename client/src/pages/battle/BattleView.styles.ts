@@ -228,6 +228,18 @@ const BattleViewStyles = makeStyles((theme: Theme) => ({
       textAlign: 'center',
       padding: '10.5px 14px'
     }
+  },
+  pfModifiers: {
+    display: 'flex',
+    flexDirection: 'column'
+  },
+  pfModifier: {
+    padding: 0,
+    height: 40,
+    width: 40
+  },
+  expansionPanelIcon: {
+    padding: 8
   }
 }))
 

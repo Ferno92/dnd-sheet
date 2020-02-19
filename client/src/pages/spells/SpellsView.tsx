@@ -270,42 +270,51 @@ const SpellsView: React.FC<SpellsViewProps> = (props: SpellsViewProps) => {
                         }
                         checkboxDisabled={!canPrepareSpells()}
                         onEdit={onEdit}
-                        RightIconButton={
-                          onEdit ? (
-                            <Tooltip title="Rimuovi">
-                              <IconButton
-                                className={styles.magicWand}
-                                color="primary"
-                                onClick={() => onRemoveSpell(spell)}
-                              >
-                                <Clear />
-                              </IconButton>
-                            </Tooltip>
-                          ) : (
-                            <Tooltip title="Lancia magia">
-                              <div>
-                                <IconButton
-                                  className={styles.magicWand}
-                                  onClick={() => onUseSlot(spell.level)}
-                                  disabled={
-                                    getSpellSlotSpent(spellInfo.level) >=
-                                    spellInfo.slot
-                                  }
-                                  style={{
-                                    visibility:
-                                      getSpellSlotSpent(spellInfo.level) >=
-                                      spellInfo.slot
-                                        ? 'hidden'
-                                        : canPrepareSpells() && !spell.prepared
-                                        ? 'hidden'
-                                        : 'visible'
-                                  }}
+                        RightIconButtons={
+                          onEdit
+                            ? [
+                                <Tooltip
+                                  title="Rimuovi"
+                                  key={'Rimuovi_' + spell.id}
                                 >
-                                  <MagicWand />
-                                </IconButton>
-                              </div>
-                            </Tooltip>
-                          )
+                                  <IconButton
+                                    className={styles.magicWand}
+                                    color="primary"
+                                    onClick={() => onRemoveSpell(spell)}
+                                  >
+                                    <Clear />
+                                  </IconButton>
+                                </Tooltip>
+                              ]
+                            : [
+                                <Tooltip
+                                  title="Lancia magia"
+                                  key={'Lancia_' + spell.id}
+                                >
+                                  <div>
+                                    <IconButton
+                                      className={styles.magicWand}
+                                      onClick={() => onUseSlot(spell.level)}
+                                      disabled={
+                                        getSpellSlotSpent(spellInfo.level) >=
+                                        spellInfo.slot
+                                      }
+                                      style={{
+                                        visibility:
+                                          getSpellSlotSpent(spellInfo.level) >=
+                                          spellInfo.slot
+                                            ? 'hidden'
+                                            : canPrepareSpells() &&
+                                              !spell.prepared
+                                            ? 'hidden'
+                                            : 'visible'
+                                      }}
+                                    >
+                                      <MagicWand />
+                                    </IconButton>
+                                  </div>
+                                </Tooltip>
+                              ]
                         }
                         onExpand={() =>
                           setSpellExpanded(

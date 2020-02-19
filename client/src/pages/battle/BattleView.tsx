@@ -19,7 +19,7 @@ import {
 } from '@material-ui/core'
 import StatsType from 'data/types/StatsEnum'
 import { useTheme } from '@material-ui/core/styles'
-import { Close, Check, Remove, Add, Clear } from '@material-ui/icons'
+import { Close, Check, Remove, Add, Clear, Edit } from '@material-ui/icons'
 import TextFieldNumber from 'components/text-field-number/TextFieldNumber'
 import TextFieldString from 'components/text-field-string/TextFieldString'
 import PG from 'pages/stats/models/PG'
@@ -55,7 +55,12 @@ interface BattleViewProps {
   onChangeTsMorte: (index: number) => void
   onChangeCurrentPf: (add: number) => void
   onAddWeapon: (bonus: number, notes: string, weapon?: Weapon) => void
-  onAddArmor: (bonus: number, notes: string, armor?: Armor) => void
+  onAddArmor: (
+    bonus: number,
+    notes: string,
+    armor?: Armor,
+    prevId?: string
+  ) => void
   onRemoveWeapon: (index: number) => void
   onRemoveArmor: (index: number) => void
   onSelectArmor: (index: number) => void
@@ -85,6 +90,7 @@ function BattleView(props: BattleViewProps) {
   const [privileges, setPrivileges] = useState<Privileges[]>()
   const [armorExpanded, setArmorExpanded] = useState<string>()
   const [weaponExpanded, setWeaponExpanded] = useState<string>()
+  const [armorSelected, setArmorSelected] = useState<ArmorInfo>()
   const theme = useTheme()
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
   let defaultModifiers = [
@@ -373,15 +379,24 @@ function BattleView(props: BattleViewProps) {
 
           <Grid item xs={12} className={classes.gridItem}>
             <Divider className={classes.divider} />
-            <Typography variant="subtitle2">PF Attuali</Typography>
             <div className={classes.pfContainer}>
-              <IconButton
-                disabled={onEdit}
-                onClick={() => onChangeCurrentPf(-1)}
-              >
-                <Remove />
-              </IconButton>
+              <div className={classes.pfModifiers}>
+                {[...Array(3).keys()].map(i => {
+                  const value = i * 5 || 1
+                  return (
+                    <IconButton
+                      key={i}
+                      disabled={onEdit}
+                      onClick={() => onChangeCurrentPf(-value)}
+                      className={classes.pfModifier}
+                    >
+                      <Typography variant="subtitle1">-{value}</Typography>
+                    </IconButton>
+                  )
+                })}
+              </div>
               <div className={classes.pf}>
+                <Typography variant="subtitle2">PF Attuali</Typography>
                 <Typography
                   variant="h2"
                   className={clsx(classes.currentPf, getPFColorClass())}
@@ -393,12 +408,21 @@ function BattleView(props: BattleViewProps) {
                   className={clsx(classes.pfTot, getPFColorClass())}
                 >{`/${pg.pfTot}`}</Typography>
               </div>
-              <IconButton
-                disabled={onEdit}
-                onClick={() => onChangeCurrentPf(1)}
-              >
-                <Add />
-              </IconButton>
+              <div className={classes.pfModifiers}>
+                {[...Array(3).keys()].map(i => {
+                  const value = i * 5 || 1
+                  return (
+                    <IconButton
+                      key={i}
+                      disabled={onEdit}
+                      onClick={() => onChangeCurrentPf(value)}
+                      className={classes.pfModifier}
+                    >
+                      <Typography variant="subtitle1">+{value}</Typography>
+                    </IconButton>
+                  )
+                })}
+              </div>
             </div>
           </Grid>
         </Grid>
@@ -425,17 +449,32 @@ function BattleView(props: BattleViewProps) {
               checkbox
               checkboxDisabled={isArmorDisabled(armorInfo)}
               onEdit={onEdit}
-              RightIconButton={
-                onEdit && (
-                  <Tooltip title="Rimuovi">
-                    <IconButton
-                      color="primary"
-                      onClick={() => onRemoveArmor(index)}
-                    >
-                      <Clear />
-                    </IconButton>
-                  </Tooltip>
-                )
+              RightIconButtons={
+                onEdit
+                  ? [
+                      <Tooltip title="Modifica" key={'Modifica_' + index}>
+                        <IconButton
+                          color="primary"
+                          onClick={() => {
+                            setArmorSelected(armorInfo)
+                            setArmorDialogOpen(!armorDialogOpen)
+                          }}
+                          className={classes.expansionPanelIcon}
+                        >
+                          <Edit />
+                        </IconButton>
+                      </Tooltip>,
+                      <Tooltip title="Rimuovi" key={'Rimuovi_' + index}>
+                        <IconButton
+                          color="primary"
+                          onClick={() => onRemoveArmor(index)}
+                          className={classes.expansionPanelIcon}
+                        >
+                          <Clear />
+                        </IconButton>
+                      </Tooltip>
+                    ]
+                  : undefined
               }
               onExpand={() =>
                 armorExpanded === armorInfo.armor.id
@@ -528,8 +567,12 @@ function BattleView(props: BattleViewProps) {
         <ArmorDialog
           open={armorDialogOpen}
           fullScreen={fullScreen}
-          onClose={() => setArmorDialogOpen(false)}
+          onClose={() => {
+            setArmorSelected(undefined)
+            setArmorDialogOpen(false)
+          }}
           onAddArmor={onAddArmor}
+          armorSelected={armorSelected}
         />
 
         <Divider className={classes.divider} />
@@ -558,17 +601,19 @@ function BattleView(props: BattleViewProps) {
               checkbox={false}
               checkboxDisabled={true}
               onEdit={onEdit}
-              RightIconButton={
-                onEdit && (
-                  <Tooltip title="Rimuovi">
-                    <IconButton
-                      color="primary"
-                      onClick={() => onRemoveWeapon(index)}
-                    >
-                      <Clear />
-                    </IconButton>
-                  </Tooltip>
-                )
+              RightIconButtons={
+                onEdit
+                  ? [
+                      <Tooltip title="Rimuovi" key={'Rimuovi_' + id}>
+                        <IconButton
+                          color="primary"
+                          onClick={() => onRemoveWeapon(index)}
+                        >
+                          <Clear />
+                        </IconButton>
+                      </Tooltip>
+                    ]
+                  : undefined
               }
               onChangeCheckbox={() => {}}
               onExpand={() =>

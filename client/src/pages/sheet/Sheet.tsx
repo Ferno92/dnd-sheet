@@ -507,16 +507,28 @@ class Sheet extends Component<
     }
   }
 
-  onAddArmor = (bonus: number, notes: string, armor?: Armor) => {
+  onAddArmor = (
+    bonus: number,
+    notes: string,
+    armor?: Armor,
+    prevId?: string
+  ) => {
     const { pg, onEdit } = this.state
     if (armor) {
-      const armorInfo: ArmorInfo = {
-        armor: armor,
-        bonus: bonus,
-        notes: notes
-      }
       const armors = [...pg.armors]
-      armors.push(armorInfo)
+      if (prevId) {
+        const index = armors.findIndex(item => item.armor.id === prevId)
+        armors[index].armor = armor
+        armors[index].bonus = bonus
+        armors[index].notes = notes
+      } else {
+        const armorInfo: ArmorInfo = {
+          armor: armor,
+          bonus: bonus,
+          notes: notes
+        }
+        armors.push(armorInfo)
+      }
       this.setState({ pg: { ...pg, armors: armors } }, () => {
         if (!onEdit) {
           this.updateDB()
