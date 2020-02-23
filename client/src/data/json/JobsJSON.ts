@@ -316,6 +316,110 @@ export default [
     ]
   },
   {
+    type: 'Ladro',
+    name: 'Ladro',
+    levels: [
+      { id: 1, proficiency: 2 },
+      { id: 2, proficiency: 2 },
+      { id: 3, proficiency: 2 },
+      { id: 4, proficiency: 2 },
+      { id: 5, proficiency: 3 },
+      { id: 6, proficiency: 3 }
+    ],
+    ts: [StatsType.Destrezza, StatsType.Intelligenza],
+    dice: 8,
+    abilitiesCount: 4,
+    abilities: [
+      AbilitiesEnum.Acrobazia,
+      AbilitiesEnum.Atletica,
+      AbilitiesEnum.Furtivita,
+      AbilitiesEnum.Indagare,
+      AbilitiesEnum.Inganno,
+      AbilitiesEnum.Intimidire,
+      AbilitiesEnum.Intrattenere,
+      AbilitiesEnum.Intuizione,
+      AbilitiesEnum.Percezione,
+      AbilitiesEnum.Persuasione,
+      AbilitiesEnum.RapiditaDiMano
+    ],
+    privileges: [
+      {
+        lv: 1,
+        type: 'maestria',
+        name: 'Maestria',
+        description:
+          'Un ladro sceglie due tra le sue competenze nelle abilità, oppure una sua competenza in una abilità e la competenza negli arnesi da scasso. Il suo bonus di competenza raddoppia per ogni prova di caratteristica effettuata usando una delle competenze scelte.',
+        counterType: 'I'
+      },
+      {
+        lv: 1,
+        type: 'attaccoFurtivo',
+        name: 'Attacco Furtivo',
+        description:
+          "Un ladro sa come ,colpire con precisione sfruttando le distrazioni di un avversario. Una volta per turno, il ladro può infliggere ld6 danni extra a una creatura che colpisce con un attacco, se dispone di vantaggio al tiro per colpire. L'attaceo deve utilizzare un'arma accurata o un'arma a distanza. Il ladro non necessita di vantaggio al tiro per colpire se un altro nemico del bersaglio si trova entro 1,5 metri da esso (purché tale nemico non sia incapacitato) e se il tiro per colpire del ladro non subisce svantaggio. L'ammontare di danni extra aumenta man mano che il ladro acquisisce livelli"
+      },
+      {
+        lv: 1,
+        type: 'gergo',
+        name: 'Gergo Ladresco',
+        description:
+          "Durante il proprio addestramento, il ladro apprende il gergo ladresco, un misto di dialetto, termini colloquiali e codici che gli permette di nascondere dei messaggi in una conversazione apparentemente normale. Soltanto un'altra creatura che conosca il gergo ladresco capisce questi messaggi. Per trasmettere un concetto tramite il gergo ladresco serve il quadruplo del tempo che normalmente servirebbe per esprimerlo direttamente. Inoltre, il ladro capis ce una serie di simboli e segni segreti usati per trasmettere semplici messaggi brevi, come per esempio per indicare se un'area è pericotosa, se un territorio ricade sotto il controllo di una gilda di ladri, se ci sono bottini appetitosi o bersagli facili nei paraggi o se qualcuno è disposto a offrire un rifugio :Sicuro a un ladro in fuga."
+      },
+      {
+        lv: 2,
+        type: 'azioneScaltra',
+        name: 'Azione Scaltra',
+        description:
+          "La prontezza di spirito e l'agilità del ladro gli consentono di muoversi e di agire in fretta. Il ladro può effettuare un'azione bonus in ognuno dei suoi turni in combattimento. Questa azione può essere usata solo per effettuare l'azione di Disimpegno, Nascondersi o Scatto."
+      },
+      {
+        lv: 3,
+        type: 'archetipo',
+        name: 'Archetipo Ladresco',
+        description:
+          "Un ladro sceglie un archetipo da emulare nell'esercizio delle sue capacità da ladro: Furfante, Assassino o Mistificatore Arcano"
+      },
+      {
+        lv: 4,
+        type: 'aumentoCaratteristiche',
+        name: 'Aumento dei punteggi di caratteristica',
+        description:
+          'Un ladro può aumentare di 2 un punteggio di caratteristica a sua scelta, oppure può aumentare di 1 due punteggi di caratteristica a sua scelta. Come di consueto, non è consentito aumentare un punteggio di caratteristica a più di 20 utilizzando questo privilegio.',
+        counterType: 'I'
+      },
+      {
+        lv: 4,
+        type: 'schivata',
+        name: 'Schivata Prodigiosa',
+        description:
+          "Quando un attaccante che il ladro è in grado di vedere colpisce il ladro con un attacco, quest'ultimo pub usare la sua reazione per dimezzare i danni che subirebbe dall'attacco."
+      },
+      {
+        lv: 6,
+        type: 'maestria',
+        name: 'Maestria',
+        description:
+          'Un ladro sceglie due tra le sue competenze nelle abilità, oppure una sua competenza in una abilità e la competenza negli arnesi da scasso. Il suo bonus di competenza raddoppia per ogni prova di caratteristica effettuata usando una delle competenze scelte.',
+        counterType: 'II'
+      },
+      {
+        lv: 4,
+        type: 'elusione',
+        name: 'Elusione',
+        description:
+          'Un ladro può schivare agilmente certi effetti ad area come il soffio di fuoco di un drago rosso o un incantesimo tempesta di ghiaccio. Quando il ladro è soggetto a un effetto che gli consente di effettuare un tiro salvezza su Destrezza per dimezzare i danni, non subisce alcun danno se supera il tiro salvezza, e soltanto la metà dei danni se lo fallisce.'
+      },
+      {
+        lv: 8,
+        type: 'aumentoCaratteristiche',
+        name: 'Aumento dei punteggi di caratteristica',
+        description:
+          'Un ladro può aumentare di 2 un punteggio di caratteristica a sua scelta, oppure può aumentare di 1 due punteggi di caratteristica a sua scelta. Come di consueto, non è consentito aumentare un punteggio di caratteristica a più di 20 utilizzando questo privilegio.',
+        counterType: 'II'
+      }
+    ]
+  },
+  {
     type: 'Stregone',
     name: 'Stregone',
     levels: [

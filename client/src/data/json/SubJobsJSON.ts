@@ -159,6 +159,101 @@ export default [
   //   privileges: []
   // },
   {
+    type: 'Ladro_Furfante',
+    name: 'Furfante',
+    levels: [],
+    ts: [],
+    dice: '',
+    abilitiesCount: 0,
+    abilities: [],
+    privileges: [
+      {
+        lv: 3,
+        type: 'mani',
+        name: 'Mani Veloci',
+        description:
+          "Un ladro può usare razione bonus conferitagli da Azione Scaltra per effettuare una prova di Destrezza (Rapidità di Mano), usare i propri arnesi da scasso per disattivare una trappola o scassinare una serratura, o effettuare un'azione di Usare un Oggetto"
+      },
+      {
+        lv: 3,
+        type: 'secondoPiano',
+        name: 'Lavoro al Secondo Piano',
+        description:
+          'Un ladro diventa in grado di scalare più velocemente rispetto al normale; scalare non gli richiede più un movimento extra. Inoltre, quando il ladro effettua un salto in lungo con rincorsa, la distanza che copre aumenta di 30 cm per ogni punto del suo modificatore di Destrezza.'
+      },
+      {
+        lv: 9,
+        type: 'furtivitaSuprema',
+        name: 'Furtività Suprema',
+        description:
+          'Un ladro dispone di vantaggio a una prova di Destrezza (Furtività) se si muove di non più della metà della sua velocità in quello stesso turno.'
+      }
+    ]
+  },
+  {
+    type: 'Ladro_Assassino',
+    name: 'Assassino',
+    levels: [],
+    ts: [],
+    dice: '',
+    abilitiesCount: 0,
+    abilities: [],
+    privileges: [
+      {
+        lv: 3,
+        type: 'competenza',
+        name: 'Competenze Bonus',
+        description:
+          'Un ladro ottiene competenza nei trucchi per il camuffamento e nelle sostanze da avvelenatore'
+      },
+      {
+        lv: 3,
+        type: 'assassinare',
+        name: 'Assassinare',
+        description:
+          'Il ladro risulta particolarmente letale quando coglie i propri nemici alla sprovvista e dispone di vantaggio ai tiri per colpire contro qualsiasi creatura che non abbia ancora effettuato un turno in combattimento. Inoltre, ogni colpo da lui messo a segno contro una creatura sorpresa è considerato un colpo critico.'
+      },
+      {
+        lv: 9,
+        type: 'infiltrato',
+        name: 'Maestro Infiltrato',
+        description:
+          "Il ladro può creare infallibilmente delle identità fittizie per se stesso. Deve utilizzare sette giorni e 25 mo per stabilire la storia, la professione e le affiliazioni dell'identità in questione. Non può stabilire un'identità che appartiene a qualcun altro. Potrebbe per esempio procurarsi degli abiti adeguati, una lettera di presentazione e un certificato apparentemente legittimo per spacciarsi per un membro di un casato mercantile di una remota città, in modo da potersi insinuare nella cerchia delle frequentazioni di altri ricchi mercanti. Da allora in poi, quando il ladro adotta la nuova identità come travestimento, le altre creature Jo riterranno quella persona finché il ladro non offrirà loro dei motivi validi per dubitare di lui."
+      }
+    ]
+  },
+  {
+    type: 'Ladro_Arcano',
+    name: 'Mistificatore Arcano',
+    levels: [],
+    ts: [],
+    dice: '',
+    abilitiesCount: 0,
+    abilities: [],
+    privileges: [
+      {
+        lv: 3,
+        type: 'incantesimi',
+        name: 'Incantesimi',
+        description: 'Il ladro ottiene la capacità di lanciare incantesimi.'
+      },
+      {
+        lv: 3,
+        type: 'prestigio',
+        name: 'Gioco di Prestigio della Mano Magica',
+        description:
+          "Quando il ladro lancia mano magica, può rendere la mano spettrale invisibile e può farle svolgere i seguenti compiti aggiuntivi:<br>• Riporre un oggetto impugnato dalla mano in un contenitore indossato o trasportato da un'altra creatura.<br>• Recuperare un oggetto in un contenitore Indossato o trasportato da un'altra creatura.<br>• Usare gli arnesi da scasso del ladro per scassinare serrature e disattivare trappole a distanza. Il ladro può svolgere uno di questi compiti senza essere notato da una creatura se effettua con successo una prova di Destrezza (Rapidità di Mano) contrapposta a una prova di Saggezza (Percezione) della creatura. Il ladro può inoltre usare l'azione bonus conferitagli da Azione Scaltra per controllare la mano."
+      },
+      {
+        lv: 9,
+        type: 'imboscata',
+        name: 'Imboscata Magica',
+        description:
+          "Se il ladro è nascosto da una creatura quando lancia un incantesimo su di essa, quella creatura subisce svantaggio a ogni tiro salvezza che effettua contro quell'incantesimo in quel turno."
+      }
+    ]
+  },
+  {
     type: 'Stregone_Draconico',
     name: 'Discendenza Draconica',
     levels: [],

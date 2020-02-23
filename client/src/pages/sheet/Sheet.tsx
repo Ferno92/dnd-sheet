@@ -992,13 +992,22 @@ class Sheet extends Component<
     return (
       <React.Fragment>
         <Prompt
-          when={
-            this.state.onEdit &&
-            JSON.stringify(this.state.pg) !== this.state.initialPgJson
-          }
-          message={
-            'Ci sono dei dati che non hai salvato, sei sicuro di voler lasciare la pagina?'
-          }
+          // when={
+          //   this.state.onEdit &&
+          //   JSON.stringify(this.state.pg) !== this.state.initialPgJson
+          // }
+          message={location => {
+            const nextLocationPath = location.pathname.split('/')
+            const currentLocationPath = this.props.match.url.split('/')
+            return this.state.onEdit &&
+              JSON.stringify(this.state.pg) !== this.state.initialPgJson &&
+              (nextLocationPath[1] !== currentLocationPath[1] || //different page (not sheet anymore)
+              nextLocationPath.length < currentLocationPath.length || //different page (not sheet anymore)
+                (nextLocationPath.length > 1 &&
+                  nextLocationPath[2] !== currentLocationPath[2])) //different pg (still sheet page)
+              ? 'Ci sono dei dati che non hai salvato, sei sicuro di voler lasciare la pagina?'
+              : false
+          }}
         />
         <Tooltip
           title={onEdit ? 'Salva' : 'Modifica'}
