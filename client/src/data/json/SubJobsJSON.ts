@@ -91,6 +91,74 @@ export default [
     ]
   },
   {
+    type: 'Guerriero_Campione',
+    name: 'Campione',
+    levels: [],
+    ts: [],
+    dice: '',
+    abilitiesCount: 0,
+    abilities: [],
+    privileges: [
+      {
+        lv: 3,
+        type: 'criticoMigliorato',
+        name: 'Critico Migliorato',
+        description:
+          "I tuoi attacchi con un'arma mettono a segno un colpo critico con un risultato di 19-20 al tiro."
+      },
+      {
+        lv: 7,
+        type: 'atleta',
+        name: 'Atleta Straordinario',
+        description:
+          'Il guerriero può aggiungere metà del suo bonus di competenza (arrotondalo per eccesso) a qualsiasi prova di Forza, Destrezza o Coatituzione che effettua e che non utilizzi già il suo bonus di competenza. Inoltre. quando il guerriero effettua un salto in lungo con rincorsa, la distanza che copre aumenta di 30 cm per ogni punto del suo modificatore di Forza.'
+      }
+    ]
+  },
+  {
+    type: 'Guerriero_Maestro',
+    name: 'Maestro di Battaglia',
+    levels: [],
+    ts: [],
+    dice: '',
+    abilitiesCount: 0,
+    abilities: [],
+    privileges: [
+      {
+        lv: 3,
+        type: 'superiorita',
+        name: 'Superiorità in Combattimento',
+        description:
+          'Il guerriero apprende alcune manovre alimentate da dadi speciali chiamati dadi di superiorità<br><b>Manovre.</b> Il guerriero apprende tre manovre a sua scelta, descritte nella sezione "Manovre" seguente. Molte manovre potenziano un attacco in qualche modo. li guerriero può usare soltanto una manovra per attacco. Ogni volta che apprende nuove manovre, può anche sostituire una manovra che conosce con una manovra diversa.<br><b>Dadi di Superiorità.</b> Il guerriero possiede quattro dadi di superiorità, rappresentati da d8. Quando il guerriero usa un dado di superiorità, lo spende. Recupera tutti i dadi di superiorità quando completa un riposo breve o lungo.<br><b>Tiri Salvezza.</b> Alcune manovre del guerriero richiedono che il bersaglio effettui un tiro salvezza per resistere agli effetti della manovra. La CD del tiro salvezza va calcolata come segue:<br>CD del tiro salvezza della manovra = 8 + il bonus di competenza del guerriero + il modificatore di Forza o di Destrezza del guerriero (a scelta del guerriero)',
+        counterType: 'I'
+      },
+      {
+        lv: 3,
+        type: 'studioso',
+        name: 'Studioso di Guerra',
+        description:
+          'Il guerriero ottiene competenza in un tipo di strumenti da artigiano a sua scelta.'
+      },
+      {
+        lv: 7,
+        type: 'studioso',
+        name: 'Studioso di Guerra',
+        description:
+          "Se il guerriero spende almeno 1 minuto a osservare un'altra creatura al di fuori del combattimento o a interagire con essa, può apprendere alcune informazioni relative alle capacità di quella reatura, confrontandole con le proprie. Il DM rivela al guerriero se la creatura gli è pari, superiore o inferiore relativamente a due dei seguenti tratti a scelta del guerriero:<br>• Punteggio di Forza<br>• Punteggio di Destrezza<br>• Punteggio di Costituzione<br>• Classe Armatura<br>• Punti ferita attuali<br>• Livelli di classe totali (se ne possiede)<br>• Livelli di classe da guerriero (se ne possiede)"
+      }
+    ]
+  },
+  //TODO {
+  //   type: 'Guerriero_Mistico',
+  //   name: 'Cavaliere Mistico',
+  //   levels: [],
+  //   ts: [],
+  //   dice: '',
+  //   abilitiesCount: 0,
+  //   abilities: [],
+  //   privileges: []
+  // },
+  {
     type: 'Stregone_Draconico',
     name: 'Discendenza Draconica',
     levels: [],
@@ -247,6 +315,45 @@ export default [
         name: 'Interdizione Entropica',
         description:
           "Il warlock impara a proteggersi magicamente dagli attacchi e a trasformare il colpo faJlito di un nemico in un colpo di fortuna per lui. Quando una creatura effettua un tiro per colpire contro di lui, il warlock può usare la sua reazione per infliggere svantaggio a quel tiro. Se l'attacco lo manca, il successivo tiro per colpire del warlock contro la creatura dispone di vantaggio purché il warlock lo effettui entro la fine del proprio turno successivo. Una volta utilizzato questo privilegio, il warlock non può più utilizzarlo finché non completa un riposo breve o lungo."
+      }
+    ]
+  },
+  {
+    type: 'Warlock_Hexblade',
+    name: 'The Hexblade',
+    levels: [],
+    ts: [],
+    dice: '',
+    abilitiesCount: 0,
+    abilities: [],
+    privileges: [
+      {
+        lv: 1,
+        type: 'lista',
+        name: 'Lista ampliata degli incantesimi',
+        description:
+          "L'Hexblade consente al warlock di accedere a una lista ampliata di incantesimi quando deve apprendere un incantesimo da warlock. Il warlock aggiunge gli incantesimi seguenti alla sua lista degli incantesimi da warlock: 1- Scudo, Wrathful smite;<br> 2- Sfocatura, Branding smite;<br> 3- Blink, Arma Elementale;<br> 4- Phantasmal killer, Staggering smite;<br> 5- Banishing smite, Cono di freddo"
+      },
+      {
+        lv: 1,
+        type: 'curse',
+        name: 'Hexblade’s Curse',
+        description:
+          'You gain the ability to place a bale—ful curse on someone. As a bonus action, choose one creature you can see within 30 feet of you. The target is cursed for 1 minute. The curse ends early if the target dies, you die, or you are incapacitated. Until the curse ends, you gain the following benefits:<br>- You gain a bonus to damage rolls against the cursed target. The bonus equals your proficiency bonus.<br>- Any attack roll you make against the cursed target is a critical hit on a roll of 19 or 20 on the d20.<br>- If the cursed target dies, you regain hit points equal to your warlock level + your Charisma modifier (minimum of 1 hit point).<br> You can’t use this feature again until you finish a short or long rest.'
+      },
+      {
+        lv: 1,
+        type: 'warrior',
+        name: 'Hex Warrior',
+        description:
+          'You acquire the training necessary to effectively arm yourself for battle. You gain proficiency with medium armor, shields, and martial weapons. The influence of your patron also allows you to mystically channel your will through a particular weapon. Whenever you finish a long rest, you can touch one weapon that you are proficient with and that lacks the two-handed property. When you attack with that weapon, you can use your Charisma modifier, instead of Strength or Dexterity, for the attack and damage rolls. This benefit lasts until you finish a long rest.'
+      },
+      {
+        lv: 6,
+        type: 'specter',
+        name: 'Accursed Specter',
+        description:
+          'You can curse the soul of a person you slay, temporarily binding it to your service. When you slay a humanoid, you can cause its Spirit to rise from its corpse as a specter, the statistics for which are in the Monster Manual. When the specter appears, it gains temporary hit points equal to half your warlock level. Roll initiative for the specter, which has its own turns. It obeys your verbal commands, and it gains a special bonus to its attack rolls equal to your Charisma modifier (minimum of +0). The specter remains in your service until the end of your next long rest, at which point it vanishes to the afterlife. Once you bind a specter with this feature, you can’t use the feature again until you finish a long rest.'
       }
     ]
   }

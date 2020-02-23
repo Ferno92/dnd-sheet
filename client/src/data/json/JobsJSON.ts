@@ -228,6 +228,94 @@ export default [
     ]
   },
   {
+    type: 'Guerriero',
+    name: 'Guerriero',
+    levels: [
+      { id: 1, proficiency: 2 },
+      { id: 2, proficiency: 2 },
+      { id: 3, proficiency: 2 },
+      { id: 4, proficiency: 2 },
+      { id: 5, proficiency: 3 },
+      { id: 6, proficiency: 3 }
+    ],
+    ts: [StatsType.Forza, StatsType.Costituzione],
+    dice: 10,
+    abilitiesCount: 2,
+    abilities: [
+      AbilitiesEnum.Acrobazia,
+      AbilitiesEnum.AddestrareAnimali,
+      AbilitiesEnum.Atletica,
+      AbilitiesEnum.Intimidire,
+      AbilitiesEnum.Intuizione,
+      AbilitiesEnum.Percezione,
+      AbilitiesEnum.Sopravvivenza,
+      AbilitiesEnum.Storia
+    ],
+    privileges: [
+      {
+        lv: 1,
+        type: 'competenza_tutto',
+        name: 'Competenza armi e armature',
+        description:
+          'Il guerriero è competente in tutte le armature e scudi, nelle armi semplici e da guerra.'
+      },
+      {
+        lv: 1,
+        type: 'stile',
+        name: 'Stile di combattimento',
+        description:
+          "Un guerriero adotta uno stile di combattimento in cui specializzarsi scegliendo una tra le opzioni seguenti.<br> <b>COMBATTERE CON ARMI POSSENTI</b><br> Quando il guerriero ottiene un 1 o un 2 a un tiro per i danni di un attacco che ha effettuato con un'arma da mischia impugnata a due mani, può ripetere il tiro e deve usare il nuovo risultato, anche se ottiene ancora un 1 o un 2. L'arma deve possedere la proprietà a due mani o versatile affinché il guerriero ottenga questo beneficio. <b>COMBATTERE CON DUE ARMI</b><br> Quando il guerriero combatte con due armi, può aggiungere il suo modificatore di caratteristica ai danni del secondo attacco. <b>DIFESA</b><br> Finché indossa unarmatura, il guerriero ottiene un bonus di + 1 alla CA. <b>DUELLARE</b><br> Quando il guerriero impugna un'arma da mischia in una mano e non impugna altre armi, ottiene un bonus di +2 ai tiri per i danni di quell'arma. <b>PROTEZIONE</b><br> Quando una creatura che iJ guerriero sia in grado di vedere attacca un bersaglio diverso dal guerriero e situato entro 1,5 metri da lui, il guerriero può usare la sua reazione per infliggere svantaggio al tiro per colpire della creatura. Il guerriero deve impugnare uno scudo. <b>TIRO</b><br> Il guerriero ottiene un bonus di +2 ai tiri per colpire che effettua con te armi a distanza."
+      },
+      {
+        lv: 1,
+        type: 'recuperareEnergie',
+        name: 'Recuperare Energie',
+        description:
+          "Un guerriero possiede una riserva limitata di resistenza fisica a cui può attingere per proteggersi dai danni. Nel suo turno può usare un'azione bonus per recuperare un ammontare di punti ferita pari a ldlO +il suo livello da guerriero. Una volta utilizzato questo privilegio, il guerriero non può più utilizzarlo finché non completa un riposo breve o lungo."
+      },
+      {
+        lv: 2,
+        type: 'azioneImpetuosa',
+        name: 'Azione Impetuosa',
+        description:
+          "un guerriero può spingersi oltre i suoi normali limiti per un istante. Nel suo turno può effettuare un'azione aggiuntiva oltre alla sua azione regolare e a una possibile azione bonus. Una volta utilizzato questo prM1egio, il guerriero non può più utilizzarlo finché non completa un riposo breve o lungo.",
+        counter: 1,
+        counterType: 'volta'
+      },
+      {
+        lv: 3,
+        type: 'archetipo',
+        name: 'Archetipo Marziale',
+        description:
+          'Un guerriero sceglie un archetipo che si sforzerà di emulare tramite i suoi stili di combattimento e le sue tecniche. Può scegliere tra Campione, Maestro di Battaglia e Cavaliere Mistico'
+      },
+      {
+        lv: 4,
+        type: 'aumentoCaratteristiche',
+        name: 'Aumento dei punteggi di caratteristica',
+        description:
+          'un guerriero può aumentare di 2 un punteggio di caratteristica a sua scelta, oppure può aumentare di 1 due punteggi di caratteristica a sua scelta. Come di consueto, non è consentito aumentare un punteggio di caratteristica a più di 20 utilizzando questo privilegio.',
+        counterType: 'I'
+      },
+      {
+        lv: 6,
+        type: 'aumentoCaratteristiche',
+        name: 'Aumento dei punteggi di caratteristica',
+        description:
+          'un guerriero può aumentare di 2 un punteggio di caratteristica a sua scelta, oppure può aumentare di 1 due punteggi di caratteristica a sua scelta. Come di consueto, non è consentito aumentare un punteggio di caratteristica a più di 20 utilizzando questo privilegio.',
+        counterType: 'II'
+      },
+      {
+        lv: 8,
+        type: 'aumentoCaratteristiche',
+        name: 'Aumento dei punteggi di caratteristica',
+        description:
+          'un guerriero può aumentare di 2 un punteggio di caratteristica a sua scelta, oppure può aumentare di 1 due punteggi di caratteristica a sua scelta. Come di consueto, non è consentito aumentare un punteggio di caratteristica a più di 20 utilizzando questo privilegio.',
+        counterType: 'III'
+      }
+    ]
+  },
+  {
     type: 'Stregone',
     name: 'Stregone',
     levels: [
