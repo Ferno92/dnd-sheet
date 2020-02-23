@@ -489,16 +489,28 @@ class Sheet extends Component<
     })
   }
 
-  onAddWeapon = (bonus: number, notes: string, weapon?: Weapon) => {
+  onAddWeapon = (
+    bonus: number,
+    notes: string,
+    weapon?: Weapon,
+    prevId?: string
+  ) => {
     const { pg, onEdit } = this.state
     if (weapon) {
-      const weaponInfo: WeaponInfo = {
-        weapon: weapon,
-        bonus: bonus,
-        notes: notes
-      }
       const weapons = [...pg.weapons]
-      weapons.push(weaponInfo)
+      if (prevId) {
+        const index = weapons.findIndex(item => item.weapon.id === prevId)
+        weapons[index].weapon = weapon
+        weapons[index].bonus = bonus
+        weapons[index].notes = notes
+      } else {
+        const weaponInfo: WeaponInfo = {
+          weapon: weapon,
+          bonus: bonus,
+          notes: notes
+        }
+        weapons.push(weaponInfo)
+      }
       this.setState({ pg: { ...pg, weapons: weapons } }, () => {
         if (!onEdit) {
           this.updateDB()
@@ -642,7 +654,7 @@ class Sheet extends Component<
     )
   }
 
-  onAddSpell = (spell: Spell) => {
+  onAddSpell = (spell: Spell, prevId?: string) => {
     const { pg } = this.state
     const spellsByLevelCopy = [...pg.spellsByLevel]
     let index = -1
@@ -658,9 +670,16 @@ class Sheet extends Component<
         slotSpent: 0,
         spells: []
       })
+    } else {
+      if (prevId) {
+        const editIndex = spellsByLevelCopy[index].spells.findIndex(
+          item => item.id === prevId
+        )
+        spellsByLevelCopy[index].spells[editIndex] = spell
+      } else {
+        spellsByLevelCopy[index].spells.push(spell)
+      }
     }
-
-    spellsByLevelCopy[index].spells.push(spell)
 
     this.setState(
       {

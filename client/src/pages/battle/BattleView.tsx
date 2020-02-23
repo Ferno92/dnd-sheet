@@ -19,7 +19,7 @@ import {
 } from '@material-ui/core'
 import StatsType from 'data/types/StatsEnum'
 import { useTheme } from '@material-ui/core/styles'
-import { Close, Check, Remove, Add, Clear, Edit } from '@material-ui/icons'
+import { Close, Check, Add, Edit, Delete } from '@material-ui/icons'
 import TextFieldNumber from 'components/text-field-number/TextFieldNumber'
 import TextFieldString from 'components/text-field-string/TextFieldString'
 import PG from 'pages/stats/models/PG'
@@ -39,6 +39,7 @@ import DataUtils from 'data/DataUtils'
 import RaceAbility from 'data/types/RaceAbility'
 import Privileges from 'data/types/Privileges'
 import ExpansionPanelItem from 'components/expansion-panel-item/ExpansionPanelItem'
+import ConfirmDialog from 'components/confirm-dialog/ConfirmDialog'
 
 export interface Modifier {
   type: string
@@ -91,6 +92,8 @@ function BattleView(props: BattleViewProps) {
   const [armorExpanded, setArmorExpanded] = useState<string>()
   const [weaponExpanded, setWeaponExpanded] = useState<string>()
   const [armorSelected, setArmorSelected] = useState<ArmorInfo>()
+  const [weaponSelected, setWeaponSelected] = useState<WeaponInfo>()
+  const [askDeleteArmorOrWeapon, setAskDeleteArmorOrWeapon] = useState(false)
   const theme = useTheme()
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
   let defaultModifiers = [
@@ -224,6 +227,32 @@ function BattleView(props: BattleViewProps) {
     },
     [pg]
   )
+
+  const onDeleteWeaponOrArmor = useCallback(() => {
+    if (weaponSelected) {
+      onRemoveWeapon(
+        pg.weapons.findIndex(
+          item => item.weapon.id === weaponSelected.weapon.id
+        )
+      )
+      setWeaponSelected(undefined)
+      setAskDeleteArmorOrWeapon(false)
+    } else if (armorSelected) {
+      onRemoveArmor(
+        pg.armors.findIndex(item => item.armor.id === armorSelected.armor.id)
+      )
+      setArmorSelected(undefined)
+
+      setAskDeleteArmorOrWeapon(false)
+    }
+  }, [
+    weaponSelected,
+    armorSelected,
+    onRemoveWeapon,
+    onRemoveArmor,
+    pg.armors,
+    pg.weapons
+  ])
 
   useEffect(() => {
     setDV(BattleUtils.getDV(pg.pgClass))
@@ -467,10 +496,13 @@ function BattleView(props: BattleViewProps) {
                       <Tooltip title="Rimuovi" key={'Rimuovi_' + index}>
                         <IconButton
                           color="primary"
-                          onClick={() => onRemoveArmor(index)}
+                          onClick={() => {
+                            setArmorSelected(armorInfo)
+                            setAskDeleteArmorOrWeapon(true)
+                          }}
                           className={classes.expansionPanelIcon}
                         >
-                          <Clear />
+                          <Delete />
                         </IconButton>
                       </Tooltip>
                     ]
@@ -599,17 +631,33 @@ function BattleView(props: BattleViewProps) {
               expanded={weaponExpanded === id}
               checked={false}
               checkbox={false}
+              checkboxHidden
               checkboxDisabled={true}
               onEdit={onEdit}
               RightIconButtons={
                 onEdit
                   ? [
+                      <Tooltip title="Modifica" key={'Modifica_' + index}>
+                        <IconButton
+                          color="primary"
+                          onClick={() => {
+                            setWeaponSelected(weaponInfo)
+                            setWeaponDialogOpen(!weaponDialogOpen)
+                          }}
+                          className={classes.expansionPanelIcon}
+                        >
+                          <Edit />
+                        </IconButton>
+                      </Tooltip>,
                       <Tooltip title="Rimuovi" key={'Rimuovi_' + id}>
                         <IconButton
                           color="primary"
-                          onClick={() => onRemoveWeapon(index)}
+                          onClick={() => {
+                            setWeaponSelected(weaponInfo)
+                            setAskDeleteArmorOrWeapon(true)
+                          }}
                         >
-                          <Clear />
+                          <Delete />
                         </IconButton>
                       </Tooltip>
                     ]
@@ -685,6 +733,32 @@ function BattleView(props: BattleViewProps) {
             </ExpansionPanelItem>
           )
         })}
+
+        {/* ________________ Weapon dialog _____________ */}
+        <WeaponDialog
+          open={weaponDialogOpen}
+          fullScreen={fullScreen}
+          onClose={() => {
+            setWeaponSelected(undefined)
+            setWeaponDialogOpen(false)
+          }}
+          onAddWeapon={onAddWeapon}
+          weaponSelected={weaponSelected}
+        />
+
+        <ConfirmDialog
+          title={weaponSelected ? 'Elimina arma' : 'Elimina armatura'}
+          description={`Sei sicuro di voler eliminare ${
+            weaponSelected ? "l'arma" : "l'armatura"
+          } selezionata?`}
+          noCallback={() => {
+            setArmorSelected(undefined)
+            setWeaponSelected(undefined)
+            setAskDeleteArmorOrWeapon(false)
+          }}
+          yesCallback={onDeleteWeaponOrArmor}
+          open={askDeleteArmorOrWeapon}
+        />
 
         <Divider className={classes.divider} />
         {/* ________________ Abilità speciali di razza _____________ */}
@@ -793,14 +867,6 @@ function BattleView(props: BattleViewProps) {
             <Divider className={classes.divider} />
           </React.Fragment>
         )}
-
-        {/* ________________ Weapon dialog _____________ */}
-        <WeaponDialog
-          open={weaponDialogOpen}
-          fullScreen={fullScreen}
-          onClose={() => setWeaponDialogOpen(false)}
-          onAddWeapon={onAddWeapon}
-        />
 
         {/* ________________ CA dialog _____________ */}
         <Dialog

@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -18,18 +18,25 @@ import DataUtils from 'data/DataUtils'
 import Weapon from 'data/types/Weapon'
 import WeaponEnum from 'data/types/WeaponEnum'
 import TextFieldNumber from 'components/text-field-number/TextFieldNumber'
+import WeaponInfo from 'data/types/WeaponInfo'
 
 interface WeaponDialogProps {
   open: boolean
   fullScreen: boolean
+  weaponSelected?: WeaponInfo
   onClose: () => void
-  onAddWeapon: (bonus: number, notes: string, weapon?: Weapon) => void
+  onAddWeapon: (
+    bonus: number,
+    notes: string,
+    weapon?: Weapon,
+    prevId?: string
+  ) => void
 }
 
 const WeaponDialog: React.FC<WeaponDialogProps> = (
   props: WeaponDialogProps
 ) => {
-  const { open, onClose, fullScreen, onAddWeapon } = props
+  const { open, onClose, fullScreen, onAddWeapon, weaponSelected } = props
   const [weapon, setWeapon] = useState<Weapon>()
   const [bonus, setBonus] = useState(0)
   const [notes, setNotes] = useState('')
@@ -68,31 +75,57 @@ const WeaponDialog: React.FC<WeaponDialogProps> = (
     ) => {
       const id = event.target.value
       const found = weaponsData.find(weaponData => weaponData.id === id)
-      setBonus(0)
-      setNotes('')
+      if (weaponSelected === undefined) {
+        setBonus(0)
+        setNotes('')
+      }
       setWeapon(found)
     },
-    [weaponsData]
+    [weaponsData, weaponSelected]
   )
+
+  const clearDataAndClose = useCallback(() => {
+    onClose()
+    setWeapon(undefined)
+    setBonus(0)
+    setNotes('')
+  }, [onClose])
 
   const onChangeNotes = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNotes(e.currentTarget.value)
   }
 
   const addWeapon = useCallback(() => {
-    onAddWeapon(bonus, notes, weapon)
-    onClose()
-  }, [bonus, notes, onAddWeapon, onClose, weapon])
+    onAddWeapon(
+      bonus,
+      notes,
+      weapon,
+      weaponSelected ? weaponSelected.weapon.id : undefined
+    )
+    clearDataAndClose()
+  }, [bonus, notes, onAddWeapon, weapon, clearDataAndClose, weaponSelected])
+
+  useEffect(() => {
+    if (weaponSelected) {
+      setWeapon(weaponSelected.weapon)
+      setBonus(weaponSelected.bonus)
+      setNotes(weaponSelected.notes)
+    }
+  }, [weaponSelected])
+
   return (
     <Dialog
       fullScreen={fullScreen}
       open={open}
-      onClose={() => onClose()}
+      onClose={() => clearDataAndClose()}
       className={styles.dialogRoot}
     >
       <DialogTitle className={styles.dialogTitle}>
         <Typography>Scegli l'arma</Typography>
-        <IconButton className={styles.closeDialog} onClick={() => onClose()}>
+        <IconButton
+          className={styles.closeDialog}
+          onClick={() => clearDataAndClose()}
+        >
           <Close />
         </IconButton>
       </DialogTitle>
@@ -176,7 +209,7 @@ const WeaponDialog: React.FC<WeaponDialogProps> = (
           color="primary"
           onClick={addWeapon}
         >
-          Aggiungi
+          {weaponSelected ? 'Salva' : 'Aggiungi'}
         </Button>
       </DialogActions>
     </Dialog>

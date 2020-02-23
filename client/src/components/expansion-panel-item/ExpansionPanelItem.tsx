@@ -16,6 +16,7 @@ interface ExpansionPanelItemProps {
   expanded: boolean
   checked: boolean
   checkbox: boolean
+  checkboxHidden?: boolean
   checkboxDisabled: boolean
   onEdit: boolean
   children: React.ReactNode
@@ -35,6 +36,7 @@ const ExpansionPanelItem: React.FC<ExpansionPanelItemProps> = (
     onExpand,
     checked,
     checkbox,
+    checkboxHidden,
     onEdit,
     id,
     onChangeCheckbox,
@@ -78,9 +80,9 @@ const ExpansionPanelItem: React.FC<ExpansionPanelItemProps> = (
                     disabled={!onEdit || checkboxDisabled}
                     onClick={e => e.stopPropagation()}
                   />
-                ) : (
+                ) : !checkboxHidden ? (
                   <div className={styles.noCheckbox} />
-                ))}
+                ) : null)}
               <Typography variant={'subtitle1'}>{name}</Typography>
             </div>
             <Typography

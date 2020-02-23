@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useState, useEffect } from 'react'
 import Spell from 'data/types/Spell'
 import {
   Dialog,
@@ -26,12 +26,13 @@ interface SpellDialogProps {
   open: boolean
   fullScreen: boolean
   level?: number
+  spellSelected?: Spell
   onClose: () => void
-  onAddSpell: (spell: Spell) => void
+  onAddSpell: (spell: Spell, prevId?: string) => void
 }
 
 const SpellDialog: React.FC<SpellDialogProps> = (props: SpellDialogProps) => {
-  const { open, fullScreen, onClose, onAddSpell, level } = props
+  const { open, fullScreen, onClose, onAddSpell, level, spellSelected } = props
   const [name, setName] = useState<string>('')
   const [tempoDiLancio, setTempoDiLancio] = useState<string>('')
   const [gittata, setGittata] = useState<string>('')
@@ -49,6 +50,16 @@ const SpellDialog: React.FC<SpellDialogProps> = (props: SpellDialogProps) => {
     }
   })
 
+  const clearDataAndClose = useCallback(() => {
+    onClose()
+    setName('')
+    setGittata('')
+    setDurata('')
+    setDescription('')
+    setSpellType(undefined)
+    setMaterials([])
+  }, [onClose])
+
   const addSpell = useCallback(() => {
     if (
       name &&
@@ -59,19 +70,22 @@ const SpellDialog: React.FC<SpellDialogProps> = (props: SpellDialogProps) => {
       durata &&
       description
     ) {
-      onAddSpell({
-        id: name.replace(/\s/g, ''),
-        name: name,
-        componenti: materials,
-        description: description,
-        durata: durata,
-        gittata: gittata,
-        level: level!,
-        prepared: false,
-        tempoDiLancio: tempoDiLancio,
-        type: spellType
-      })
-      onClose()
+      onAddSpell(
+        {
+          id: name.replace(/\s/g, ''),
+          name: name,
+          componenti: materials,
+          description: description,
+          durata: durata,
+          gittata: gittata,
+          level: level!,
+          prepared: false,
+          tempoDiLancio: tempoDiLancio,
+          type: spellType
+        },
+        spellSelected ? spellSelected.id : undefined
+      )
+      clearDataAndClose()
     } else {
       setShowErrorMessage(true)
     }
@@ -85,7 +99,8 @@ const SpellDialog: React.FC<SpellDialogProps> = (props: SpellDialogProps) => {
     level,
     materials,
     onAddSpell,
-    onClose
+    clearDataAndClose,
+    spellSelected
   ])
 
   const onChangeSpellType = useCallback(
@@ -118,16 +133,31 @@ const SpellDialog: React.FC<SpellDialogProps> = (props: SpellDialogProps) => {
     [materials]
   )
 
+  useEffect(() => {
+    if (spellSelected) {
+      setName(spellSelected.name)
+      setGittata(spellSelected.gittata)
+      setDurata(spellSelected.durata)
+      setDescription(spellSelected.description)
+      setSpellType(spellSelected.type)
+      setMaterials(spellSelected.componenti)
+      setTempoDiLancio(spellSelected.tempoDiLancio)
+    }
+  }, [spellSelected])
+
   return (
     <Dialog
       fullScreen={fullScreen}
       open={open}
-      onClose={() => onClose()}
+      onClose={() => clearDataAndClose()}
       className={styles.dialogRoot}
     >
       <DialogTitle className={styles.dialogTitle}>
         <Typography>Nuovo Incantesimo</Typography>
-        <IconButton className={styles.closeDialog} onClick={() => onClose()}>
+        <IconButton
+          className={styles.closeDialog}
+          onClick={() => clearDataAndClose()}
+        >
           <Close />
         </IconButton>
       </DialogTitle>
@@ -209,7 +239,7 @@ const SpellDialog: React.FC<SpellDialogProps> = (props: SpellDialogProps) => {
           color="primary"
           onClick={addSpell}
         >
-          Aggiungi
+          {spellSelected ? 'Salva' : 'Aggiungi'}
         </Button>
       </DialogActions>
 

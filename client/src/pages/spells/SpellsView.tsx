@@ -16,13 +16,14 @@ import TextUtils from 'utils/TextUtils'
 import SpellsByJobLevel from 'data/types/SpellsByJobLevel'
 import DataUtils from 'data/DataUtils'
 import { default as jobsJSON } from 'data/json/JobsJSON'
-import { Add, ErrorOutline, Clear } from '@material-ui/icons'
+import { Add, ErrorOutline, Delete, Edit } from '@material-ui/icons'
 import Spell from 'data/types/Spell'
 import SpellDialog from 'components/spell-dialog/SpellDialog'
 import { useTheme } from '@material-ui/styles'
 import { ReactComponent as MagicWand } from 'assets/images/magic-wand.svg'
 import { JobsEnum } from 'data/types/JobsEnum'
 import ExpansionPanelItem from 'components/expansion-panel-item/ExpansionPanelItem'
+import ConfirmDialog from 'components/confirm-dialog/ConfirmDialog'
 
 interface SpellsViewProps {
   onEdit: boolean
@@ -45,6 +46,8 @@ const SpellsView: React.FC<SpellsViewProps> = (props: SpellsViewProps) => {
   const [spellByJobLevel, setSpellByJobLevel] = useState<SpellsByJobLevel>()
   const [spellExpanded, setSpellExpanded] = useState<string>()
   const [spellDialogOpen, setSpellDialogOpen] = useState<number>()
+  const [spellSelected, setSpellSelected] = useState<Spell>()
+  const [askDeleteSpell, setAskDeleteSpell] = useState(false)
   const styles = useStyles()
   const theme = useTheme<Theme>()
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
@@ -82,6 +85,13 @@ const SpellsView: React.FC<SpellsViewProps> = (props: SpellsViewProps) => {
       pg.pgClass === JobsEnum.Mago
     )
   }, [pg])
+
+  const onDeleteSpell = useCallback(() => {
+    if (spellSelected) {
+      onRemoveSpell(spellSelected)
+    }
+    setAskDeleteSpell(false)
+  }, [spellSelected, onRemoveSpell])
 
   useEffect(() => {
     if (
@@ -257,13 +267,14 @@ const SpellsView: React.FC<SpellsViewProps> = (props: SpellsViewProps) => {
                     ))}
                 </div>
                 {spellByLevel &&
-                  spellByLevel.spells.map(spell => {
+                  spellByLevel.spells.map((spell, index) => {
+                    const id = `${spell.id}_${index}_${spellInfo.level}`
                     return (
                       <ExpansionPanelItem
-                        key={spell.id}
-                        id={spell.id}
+                        key={id}
+                        id={id}
                         name={spell.name}
-                        expanded={spellExpanded === spell.id}
+                        expanded={spellExpanded === id}
                         checked={spell.prepared}
                         checkbox={
                           spell.prepared || (onEdit && canPrepareSpells())
@@ -274,22 +285,37 @@ const SpellsView: React.FC<SpellsViewProps> = (props: SpellsViewProps) => {
                           onEdit
                             ? [
                                 <Tooltip
-                                  title="Rimuovi"
-                                  key={'Rimuovi_' + spell.id}
+                                  title="Modifica"
+                                  key={'Modifica_' + index}
                                 >
+                                  <IconButton
+                                    color="primary"
+                                    onClick={() => {
+                                      setSpellSelected(spell)
+                                      setSpellDialogOpen(spell.level)
+                                    }}
+                                    //className={classes.expansionPanelIcon}
+                                  >
+                                    <Edit />
+                                  </IconButton>
+                                </Tooltip>,
+                                <Tooltip title="Rimuovi" key={'Rimuovi_' + id}>
                                   <IconButton
                                     className={styles.magicWand}
                                     color="primary"
-                                    onClick={() => onRemoveSpell(spell)}
+                                    onClick={() => {
+                                      setSpellSelected(spell)
+                                      setAskDeleteSpell(true)
+                                    }}
                                   >
-                                    <Clear />
+                                    <Delete />
                                   </IconButton>
                                 </Tooltip>
                               ]
                             : [
                                 <Tooltip
                                   title="Lancia magia"
-                                  key={'Lancia_' + spell.id}
+                                  key={'Lancia_' + id}
                                 >
                                   <div>
                                     <IconButton
@@ -318,7 +344,7 @@ const SpellsView: React.FC<SpellsViewProps> = (props: SpellsViewProps) => {
                         }
                         onExpand={() =>
                           setSpellExpanded(
-                            spellExpanded === spell.id ? undefined : spell.id
+                            spellExpanded === id ? undefined : id
                           )
                         }
                         onChangeCheckbox={() => onChangeSpellChecked(spell)}
@@ -384,9 +410,24 @@ const SpellsView: React.FC<SpellsViewProps> = (props: SpellsViewProps) => {
         <SpellDialog
           open={Boolean(spellDialogOpen !== undefined && spellDialogOpen >= 0)}
           fullScreen={fullScreen}
-          onClose={() => setSpellDialogOpen(-1)}
+          onClose={() => {
+            setSpellSelected(undefined)
+            setSpellDialogOpen(-1)
+          }}
           onAddSpell={onAddSpell}
           level={spellDialogOpen}
+          spellSelected={spellSelected}
+        />
+
+        <ConfirmDialog
+          title={'Elimina incantesimo'}
+          description={`Sei sicuro di voler eliminare l'incantesimo selezionato?`}
+          noCallback={() => {
+            setSpellSelected(undefined)
+            setAskDeleteSpell(false)
+          }}
+          yesCallback={onDeleteSpell}
+          open={askDeleteSpell}
         />
       </div>
     </div>

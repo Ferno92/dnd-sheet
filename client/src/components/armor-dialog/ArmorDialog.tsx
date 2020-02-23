@@ -101,7 +101,7 @@ const ArmorDialog: React.FC<ArmorDialogProps> = (props: ArmorDialogProps) => {
       armorSelected ? armorSelected.armor.id : undefined
     )
     clearDataAndClose()
-  }, [bonus, notes, onAddArmor, onClose, armor])
+  }, [bonus, notes, onAddArmor, armor, armorSelected, clearDataAndClose])
 
   const onChangeOtherName = useCallback(
     (name: string) => {
@@ -131,7 +131,6 @@ const ArmorDialog: React.FC<ArmorDialogProps> = (props: ArmorDialogProps) => {
   )
 
   useEffect(() => {
-    console.log('effect', armorSelected)
     if (armorSelected) {
       setArmor(armorSelected.armor)
       setBonus(armorSelected.bonus)
