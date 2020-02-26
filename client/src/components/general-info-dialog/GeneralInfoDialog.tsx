@@ -22,7 +22,6 @@ import { RacesEnum } from 'data/types/RacesEnum'
 import { default as racesJSON } from 'data/json/RacesJSON'
 import DataUtils from 'data/DataUtils'
 import Race from 'data/types/Race'
-import { usePrevious } from 'utils/HooksUtils'
 import TextFieldUpdateOnBlur from 'components/text-field-updateOnBlur/TextFieldUpdateOnBlur'
 import { default as backgroundJSON } from 'data/json/BackgroundJSON'
 
@@ -52,7 +51,6 @@ const GeneralInfoDialog: React.FC<GeneralInfoDialogProps> = (
   const racesData = DataUtils.RaceMapper(racesJSON as any)
   const backgroundData = DataUtils.BackgroundMapper(backgroundJSON as any)
   const { pg, open, onClose, fullscreen, onSave } = props
-  const prevOpen = usePrevious(open)
   const [weight, setWeight] = useState<number>()
   const [height, setHeight] = useState<number>()
   const [alignment, setAlignment] = useState<string>()
@@ -129,7 +127,7 @@ const GeneralInfoDialog: React.FC<GeneralInfoDialogProps> = (
       : `Puoi ancora aggiungere ${count} ${
           count === 1 ? 'linguaggio' : 'linguaggi'
         }`
-  }, [racesData, languages, otherLanguages])
+  }, [racesData, languages, otherLanguages, backgroundData, pg.background])
 
   const getLanguages = (race: RacesEnum, racesData: Race[]) => {
     let languages: string[] = []
@@ -163,7 +161,7 @@ const GeneralInfoDialog: React.FC<GeneralInfoDialogProps> = (
 
   useEffect(() => {
     setOtherLanguages(getLanguages(pg.race, racesData))
-  }, [pg.race])
+  }, [pg.race, racesData])
 
   return (
     <Dialog

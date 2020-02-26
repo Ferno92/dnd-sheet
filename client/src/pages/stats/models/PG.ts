@@ -30,6 +30,7 @@ interface PG {
   pe: number
   background: string
   generalInfo?: PgGeneralInfo
+  temp?: any
 }
 
 export default PG

@@ -40,6 +40,7 @@ import RaceAbility from 'data/types/RaceAbility'
 import Privileges from 'data/types/Privileges'
 import ExpansionPanelItem from 'components/expansion-panel-item/ExpansionPanelItem'
 import ConfirmDialog from 'components/confirm-dialog/ConfirmDialog'
+import RestType from 'data/types/RestType'
 
 export interface Modifier {
   type: string
@@ -65,6 +66,7 @@ interface BattleViewProps {
   onRemoveWeapon: (index: number) => void
   onRemoveArmor: (index: number) => void
   onSelectArmor: (index: number) => void
+  onChangeTemp: (type: string, value: any, rest?: RestType) => void
 }
 
 function BattleView(props: BattleViewProps) {
@@ -79,7 +81,8 @@ function BattleView(props: BattleViewProps) {
     onAddArmor,
     onRemoveWeapon,
     onRemoveArmor,
-    onSelectArmor
+    onSelectArmor,
+    onChangeTemp
   } = props
   const classes = BattleViewStyles()
   const [caModifiersOpen, setCaModifiersOpen] = useState(false)
@@ -130,12 +133,22 @@ function BattleView(props: BattleViewProps) {
       }
     })
     if (!wearing) {
-      count += StatsUtils.getStatModifier(
-        pg.stats.find(stat => stat.type === StatsType.Destrezza)!
-      )
+      count += StatsUtils.getStatModifierFromName(StatsType.Destrezza, pg)
+
+      if (privileges) {
+        //barbaro
+        privileges.forEach(item => {
+          if (item.type === 'difesaSenzaArmatura') {
+            count += StatsUtils.getStatModifierFromName(
+              StatsType.Costituzione,
+              pg
+            )
+          }
+        })
+      }
     }
     return count < 10 ? count + 10 : count
-  }, [pg, props.pg])
+  }, [pg, props.pg, privileges])
 
   const showCAmodifiers = useCallback(() => {
     setCaModifiersOpen(true)
@@ -828,25 +841,48 @@ function BattleView(props: BattleViewProps) {
                         privilege.counterType !== undefined
                           ? `${
                               privilege.counter
-                                ? `${privilege.counter}/${privilege.counter}`
+                                ? `${
+                                    pg.temp && pg.temp[privilege.type]
+                                      ? privilege.counter -
+                                        pg.temp[privilege.type].value
+                                      : privilege.counter
+                                  }/${privilege.counter}`
                                 : ''
                             } ${
                               privilege.counterType ? privilege.counterType : ''
                             }`
                           : undefined}
                       </Typography>
-                      {privilege.counter && (
-                        <Button
-                          variant="text"
-                          onClick={e => {
-                            e.stopPropagation()
-                            console.log('TODO')
-                          }}
-                          className={classes.counterButton}
-                        >
-                          <Typography variant="subtitle2">LANCIA</Typography>
-                        </Button>
-                      )}
+                      {privilege.counter &&
+                        (pg.temp === undefined ||
+                          pg.temp[privilege.type] === undefined ||
+                          pg.temp[privilege.type].value <
+                            privilege.counter) && (
+                          <Button
+                            variant="text"
+                            onClick={e => {
+                              e.stopPropagation()
+                              console.log('TODO')
+                            }}
+                            className={classes.counterButton}
+                          >
+                            <Typography
+                              variant="subtitle2"
+                              onClick={() =>
+                                onChangeTemp(
+                                  privilege.type,
+                                  pg.temp &&
+                                    pg.temp[privilege.type] !== undefined
+                                    ? pg.temp[privilege.type].value + 1
+                                    : 1,
+                                  privilege.rest
+                                )
+                              }
+                            >
+                              Attiva
+                            </Typography>
+                          </Button>
+                        )}
                     </div>
                   </ExpansionPanelSummary>
                   <ExpansionPanelDetails>
@@ -923,6 +959,28 @@ function BattleView(props: BattleViewProps) {
                   )}
                 </Typography>
               </Grid>
+              {privileges &&
+                privileges.find(x => x.type === 'difesaSenzaArmatura') !==
+                  undefined &&
+                pg.armors.find(x => x.isWearing && x.armor.ca > 10) ===
+                  undefined && (
+                  <React.Fragment>
+                    <Grid item xs={8}>
+                      <Typography variant="subtitle1" itemType="span">
+                        Costituzione
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={2} className={classes.gridItem}>
+                      <Typography variant="body1" itemType="span">
+                        {StatsUtils.getStatModifier(
+                          pg.stats.find(
+                            stat => stat.type === StatsType.Costituzione
+                          )!
+                        )}
+                      </Typography>
+                    </Grid>
+                  </React.Fragment>
+                )}
               <Divider className={classes.divider} />
               <Grid item xs={8}>
                 <Typography variant="body1">TOT</Typography>

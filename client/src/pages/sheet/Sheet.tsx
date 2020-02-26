@@ -10,13 +10,22 @@ import {
   Tooltip,
   MenuItem,
   ListItemIcon,
-  ListItemText
+  ListItemText,
+  Snackbar
 } from '@material-ui/core'
 import { ReactComponent as FightIcon } from 'assets/images/swords.svg'
 import { ReactComponent as ProfileIcon } from 'assets/images/viking.svg'
 import { ReactComponent as BackpackIcon } from 'assets/images/backpack.svg'
 import { ReactComponent as BookIcon } from 'assets/images/spellbook.svg'
-import { Edit, Done, MoreHoriz, People, Share } from '@material-ui/icons'
+import {
+  Edit,
+  Done,
+  MoreHoriz,
+  People,
+  Share,
+  Hotel,
+  Restaurant
+} from '@material-ui/icons'
 import SwipeableViews from 'react-swipeable-views'
 import StatsView from 'pages/stats/StatsView'
 import { RouteComponentProps, withRouter, Prompt } from 'react-router-dom'
@@ -42,6 +51,8 @@ import _ from 'lodash'
 import firebase from 'firebase/app'
 import 'firebase/firestore'
 import PgGeneralInfo from 'data/types/PgGeneralInfo'
+import RestType from 'data/types/RestType'
+import MuiAlert from '@material-ui/lab/Alert'
 
 interface SheetProps {
   id: number
@@ -57,6 +68,13 @@ interface SheetState {
   pg: PG
   exist: boolean
   initialPgJson: string
+  snackMessage?: string
+}
+
+interface LastPageAction {
+  icon: JSX.Element
+  name: string
+  onClick: () => void
 }
 
 class Sheet extends Component<
@@ -66,48 +84,7 @@ class Sheet extends Component<
     WithTheme,
   SheetState
 > {
-  actions = [
-    {
-      icon: <People />,
-      name: 'Torna a selezione personaggi',
-      onClick: () => {
-        //go back
-        this.props.history.goBack()
-      }
-    },
-    {
-      icon: <Share />,
-      name: 'Condividi personaggio',
-      onClick: () => {
-        const nav = navigator as any
-        const pgEncoded = JSON.stringify(this.state.pg)
-        const id = window.btoa(this.state.pg.name + this.props.match.params.id)
-        const url = `https://${window.location.hostname}/download/${id}`
-
-        firebase
-          .app()
-          .firestore()
-          .collection('sharing')
-          .doc(id)
-          .set({ data: pgEncoded })
-          .then(() => {
-            console.log('url', url)
-            if (nav.share) {
-              nav.share({
-                title: 'Condividi il personaggio',
-                url: url
-              })
-            } else {
-              navigator.clipboard.writeText(url)
-              alert('URL copied to clipboard')
-            }
-          })
-          .catch(error => {
-            console.log('db upload err: ', error)
-          })
-      }
-    }
-  ]
+  actions: LastPageAction[]
 
   pg: Dexie.Table<PG, number> | undefined
   db: Dexie
@@ -194,6 +171,61 @@ class Sheet extends Component<
     })
 
     this.onChangePE = _.debounce(this.onChangePE, 800)
+
+    this.actions = [
+      {
+        icon: <People />,
+        name: 'Torna a selezione personaggi',
+        onClick: () => {
+          //go back
+          this.props.history.goBack()
+        }
+      },
+      {
+        icon: <Share />,
+        name: 'Condividi personaggio',
+        onClick: () => {
+          const nav = navigator as any
+          const pgEncoded = JSON.stringify(this.state.pg)
+          const id = window.btoa(
+            this.state.pg.name + this.props.match.params.id
+          )
+          const url = `https://${window.location.hostname}/download/${id}`
+
+          firebase
+            .app()
+            .firestore()
+            .collection('sharing')
+            .doc(id)
+            .set({ data: pgEncoded })
+            .then(() => {
+              console.log('url', url)
+              if (nav.share) {
+                nav.share({
+                  title: 'Condividi il personaggio',
+                  url: url
+                })
+              } else {
+                navigator.clipboard.writeText(url)
+                alert('URL copied to clipboard')
+              }
+            })
+            .catch(error => {
+              console.log('db upload err: ', error)
+            })
+        }
+      },
+      {
+        icon: <Restaurant />,
+        name: 'Riposo Breve',
+        onClick: this.shortRest
+      },
+      {
+        icon: <Hotel />,
+        name: 'Riposo Lungo',
+        onClick: this.longRest
+      }
+    ]
   }
 
   componentDidUpdate(prevProps: SheetProps, prevState: SheetState) {
@@ -226,7 +258,8 @@ class Sheet extends Component<
       subClass,
       pe,
       background,
-      generalInfo
+      generalInfo,
+      temp
     } = this.state.pg
 
     if (this.pg) {
@@ -252,7 +285,8 @@ class Sheet extends Component<
             subClass,
             pe,
             background,
-            generalInfo
+            generalInfo,
+            temp
           })
           .then(() => {
             console.log('update done')
@@ -282,7 +316,8 @@ class Sheet extends Component<
             subClass,
             pe,
             background,
-            generalInfo
+            generalInfo,
+            temp
           })
           .then(() => {
             console.log('create done')
@@ -873,9 +908,73 @@ class Sheet extends Component<
     })
   }
 
+  onChangeTemp = (type: string, value: any, rest?: RestType) => {
+    const { pg } = this.state
+    let newTemp = pg.temp
+    if (pg.temp) {
+      newTemp[type] = {
+        value: value,
+        rest: rest
+      }
+    } else {
+      newTemp = {
+        [type]: {
+          value: value,
+          rest: rest
+        }
+      }
+    }
+
+    this.setState(
+      {
+        pg: {
+          ...pg,
+          temp: newTemp
+        }
+      },
+      () => {
+        const { onEdit } = this.state
+        if (!onEdit) {
+          this.updateDB()
+        }
+      }
+    )
+  }
+
+  shortRest = () => {}
+
+  longRest = () => {
+    const { pg } = this.state
+    let newTemp = pg.temp
+    if (pg.temp) {
+      Object.keys(pg.temp).forEach(key => {
+        if (pg.temp[key].rest === RestType.Long) {
+          delete newTemp[key]
+        }
+      })
+    }
+
+    this.setState(
+      {
+        pg: {
+          ...pg,
+          temp: newTemp,
+          currentPF: pg.pfTot
+        }
+      },
+      () => {
+        const { onEdit } = this.state
+        if (!onEdit) {
+          this.updateDB()
+        }
+        this.setState({ snackMessage: 'Riposo lungo effettuato!' })
+      }
+    )
+  }
+
   render() {
     const { classes, theme } = this.props
-    const { pageIndex, onEdit, sheetId, pg, exist } = this.state
+    const { pageIndex, onEdit, sheetId, pg, exist, snackMessage } = this.state
 
     let swipeableViews = [
       <div key={'slide1'}>
@@ -917,6 +1016,7 @@ class Sheet extends Component<
           onRemoveArmor={this.onRemoveArmor}
           onAddArmor={this.onAddArmor}
           onSelectArmor={this.onSelectArmor}
+          onChangeTemp={this.onChangeTemp}
         />
       </div>,
       <div key={'slide3'}>
@@ -1043,6 +1143,21 @@ class Sheet extends Component<
         >
           {bottomNavigations.map(item => item)}
         </BottomNavigation>
+
+        <Snackbar
+          open={Boolean(snackMessage)}
+          autoHideDuration={3000}
+          onClose={() => this.setState({ snackMessage: undefined })}
+        >
+          <MuiAlert
+            variant="filled"
+            elevation={6}
+            onClose={() => this.setState({ snackMessage: undefined })}
+            severity="success"
+          >
+            {snackMessage}
+          </MuiAlert>
+        </Snackbar>
       </React.Fragment>
     )
   }

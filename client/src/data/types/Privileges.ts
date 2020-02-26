@@ -1,3 +1,5 @@
+import RestType from './RestType'
+
 interface Privileges {
   lv: number
   type: string
@@ -5,5 +7,6 @@ interface Privileges {
   description: string
   counter?: number
   counterType?: string
+  rest?: RestType
 }
 export default Privileges

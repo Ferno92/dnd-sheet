@@ -1,5 +1,6 @@
 import StatsType from 'data/types/StatsEnum'
 import AbilitiesEnum from 'data/types/AbilitiesEnum'
+import RestType from 'data/types/RestType'
 
 export default [
   {
@@ -32,14 +33,15 @@ export default [
         description:
           'In battaglia, un barbaro combatte animato da una ferocia primordiale. Nel suo turno può entrare in ira come azione bonus.',
         counter: 2,
-        counterType: 'volte'
+        counterType: 'volte',
+        rest: RestType.Long
       },
       {
         lv: 1,
         type: 'difesaSenzaArmatura',
         name: 'Difesa Senza Armatura',
         description:
-          'Finché un barbaro non indossa alcuna armatura, la sua Classe Armatura è pari a 10 +il suo modificatore di Destrezza + il suo modificatore di Costituzione. Un barbaro può usare uno scudo e ottenere comunque questo beneficio.'
+          'Finché un barbaro non indossa alcuna armatura, la sua Classe Armatura è pari a 10 + il suo modificatore di Destrezza + il suo modificatore di Costituzione. Un barbaro può usare uno scudo e ottenere comunque questo beneficio.'
       },
       {
         lv: 2,
@@ -69,7 +71,8 @@ export default [
         description:
           'In battaglia, un barbaro combatte animato da una ferocia primordiale. Nel suo turno può entrare in ira come azione bonus.',
         counter: 3,
-        counterType: 'volte'
+        counterType: 'volte',
+        rest: RestType.Long
       },
       {
         lv: 5,
@@ -92,7 +95,8 @@ export default [
         description:
           'In battaglia, un barbaro combatte animato da una ferocia primordiale. Nel suo turno può entrare in ira come azione bonus.',
         counter: 4,
-        counterType: 'volte'
+        counterType: 'volte',
+        rest: RestType.Long
       }
     ]
   },
