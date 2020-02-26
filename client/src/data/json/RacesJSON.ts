@@ -66,12 +66,14 @@ export default [
       },
       {
         name: 'Versatilità nelle Abilità',
-        description: 'Un mezzelfo ha competenza in due abilità a sua scelta.'
+        description: 'Un mezzelfo ha competenza in due abilità a sua scelta.',
+        extra: 'abilities|{"count":2}'
       },
       {
         name: 'Linguaggi',
         description:
-          'Un mezzelfo può parlare, leggere e scrivere in Comune, in Elfico e in un linguaggio extra a sua scelta.'
+          'Un mezzelfo può parlare, leggere e scrivere in Comune, in Elfico e in un linguaggio extra a sua scelta.',
+        extra: 'languages|{"count":1,"list":["Comune","Elfico"]}'
       }
     ],
     special: [],

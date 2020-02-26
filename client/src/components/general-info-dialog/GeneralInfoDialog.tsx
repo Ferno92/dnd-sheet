@@ -18,6 +18,13 @@ import { Add, Close, Delete } from '@material-ui/icons'
 import useStyles from './GeneralInfoDialog.styles'
 import PgGeneralInfo from 'data/types/PgGeneralInfo'
 import MuiAlert from '@material-ui/lab/Alert'
+import { RacesEnum } from 'data/types/RacesEnum'
+import { default as racesJSON } from 'data/json/RacesJSON'
+import DataUtils from 'data/DataUtils'
+import Race from 'data/types/Race'
+import { usePrevious } from 'utils/HooksUtils'
+import TextFieldUpdateOnBlur from 'components/text-field-updateOnBlur/TextFieldUpdateOnBlur'
+import { default as backgroundJSON } from 'data/json/BackgroundJSON'
 
 interface GeneralInfoDialogProps {
   pg: PG
@@ -42,13 +49,17 @@ enum Alignment {
 const GeneralInfoDialog: React.FC<GeneralInfoDialogProps> = (
   props: GeneralInfoDialogProps
 ) => {
+  const racesData = DataUtils.RaceMapper(racesJSON as any)
+  const backgroundData = DataUtils.BackgroundMapper(backgroundJSON as any)
   const { pg, open, onClose, fullscreen, onSave } = props
+  const prevOpen = usePrevious(open)
   const [weight, setWeight] = useState<number>()
   const [height, setHeight] = useState<number>()
   const [alignment, setAlignment] = useState<string>()
   const [age, setAge] = useState<number>()
-  const [languages, setLanguages] = useState<string[]>()
+  const [languages, setLanguages] = useState<string[]>([])
   const [showErrorMessage, setShowErrorMessage] = useState(false)
+  const [otherLanguages, setOtherLanguages] = useState<string[]>([])
   const alignmentTypes = Alignment as any
   const styles = useStyles()
 
@@ -99,6 +110,47 @@ const GeneralInfoDialog: React.FC<GeneralInfoDialogProps> = (
     }
   }, [alignment, height, weight, languages, onClose, onSave, age])
 
+  const missingLanguagesLabel = useCallback(() => {
+    let count = otherLanguages.length
+    if (pg.background) {
+      backgroundData.forEach(data => {
+        if (data.type === pg.background) {
+          count += data.languages ? data.languages : 0
+        }
+      })
+    }
+
+    if (languages) {
+      count -= languages.length
+    }
+
+    return count <= 0
+      ? ''
+      : `Puoi ancora aggiungere ${count} ${
+          count === 1 ? 'linguaggio' : 'linguaggi'
+        }`
+  }, [racesData, languages, otherLanguages])
+
+  const getLanguages = (race: RacesEnum, racesData: Race[]) => {
+    let languages: string[] = []
+    racesData.forEach(data => {
+      if (data.type === race.toString()) {
+        data.abilities.forEach(item => {
+          if (item.extra) {
+            const splitted = item.extra.split('|')
+            if (splitted[0] === 'languages') {
+              const obj = JSON.parse(splitted[1])
+              if (obj.list) {
+                languages = languages.concat(obj.list)
+              }
+            }
+          }
+        })
+      }
+    })
+    return languages
+  }
+
   useEffect(() => {
     if (pg.generalInfo) {
       setWeight(pg.generalInfo.weight)
@@ -107,7 +159,11 @@ const GeneralInfoDialog: React.FC<GeneralInfoDialogProps> = (
       setLanguages(pg.generalInfo.languages)
       setAge(pg.generalInfo.age)
     }
-  }, [pg.generalInfo])
+  }, [pg.generalInfo, racesData])
+
+  useEffect(() => {
+    setOtherLanguages(getLanguages(pg.race, racesData))
+  }, [pg.race])
 
   return (
     <Dialog
@@ -187,14 +243,20 @@ const GeneralInfoDialog: React.FC<GeneralInfoDialogProps> = (
             <Add />
           </IconButton>
         </div>
+        <Typography variant="caption" className={styles.errorCaption}>
+          {missingLanguagesLabel()}
+        </Typography>
+        {otherLanguages.map(item => (
+          <TextField value={item} key={'other_' + item} disabled />
+        ))}
         {languages &&
           languages.map((item, index) => (
             <div className={styles.flexContainer} key={item + index}>
-              <TextField
+              <TextFieldUpdateOnBlur
                 key={index}
                 value={languages[index]}
-                onChange={e => onChangeLanguage(e.currentTarget.value, index)}
                 autoFocus={languages[index] === ''}
+                onBlur={text => onChangeLanguage(text, index)}
               />
               <IconButton onClick={() => removeLanguage(index)}>
                 <Delete />

@@ -269,7 +269,7 @@ class StatsView extends Component<
   }
 
   getAbilitiesCountFromClass = (): number => {
-    const { pgClass } = this.props.pg
+    const { pgClass, race } = this.props.pg
     let count = 0
     if (pgClass) {
       this.jobsData.forEach(job => {
@@ -278,6 +278,21 @@ class StatsView extends Component<
         }
       })
     }
+    this.racesData.forEach(data => {
+      if (data.type === race.toString()) {
+        data.abilities.forEach(item => {
+          if (item.extra) {
+            const splitted = item.extra.split('|')
+            if (splitted[0] === 'abilities') {
+              const obj = JSON.parse(splitted[1])
+              if (obj.count) {
+                count += obj.count
+              }
+            }
+          }
+        })
+      }
+    })
     return count
   }
 
@@ -383,6 +398,31 @@ class StatsView extends Component<
     }
 
     this.setState({ tempStatMode: !tempStatMode, askDeleteTempStat: false })
+  }
+
+  getLanguages = () => {
+    const { generalInfo, race } = this.props.pg
+    let languages: string[] = []
+    this.racesData.forEach(data => {
+      if (data.type === race.toString()) {
+        data.abilities.forEach(item => {
+          if (item.extra) {
+            const splitted = item.extra.split('|')
+            if (splitted[0] === 'languages') {
+              const obj = JSON.parse(splitted[1])
+              if (obj.list) {
+                languages = languages.concat(obj.list)
+              }
+            }
+          }
+        })
+      }
+    })
+    if (generalInfo) {
+      //from generalInfo and from raceAbility
+      languages = languages.concat(generalInfo.languages || [])
+    }
+    return languages
   }
 
   render() {
@@ -588,11 +628,11 @@ class StatsView extends Component<
             <div className={classes.moreInfo}>
               <Translate className={classes.infoIcon} />
               <Typography variant="body1">
-                {generalInfo
-                  ? generalInfo.languages.map(
+                {this.getLanguages().length !== 0
+                  ? this.getLanguages().map(
                       (item, i) =>
                         `${item}${
-                          i !== generalInfo.languages.length - 1 ? ', ' : ''
+                          i !== this.getLanguages().length - 1 ? ', ' : ''
                         }`
                     )
                   : 'Linguaggi'}
