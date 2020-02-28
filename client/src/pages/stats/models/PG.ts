@@ -16,6 +16,8 @@ interface PG {
   subRace?: SubRacesEnum
   pgClass?: JobsEnum
   subClass?: SubJobsEnum
+  pgClass2?: JobsEnum
+  subClass2?: SubJobsEnum
   stats: Stats[]
   abilities: PGAbility[]
   ispiration: boolean
@@ -31,6 +33,7 @@ interface PG {
   background: string
   generalInfo?: PgGeneralInfo
   temp?: any
+  multiclass?: boolean
 }
 
 export default PG

@@ -127,7 +127,7 @@ const GeneralInfoDialog: React.FC<GeneralInfoDialogProps> = (
       : `Puoi ancora aggiungere ${count} ${
           count === 1 ? 'linguaggio' : 'linguaggi'
         }`
-  }, [racesData, languages, otherLanguages, backgroundData, pg.background])
+  }, [languages, otherLanguages, backgroundData, pg.background])
 
   const getLanguages = (race: RacesEnum, racesData: Race[]) => {
     let languages: string[] = []

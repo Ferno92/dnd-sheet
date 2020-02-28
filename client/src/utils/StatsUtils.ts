@@ -3,7 +3,7 @@ import { RacesEnum } from 'data/types/RacesEnum'
 import StatsType from 'data/types/StatsEnum'
 import { default as racesJSON } from 'data/json/RacesJSON'
 import { default as subRacesJSON } from 'data/json/SubRacesJSON'
-import { default as jobsJSON } from 'data/json/JobsJSON'
+import { default as proficiencyJSON } from 'data/json/ProficiencyJSON'
 import DataUtils from 'data/DataUtils'
 import SizeEnum from 'data/types/SizeEnum'
 import Stats from 'pages/stats/models/Stats'
@@ -145,14 +145,12 @@ class StatsUtils {
   static getProficiency = (level: number, pgClass?: JobsEnum) => {
     let proficiency = 0
     if (pgClass) {
-      const jobsData = DataUtils.JobMapper(jobsJSON as any)
-      jobsData.forEach(job => {
-        if (job.type === pgClass.toString()) {
-          job.levels.forEach(levelData => {
-            if (levelData.id === level) {
-              proficiency = levelData.proficiency
-            }
-          })
+      const proficiencyData = DataUtils.ProficiencyMapper(
+        proficiencyJSON as any
+      )
+      proficiencyData.forEach(x => {
+        if (x.id === level) {
+          proficiency = x.proficiency
         }
       })
     }

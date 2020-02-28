@@ -86,7 +86,7 @@ function BattleView(props: BattleViewProps) {
   } = props
   const classes = BattleViewStyles()
   const [caModifiersOpen, setCaModifiersOpen] = useState(false)
-  const [dv, setDV] = useState(0)
+  const [dv, setDV] = useState('')
   const [weaponDialogOpen, setWeaponDialogOpen] = useState(false)
   const [armorDialogOpen, setArmorDialogOpen] = useState(false)
   const [abilityExpanded, setAbilityExpanded] = useState<string>()
@@ -268,7 +268,16 @@ function BattleView(props: BattleViewProps) {
   ])
 
   useEffect(() => {
-    setDV(BattleUtils.getDV(pg.pgClass))
+    const primary = BattleUtils.getDV(pg.pgClass)
+    let secondary = ''
+    if (pg.pgClass2) {
+      secondary = BattleUtils.getDV(pg.pgClass2)
+    }
+    setDV(
+      `${primary}${
+        secondary !== '' && primary !== secondary ? `/${secondary}` : ''
+      }`
+    )
   }, [pg.race, pg.pgClass])
 
   useEffect(() => {
@@ -338,14 +347,31 @@ function BattleView(props: BattleViewProps) {
             />
           </Grid>
 
-          <Grid item xs={3} className={classes.gridItem}>
-            <TextFieldString
-              disabled
-              label={'Dado vita'}
-              value={`d${dv}`}
-              onChange={() => {}}
-            />
-          </Grid>
+          {dv.split('/').length > 1 ? (
+            <Grid item xs={3} className={classes.gridItem}>
+              {[...Array(2).keys()].map(i => {
+                console.log(dv, dv.split('/'), dv.split('/')[0], i)
+                return (
+                  <TextFieldString
+                    key={`${dv.split('/')[i]}`}
+                    disabled
+                    label={`${i === 0 ? pg.pgClass : pg.pgClass2}`}
+                    value={`${dv.split('/')[i]}`}
+                    onChange={() => {}}
+                  />
+                )
+              })}
+            </Grid>
+          ) : (
+            <Grid item xs={3} className={classes.gridItem}>
+              <TextFieldString
+                disabled
+                label={'Dado vita'}
+                value={`${dv}`}
+                onChange={() => {}}
+              />
+            </Grid>
+          )}
 
           <Grid item xs={5} className={classes.gridItem}>
             <div className={classes.tsContainer}>

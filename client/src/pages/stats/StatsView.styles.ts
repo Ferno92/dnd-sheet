@@ -210,6 +210,9 @@ const StatsViewStyles = (theme: Theme) =>
     },
     tsNegative: {
       color: theme.palette.warning.main
+    },
+    multiclass: {
+      marginBottom: 10
     }
   })
 

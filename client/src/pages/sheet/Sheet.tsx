@@ -259,7 +259,10 @@ class Sheet extends Component<
       pe,
       background,
       generalInfo,
-      temp
+      temp,
+      pgClass2,
+      subClass2,
+      multiclass
     } = this.state.pg
 
     if (this.pg) {
@@ -286,7 +289,10 @@ class Sheet extends Component<
             pe,
             background,
             generalInfo,
-            temp
+            temp,
+            pgClass2,
+            subClass2,
+            multiclass
           })
           .then(() => {
             console.log('update done')
@@ -317,7 +323,10 @@ class Sheet extends Component<
             pe,
             background,
             generalInfo,
-            temp
+            temp,
+            pgClass2,
+            subClass2,
+            multiclass
           })
           .then(() => {
             console.log('create done')
@@ -418,28 +427,26 @@ class Sheet extends Component<
     this.setState({ pg })
   }
 
-  onChangeJob = (
-    event: React.ChangeEvent<{
-      name?: string | undefined
-      value: unknown
-    }>
-  ) => {
+  onChangeJob = (job: JobsEnum, secondary?: boolean) => {
     const { pg } = this.state
-    const value = event.target.value as JobsEnum
-    this.setState({
-      pg: { ...pg, pgClass: value, subClass: undefined, abilities: [] }
-    })
+    if (secondary) {
+      this.setState({
+        pg: { ...pg, pgClass2: job, subClass2: undefined, abilities: [] }
+      })
+    } else {
+      this.setState({
+        pg: { ...pg, pgClass: job, subClass: undefined, abilities: [] }
+      })
+    }
   }
 
-  onChangeSubJob = (
-    event: React.ChangeEvent<{
-      name?: string | undefined
-      value: unknown
-    }>
-  ) => {
+  onChangeSubJob = (job: SubJobsEnum, secondary?: boolean) => {
     const { pg } = this.state
-    const value = event.target.value as SubJobsEnum
-    this.setState({ pg: { ...pg, subClass: value, abilities: [] } })
+    if (secondary) {
+      this.setState({ pg: { ...pg, subClass2: job, abilities: [] } })
+    } else {
+      this.setState({ pg: { ...pg, subClass: job, abilities: [] } })
+    }
   }
 
   onChangeAbilityCheck = (type: AbilitiesEnum, checked: boolean) => {
@@ -972,6 +979,16 @@ class Sheet extends Component<
     )
   }
 
+  onChangeMulticlass = (multi: boolean) => {
+    const { pg } = this.state
+    this.setState({
+      pg: {
+        ...pg,
+        multiclass: multi
+      }
+    })
+  }
+
   render() {
     const { classes, theme } = this.props
     const { pageIndex, onEdit, sheetId, pg, exist, snackMessage } = this.state
@@ -999,6 +1016,7 @@ class Sheet extends Component<
           onChangeBackground={this.onChangeBackground}
           onAddEquipment={this.onAddEquipment}
           onChangeGeneralInfo={this.onChangeGeneralInfo}
+          onChangeMulticlass={this.onChangeMulticlass}
         />
       </div>,
       <div key={'slide2'}>

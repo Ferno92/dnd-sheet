@@ -1,7 +1,8 @@
 interface SimpleSelectItem {
-  type: string;
-  value: string | number;
-  extra?: string;
+  type: string
+  value: string | number
+  extra?: string
+  disabled?: boolean
 }
 
-export default SimpleSelectItem;
+export default SimpleSelectItem

@@ -64,7 +64,11 @@ function SimpleSelect<T>(props: SimpleSelectProps<T>) {
               {data.value}
             </ListSubheader>
           ) : (
-            <MenuItem key={data.type} value={data.type}>
+            <MenuItem
+              key={data.type}
+              value={data.type}
+              disabled={data.disabled}
+            >
               {`${data.value}${data.extra ? ` (${data.extra})` : ''}`}
             </MenuItem>
           )

@@ -7,12 +7,12 @@ import Privileges from 'data/types/Privileges'
 
 class BattleUtils {
   static getDV(jobType?: JobsEnum) {
-    let dv = 0
+    let dv = ''
     if (jobType !== undefined) {
       const jobsData = DataUtils.JobMapper(JobsJSON as any)
       jobsData.forEach(job => {
         if (job.type === jobType.toString()) {
-          dv = job.dice
+          dv = `d${job.dice.toString()}`
         }
       })
     }

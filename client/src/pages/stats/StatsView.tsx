@@ -61,6 +61,7 @@ import clsx from 'clsx'
 import GeneralInfoDialog from 'components/general-info-dialog/GeneralInfoDialog'
 import PgGeneralInfo from 'data/types/PgGeneralInfo'
 import ConfirmDialog from 'components/confirm-dialog/ConfirmDialog'
+import Job from 'data/types/Job'
 
 interface StatsViewProps {
   onEdit: boolean
@@ -87,18 +88,8 @@ interface StatsViewProps {
       value: unknown
     }>
   ) => void
-  onChangeJob: (
-    event: React.ChangeEvent<{
-      name?: string | undefined
-      value: unknown
-    }>
-  ) => void
-  onChangeSubJob: (
-    event: React.ChangeEvent<{
-      name?: string | undefined
-      value: unknown
-    }>
-  ) => void
+  onChangeJob: (job: JobsEnum, secondary?: boolean) => void
+  onChangeSubJob: (job: SubJobsEnum, secondary?: boolean) => void
   onChangeBackground: (
     event: React.ChangeEvent<{
       name?: string | undefined
@@ -112,6 +103,7 @@ interface StatsViewProps {
   onChangePE: (value: number) => void
   onAddEquipment: (equipments: EquipmentObject[]) => void
   onChangeGeneralInfo: (info: PgGeneralInfo) => void
+  onChangeMulticlass: (multi: boolean) => void
 }
 
 interface StatsViewState {
@@ -342,6 +334,21 @@ class StatsView extends Component<
     }
   }
 
+  getSecondarySubJobsData = () => {
+    const { pgClass2 } = this.props.pg
+    if (pgClass2) {
+      const filtered = this.subJobsData.filter(
+        subJob =>
+          subJob.type
+            .toLowerCase()
+            .indexOf(pgClass2.toString().toLowerCase()) >= 0
+      )
+      return filtered
+    } else {
+      return []
+    }
+  }
+
   onEditAvatar = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event.stopPropagation()
 
@@ -425,6 +432,109 @@ class StatsView extends Component<
     return languages
   }
 
+  getJobRequirement = (job: JobsEnum) => {
+    let requirement: string | undefined = ''
+    switch (job) {
+      case JobsEnum.Barbaro:
+        requirement =
+          StatsUtils.getStatValue(StatsType.Forza, this.props.pg) < 13
+            ? 'Forza 13'
+            : undefined
+        break
+      case JobsEnum.Bardo:
+        requirement =
+          StatsUtils.getStatValue(StatsType.Carisma, this.props.pg) < 13
+            ? 'Carisma 13'
+            : undefined
+        break
+      case JobsEnum.Chierico:
+        requirement =
+          StatsUtils.getStatValue(StatsType.Saggezza, this.props.pg) < 13
+            ? 'Saggezza 13'
+            : undefined
+        break
+      case JobsEnum.Druido:
+        requirement =
+          StatsUtils.getStatValue(StatsType.Saggezza, this.props.pg) < 13
+            ? 'Saggezza 13'
+            : undefined
+        break
+      case JobsEnum.Guerriero:
+        if (StatsUtils.getStatValue(StatsType.Forza, this.props.pg) < 13) {
+          requirement = 'Forza 13'
+        }
+        if (StatsUtils.getStatValue(StatsType.Destrezza, this.props.pg) < 13) {
+          requirement += requirement === '' ? 'Destrezza 13' : ', Destrezza 13'
+        }
+        break
+      case JobsEnum.Ladro:
+        requirement =
+          StatsUtils.getStatValue(StatsType.Destrezza, this.props.pg) < 13
+            ? 'Destrezza 13'
+            : undefined
+        break
+      case JobsEnum.Mago:
+        requirement =
+          StatsUtils.getStatValue(StatsType.Intelligenza, this.props.pg) < 13
+            ? 'Intelligenza 13'
+            : undefined
+        break
+      case JobsEnum.Monaco:
+        if (StatsUtils.getStatValue(StatsType.Destrezza, this.props.pg) < 13) {
+          requirement = 'Destrezza 13'
+        }
+        if (StatsUtils.getStatValue(StatsType.Saggezza, this.props.pg) < 13) {
+          requirement += requirement === '' ? 'Saggezza 13' : ', Saggezza 13'
+        }
+        break
+      case JobsEnum.Paladino:
+        if (StatsUtils.getStatValue(StatsType.Forza, this.props.pg) < 13) {
+          requirement = 'Forza 13'
+        }
+        if (StatsUtils.getStatValue(StatsType.Carisma, this.props.pg) < 13) {
+          requirement += requirement === '' ? 'Carisma 13' : ', Carisma 13'
+        }
+        break
+      case JobsEnum.Ranger:
+        if (StatsUtils.getStatValue(StatsType.Destrezza, this.props.pg) < 13) {
+          requirement = 'Destrezza 13'
+        }
+        if (StatsUtils.getStatValue(StatsType.Saggezza, this.props.pg) < 13) {
+          requirement += requirement === '' ? 'Saggezza 13' : ', Saggezza 13'
+        }
+        break
+      case JobsEnum.Stregone:
+        requirement =
+          StatsUtils.getStatValue(StatsType.Carisma, this.props.pg) < 13
+            ? 'Carisma 13'
+            : undefined
+        break
+      case JobsEnum.Warlock:
+        requirement =
+          StatsUtils.getStatValue(StatsType.Carisma, this.props.pg) < 13
+            ? 'Carisma 13'
+            : undefined
+        break
+    }
+
+    return requirement
+  }
+
+  getSecondaryJobsData = (): Job[] => {
+    const { pgClass } = this.props.pg
+    const filtered: Job[] = this.jobsData.filter(job => job.type !== pgClass)
+    console.log('filtered', filtered)
+    const mapped: Job[] = filtered.map(x => {
+      const req = this.getJobRequirement(x.type as JobsEnum)
+      return {
+        ...x,
+        disabled: req !== undefined,
+        extra: req ? req : undefined
+      } as Job
+    })
+    return mapped || []
+  }
+
   render() {
     const {
       name,
@@ -435,7 +545,10 @@ class StatsView extends Component<
       ispiration,
       image,
       subClass,
-      generalInfo
+      generalInfo,
+      multiclass,
+      pgClass2,
+      subClass2
     } = this.props.pg
     const {
       classes,
@@ -450,7 +563,8 @@ class StatsView extends Component<
       onChangeBackground,
       onEditName,
       onEditStats,
-      onChangePE
+      onChangePE,
+      onChangeMulticlass
     } = this.props
     const {
       dialogInfoAbilitiesOpen,
@@ -551,21 +665,61 @@ class StatsView extends Component<
                   onChange={onChangeSubRace}
                 />
               )}
+              {onEdit && (
+                <FormControlLabel
+                  className={classes.multiclass}
+                  control={
+                    <Checkbox
+                      checked={multiclass || false}
+                      onChange={() => onChangeMulticlass(!multiclass)}
+                    />
+                  }
+                  label={'Multiclasse'}
+                />
+              )}
               <SimpleSelect<JobsEnum>
-                label={'Classe'}
+                label={multiclass ? 'Classe Primaria' : 'Classe'}
                 item={pgClass}
                 data={this.jobsData}
                 onEdit={onEdit}
-                onChange={onChangeJob}
+                onChange={e => onChangeJob(e.target.value as JobsEnum)}
               />
               {pgClass && (
                 <SimpleSelect<SubJobsEnum>
-                  label={'Specializzazione'}
+                  label={
+                    multiclass
+                      ? 'Specializzazione Primaria'
+                      : 'Specializzazione'
+                  }
                   item={subClass}
                   data={this.getSubJobsData()}
                   onEdit={onEdit}
-                  onChange={onChangeSubJob}
+                  onChange={e => onChangeSubJob(e.target.value as SubJobsEnum)}
                 />
+              )}
+              {multiclass && (
+                <React.Fragment>
+                  <SimpleSelect<JobsEnum>
+                    label={'Classe Secondaria'}
+                    item={pgClass2}
+                    data={this.getSecondaryJobsData()}
+                    onEdit={onEdit}
+                    onChange={e =>
+                      onChangeJob(e.target.value as JobsEnum, true)
+                    }
+                  />
+                  {pgClass2 && (
+                    <SimpleSelect<SubJobsEnum>
+                      label={'Specializzazione Secondaria'}
+                      item={subClass2}
+                      data={this.getSecondarySubJobsData()}
+                      onEdit={onEdit}
+                      onChange={e =>
+                        onChangeSubJob(e.target.value as SubJobsEnum, true)
+                      }
+                    />
+                  )}
+                </React.Fragment>
               )}
               <SimpleSelect<string>
                 label={'Background'}
@@ -577,13 +731,6 @@ class StatsView extends Component<
                   onChangeBackground(event)
                 }}
               />
-              {/* <TextFieldNumber
-                label="Livello"
-                value={level}
-                onChange={onEditLevel}
-                fullWidth
-                disabled={!onEdit}
-              /> */}
             </ExpansionPanelDetails>
           </ExpansionPanel>
 

@@ -6,6 +6,7 @@ import Ability from './types/Ability'
 import Weapon from './types/Weapon'
 import Armor from './types/Armor'
 import Background from './types/Background'
+import Level from './types/Level'
 
 class DataUtils {
   static RaceMapper(json: any): Race[] {
@@ -39,7 +40,6 @@ class DataUtils {
       jobs.push({
         type: child.type,
         value: child.name,
-        levels: child.levels,
         ts: child.ts,
         dice: child.dice,
         abilitiesCount: child.abilitiesCount,
@@ -114,6 +114,17 @@ class DataUtils {
       })
     })
     return backgrounds
+  }
+
+  static ProficiencyMapper(json: any): Level[] {
+    let levels: Level[] = []
+    json.forEach((child: any) => {
+      levels.push({
+        id: child.id,
+        proficiency: child.proficiency
+      })
+    })
+    return levels
   }
 }
 

@@ -6,14 +6,6 @@ export default [
   {
     type: 'Barbaro',
     name: 'Barbaro',
-    levels: [
-      { id: 1, proficiency: 2 },
-      { id: 2, proficiency: 2 },
-      { id: 3, proficiency: 2 },
-      { id: 4, proficiency: 2 },
-      { id: 5, proficiency: 3 },
-      { id: 6, proficiency: 3 }
-    ],
     ts: [StatsType.Forza, StatsType.Costituzione],
     dice: 12,
     abilitiesCount: 2,
@@ -103,14 +95,6 @@ export default [
   {
     type: 'Chierico',
     name: 'Chierico',
-    levels: [
-      { id: 1, proficiency: 2 },
-      { id: 2, proficiency: 2 },
-      { id: 3, proficiency: 2 },
-      { id: 4, proficiency: 2 },
-      { id: 5, proficiency: 3 },
-      { id: 6, proficiency: 3 }
-    ],
     ts: [StatsType.Saggezza, StatsType.Carisma],
     dice: 8,
     abilitiesCount: 2,
@@ -234,14 +218,6 @@ export default [
   {
     type: 'Guerriero',
     name: 'Guerriero',
-    levels: [
-      { id: 1, proficiency: 2 },
-      { id: 2, proficiency: 2 },
-      { id: 3, proficiency: 2 },
-      { id: 4, proficiency: 2 },
-      { id: 5, proficiency: 3 },
-      { id: 6, proficiency: 3 }
-    ],
     ts: [StatsType.Forza, StatsType.Costituzione],
     dice: 10,
     abilitiesCount: 2,
@@ -322,14 +298,6 @@ export default [
   {
     type: 'Ladro',
     name: 'Ladro',
-    levels: [
-      { id: 1, proficiency: 2 },
-      { id: 2, proficiency: 2 },
-      { id: 3, proficiency: 2 },
-      { id: 4, proficiency: 2 },
-      { id: 5, proficiency: 3 },
-      { id: 6, proficiency: 3 }
-    ],
     ts: [StatsType.Destrezza, StatsType.Intelligenza],
     dice: 8,
     abilitiesCount: 4,
@@ -426,14 +394,6 @@ export default [
   {
     type: 'Stregone',
     name: 'Stregone',
-    levels: [
-      { id: 1, proficiency: 2 },
-      { id: 2, proficiency: 2 },
-      { id: 3, proficiency: 2 },
-      { id: 4, proficiency: 2 },
-      { id: 5, proficiency: 3 },
-      { id: 6, proficiency: 3 }
-    ],
     ts: [StatsType.Carisma, StatsType.Costituzione],
     dice: 6,
     abilitiesCount: 2,
@@ -515,14 +475,6 @@ export default [
   {
     type: 'Warlock',
     name: 'Warlock',
-    levels: [
-      { id: 1, proficiency: 2 },
-      { id: 2, proficiency: 2 },
-      { id: 3, proficiency: 2 },
-      { id: 4, proficiency: 2 },
-      { id: 5, proficiency: 3 },
-      { id: 6, proficiency: 3 }
-    ],
     ts: [StatsType.Carisma, StatsType.Saggezza],
     dice: 8,
     abilitiesCount: 2,
