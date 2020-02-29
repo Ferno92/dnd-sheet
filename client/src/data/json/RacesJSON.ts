@@ -5,8 +5,22 @@ export default [
     type: 'Umano',
     name: 'Umano',
     subraces: [],
-    stats: [],
-    abilities: [],
+    stats: [
+      { For: 1 },
+      { Des: 1 },
+      { Cos: 1 },
+      { Int: 1 },
+      { Sag: 1 },
+      { Car: 1 }
+    ],
+    abilities: [
+      {
+        name: 'Linguaggi',
+        description:
+          'Gli umani parlano, leggono e scrivono in Comune e in un linguaggio extra a scelta',
+        extra: 'languages|{"count":1,"list":["Comune"]}'
+      }
+    ],
     special: [],
     languages: ['Comune'],
     size: SizeEnum.Media,

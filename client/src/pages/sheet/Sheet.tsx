@@ -863,10 +863,32 @@ class Sheet extends Component<
 
   onChangePE = (value: number) => {
     const { pg } = this.state
+    let levelFirstClass = pg.levelFirstClass
+    if (
+      pg.levelFirstClass &&
+      StatsUtils.getPgLevel(pg.pe) !== StatsUtils.getPgLevel(value)
+    ) {
+      levelFirstClass =
+        pg.levelFirstClass +
+        (StatsUtils.getPgLevel(value) - StatsUtils.getPgLevel(pg.pe))
+    }
+    console.log('changed')
+    const clear =
+      levelFirstClass === undefined &&
+      (pg.pgClass2 !== undefined || pg.subClass2 !== undefined) &&
+      StatsUtils.getPgLevel(value) !== StatsUtils.getPgLevel(pg.pe) &&
+      StatsUtils.getPgLevel(value) - StatsUtils.getPgLevel(pg.pe) <= 0
     this.setState({
       pg: {
         ...pg,
-        pe: value
+        pe: value,
+        levelFirstClass:
+          levelFirstClass !== undefined && levelFirstClass > 0
+            ? levelFirstClass
+            : undefined,
+        // pgClass2: clear ? undefined : pg.pgClass2,
+        // subClass2: clear ? undefined : pg.subClass2,
+        multiclass: clear ? false : pg.multiclass
       }
     })
   }
@@ -1131,14 +1153,16 @@ class Sheet extends Component<
           message={location => {
             const nextLocationPath = location.pathname.split('/')
             const currentLocationPath = this.props.match.url.split('/')
-            return this.state.onEdit &&
+            const shouldPrompt =
+              this.state.onEdit &&
               JSON.stringify(this.state.pg) !== this.state.initialPgJson &&
               (nextLocationPath[1] !== currentLocationPath[1] || //different page (not sheet anymore)
               nextLocationPath.length < currentLocationPath.length || //different page (not sheet anymore)
                 (nextLocationPath.length > 1 &&
                   nextLocationPath[2] !== currentLocationPath[2])) //different pg (still sheet page)
-              ? 'Ci sono dei dati che non hai salvato, sei sicuro di voler lasciare la pagina?'
-              : false
+                ? 'Ci sono dei dati che non hai salvato, sei sicuro di voler lasciare la pagina?'
+                : true
+            return shouldPrompt
           }}
         />
         <Tooltip

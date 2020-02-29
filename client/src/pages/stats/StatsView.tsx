@@ -266,12 +266,24 @@ class StatsView extends Component<
   }
 
   getAbilitiesCountFromClass = (): number => {
-    const { pgClass, race } = this.props.pg
+    const { pgClass, race, pgClass2, multiclass } = this.props.pg
     let count = 0
     if (pgClass) {
       this.jobsData.forEach(job => {
         if (job.type === pgClass) {
           count = job.abilitiesCount
+        } else if (job.type === pgClass2 && multiclass && job.multiclass) {
+          job.multiclass.forEach(privilege => {
+            if (privilege.extra) {
+              const splitted = privilege.extra.split('|')
+              if (splitted[0] === 'abilities') {
+                const obj = JSON.parse(splitted[1])
+                if (obj.count !== undefined) {
+                  count += obj.count
+                }
+              }
+            }
+          })
         }
       })
     }
@@ -589,8 +601,7 @@ class StatsView extends Component<
       onEditName,
       onEditStats,
       onChangePE,
-      onChangeMulticlass,
-      onUpdateFirstClassLevel
+      onChangeMulticlass
     } = this.props
     const {
       dialogInfoAbilitiesOpen,
@@ -706,7 +717,7 @@ class StatsView extends Component<
                   onChange={onChangeSubRace}
                 />
               )}
-              {onEdit && (
+              {onEdit && StatsUtils.getPgLevel(this.props.pg.pe) !== 1 && (
                 <FormControlLabel
                   className={classes.multiclass}
                   control={
@@ -897,7 +908,6 @@ class StatsView extends Component<
                     const newPE = parseInt(event.target.value)
                     this.setState({ peFromState: newPE })
                     onChangePE(newPE)
-                    onUpdateFirstClassLevel(StatsUtils.getPgLevel(newPE))
                   }}
                   value={peFromState}
                   fullWidth

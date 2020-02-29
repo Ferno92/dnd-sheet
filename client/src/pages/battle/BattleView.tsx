@@ -35,6 +35,7 @@ import ArmorDialog from 'components/armor-dialog/ArmorDialog'
 import Armor from 'data/types/Armor'
 import { RacesEnum, SubRacesEnum } from 'data/types/RacesEnum'
 import { default as racesJSON } from 'data/json/RacesJSON'
+import { default as jobsJSON } from 'data/json/JobsJSON'
 import DataUtils from 'data/DataUtils'
 import RaceAbility from 'data/types/RaceAbility'
 import Privileges from 'data/types/Privileges'
@@ -171,12 +172,107 @@ function BattleView(props: BattleViewProps) {
     return className
   }, [pg])
 
+  const hasArmorProficiency = useCallback(
+    (armorInfo: ArmorInfo) => {
+      const { pgClass, pgClass2 } = pg
+      let hasProficiency = false
+
+      const jobsData = DataUtils.JobMapper(jobsJSON as any)
+      jobsData.forEach(job => {
+        if (job.type === pgClass) {
+          job.privileges.forEach(item => {
+            if (item.extra) {
+              const splitted = item.extra.split('|')
+              if (splitted[0] === 'competenza') {
+                const obj = JSON.parse(splitted[1])
+                if (obj.armorList !== undefined) {
+                  hasProficiency = obj.armorList.find(
+                    (x: string) =>
+                      armorInfo.armor.armorType === x ||
+                      armorInfo.armor.name.toLowerCase() === x
+                  )
+                }
+              }
+            }
+          })
+        } else if (job.type === pgClass2 && job.multiclass) {
+          job.multiclass.forEach(item => {
+            if (item.extra) {
+              const splitted = item.extra.split('|')
+              if (splitted[0] === 'competenza') {
+                const obj = JSON.parse(splitted[1])
+                if (obj.armorList !== undefined) {
+                  hasProficiency = obj.armorList.find(
+                    (x: string) =>
+                      armorInfo.armor.armorType === x ||
+                      armorInfo.armor.name.toLowerCase() === x
+                  )
+                }
+              }
+            }
+          })
+        }
+      })
+      return hasProficiency
+    },
+    [pg]
+  )
+
+  const hasWeaponProficiency = useCallback(
+    (weaponInfo: WeaponInfo) => {
+      const { pgClass, pgClass2 } = pg
+      let hasProficiency = false
+
+      const jobsData = DataUtils.JobMapper(jobsJSON as any)
+      jobsData.forEach(job => {
+        if (job.type === pgClass) {
+          job.privileges.forEach(item => {
+            if (item.extra) {
+              const splitted = item.extra.split('|')
+              if (splitted[0] === 'competenza') {
+                const obj = JSON.parse(splitted[1])
+                if (obj.weaponList !== undefined) {
+                  hasProficiency = obj.weaponList.find(
+                    (x: string) =>
+                      weaponInfo.weapon.type.toLowerCase().indexOf(x) ||
+                      weaponInfo.weapon.name.toLowerCase() === x
+                  )
+                }
+              }
+            }
+          })
+        } else if (job.type === pgClass2 && job.multiclass) {
+          job.multiclass.forEach(item => {
+            if (item.extra) {
+              const splitted = item.extra.split('|')
+              if (splitted[0] === 'competenza') {
+                const obj = JSON.parse(splitted[1])
+                if (obj.weaponList !== undefined) {
+                  hasProficiency = obj.weaponList.find(
+                    (x: string) =>
+                      weaponInfo.weapon.type.toLowerCase().indexOf(x) ||
+                      weaponInfo.weapon.name.toLowerCase() === x
+                  )
+                }
+              }
+            }
+          })
+        }
+      })
+      return hasProficiency
+    },
+    [pg]
+  )
+
   const getWeaponTPC = useCallback(
     (weaponInfo: WeaponInfo) => {
       const { pgClass } = pg
+      const hasProficiency = hasWeaponProficiency(weaponInfo)
       let tpc =
         weaponInfo.bonus +
-        StatsUtils.getProficiency(StatsUtils.getPgLevel(pg.pe), pgClass)
+        (hasProficiency
+          ? StatsUtils.getProficiency(StatsUtils.getPgLevel(pg.pe), pgClass)
+          : 0)
       const forza = StatsUtils.getStatModifierFromName(StatsType.Forza, pg)
       const destrezza = StatsUtils.getStatModifierFromName(
         StatsType.Destrezza,
@@ -194,7 +290,7 @@ function BattleView(props: BattleViewProps) {
       }
       return `${tpc >= 0 ? '+' : '-'}${tpc}`
     },
-    [pg]
+    [pg, hasWeaponProficiency]
   )
 
   const getWeaponDamageBonus = useCallback(
@@ -287,7 +383,9 @@ function BattleView(props: BattleViewProps) {
           StatsUtils.getPgLevel(pg.pe),
           pg.pgClass,
           pg.subClass,
-          pg.background
+          pg.background,
+          pg.pgClass2,
+          pg.multiclass
         )
       )
     }
@@ -464,16 +562,18 @@ function BattleView(props: BattleViewProps) {
               </div>
               <div className={classes.pf}>
                 <Typography variant="subtitle2">PF Attuali</Typography>
-                <Typography
-                  variant="h2"
-                  className={clsx(classes.currentPf, getPFColorClass())}
-                >
-                  {pg.currentPF}
-                </Typography>
-                <Typography
-                  variant="body2"
-                  className={clsx(classes.pfTot, getPFColorClass())}
-                >{`/${pg.pfTot}`}</Typography>
+                <div>
+                  <Typography
+                    variant="h2"
+                    className={clsx(classes.currentPf, getPFColorClass())}
+                  >
+                    {pg.currentPF}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    className={clsx(classes.pfTot, getPFColorClass())}
+                  >{`/${pg.pfTot}`}</Typography>
+                </div>
               </div>
               <div className={classes.pfModifiers}>
                 {[...Array(3).keys()].map(i => {
@@ -510,7 +610,9 @@ function BattleView(props: BattleViewProps) {
             <ExpansionPanelItem
               key={`${armorInfo.armor.id}_${index}`}
               id={armorInfo.armor.id}
-              name={armorInfo.armor.name}
+              name={`${armorInfo.armor.name}${
+                hasArmorProficiency(armorInfo) ? '' : ' (Non competente)'
+              }`}
               expanded={armorExpanded === armorInfo.armor.id}
               checked={armorInfo.isWearing || false}
               checkbox
@@ -592,14 +694,18 @@ function BattleView(props: BattleViewProps) {
                     {`${armorInfo.armor.weight} Kg`}
                   </Typography>
                 </div>
-                {armorInfo.armor.noFurtivity && (
+                {(armorInfo.armor.noFurtivity ||
+                  !hasArmorProficiency(armorInfo)) && (
                   <div className={classes.armorLabel}>
                     <Typography
                       variant={'subtitle1'}
                       className={classes.armorDetailTitle}
                     >{`Furtività: `}</Typography>
                     <Typography variant={'body2'}>
-                      {armorInfo.armor.noFurtivity ? 'Svantaggio' : ''}
+                      {armorInfo.armor.noFurtivity ||
+                      !hasArmorProficiency(armorInfo)
+                        ? 'Svantaggio'
+                        : ''}
                     </Typography>
                   </div>
                 )}
@@ -665,7 +771,7 @@ function BattleView(props: BattleViewProps) {
               id={id}
               name={`${weaponInfo.weapon.name}${
                 weaponInfo.bonus ? `(+${weaponInfo.bonus})` : ''
-              }`}
+              }${hasWeaponProficiency(weaponInfo) ? '' : '(Non competente)'}`}
               expanded={weaponExpanded === id}
               checked={false}
               checkbox={false}
@@ -771,6 +877,9 @@ function BattleView(props: BattleViewProps) {
             </ExpansionPanelItem>
           )
         })}
+        {pg.weapons.length === 0 && (
+          <Typography variant="body2">Nessuna arma</Typography>
+        )}
 
         {/* ________________ Weapon dialog _____________ */}
         <WeaponDialog

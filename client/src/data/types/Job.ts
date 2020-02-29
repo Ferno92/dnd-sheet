@@ -11,5 +11,6 @@ interface Job extends SimpleSelectItem {
   abilities: AbilitiesEnum[]
   spellsByJobLevel?: SpellsByJobLevel[]
   privileges: Privileges[]
+  multiclass?: Privileges[]
 }
 export default Job

@@ -45,7 +45,8 @@ class DataUtils {
         abilitiesCount: child.abilitiesCount,
         abilities: child.abilities,
         spellsByJobLevel: child.spellsByJobLevel,
-        privileges: child.privileges
+        privileges: child.privileges,
+        multiclass: child.multiclass
       })
     })
     return jobs

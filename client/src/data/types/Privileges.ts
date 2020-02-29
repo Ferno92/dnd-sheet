@@ -8,5 +8,6 @@ interface Privileges {
   counter?: number
   counterType?: string
   rest?: RestType
+  extra?: any
 }
 export default Privileges

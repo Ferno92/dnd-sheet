@@ -19,6 +19,7 @@ import Armor from 'data/types/Armor'
 import ArmorEnum from 'data/types/ArmorEnum'
 import TextFieldNumber from 'components/text-field-number/TextFieldNumber'
 import ArmorInfo from 'data/types/ArmorInfo'
+import ArmorType from 'data/types/ArmorType'
 
 interface ArmorDialogProps {
   open: boolean
@@ -52,7 +53,7 @@ const ArmorDialog: React.FC<ArmorDialogProps> = (props: ArmorDialogProps) => {
           value: currentType,
           id: ArmorEnum.SubHeader,
           type: ArmorEnum.SubHeader,
-          armorType: '',
+          armorType: ArmorType.Leggera,
           ca: 0,
           noFurtivity: false,
           weight: 0,

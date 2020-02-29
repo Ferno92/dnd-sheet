@@ -108,7 +108,10 @@ const BattleViewStyles = makeStyles((theme: Theme) => ({
     alignItems: 'center'
   },
   pf: {
-    margin: '0 16px'
+    margin: '0 16px',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center'
   },
   currentPf: {
     display: 'inline',

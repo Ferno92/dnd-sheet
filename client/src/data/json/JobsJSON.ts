@@ -1,6 +1,7 @@
 import StatsType from 'data/types/StatsEnum'
 import AbilitiesEnum from 'data/types/AbilitiesEnum'
 import RestType from 'data/types/RestType'
+import ArmorType from 'data/types/ArmorType'
 
 export default [
   {
@@ -17,7 +18,25 @@ export default [
       AbilitiesEnum.Percezione,
       AbilitiesEnum.Sopravvivenza
     ],
+    multiclass: [
+      {
+        lv: 1,
+        type: 'competenza',
+        name: 'Competenza armi e armature (Barbaro)',
+        description:
+          'Un Barbaro è competente negli scudi, armi semplici e armi da guerra',
+        extra: `competenza|{"armorList":["${ArmorType.Scudo}"],"weaponList":["semplice","guerra"]}`
+      }
+    ],
     privileges: [
+      {
+        lv: 1,
+        type: 'competenzaBase',
+        name: 'Competenza armi e armature',
+        description:
+          'Un Barbaro è competente negli scudi. armature leggere e medie, armi semplici e armi da guerra',
+        extra: `competenza|{"armorList":["${ArmorType.Scudo}","${ArmorType.Leggera}","${ArmorType.Media}"],"weaponList":["semplice","guerra"]}`
+      },
       {
         lv: 1,
         type: 'ira',
@@ -161,7 +180,25 @@ export default [
         ]
       }
     ],
+    multiclass: [
+      {
+        lv: 1,
+        type: 'competenza',
+        name: 'Competenza armi e armature (Chierico)',
+        description:
+          'Un Chierico è competente negli scudi, armature leggere e medie',
+        extra: `competenza|{"armorList":["${ArmorType.Leggera}","${ArmorType.Media}","${ArmorType.Scudo}"]}`
+      }
+    ],
     privileges: [
+      {
+        lv: 1,
+        type: 'competenzaBase',
+        name: 'Competenza armi e armature (Chierico)',
+        description:
+          'Un Chierico è competente negli scudi, armature leggere e medie, armi semplici',
+        extra: `competenza|{"armorList":["${ArmorType.Leggera}","${ArmorType.Media}","${ArmorType.Scudo}"], weaponList:["semplice"]}`
+      },
       {
         lv: 1,
         type: 'dominio',
@@ -231,13 +268,24 @@ export default [
       AbilitiesEnum.Sopravvivenza,
       AbilitiesEnum.Storia
     ],
+    multiclass: [
+      {
+        lv: 1,
+        type: 'competenza',
+        name: 'Competenza armi e armature (Guerriero)',
+        description:
+          'Un Guerriero è competente negli scudi, armature leggere e medie, armi semplici e armi da guerra',
+        extra: `competenza|{"armorList":["${ArmorType.Scudo}","${ArmorType.Leggera}","${ArmorType.Media}"],"weaponList":["semplice","guerra"]}`
+      }
+    ],
     privileges: [
       {
         lv: 1,
-        type: 'competenza_tutto',
+        type: 'competenzaBase',
         name: 'Competenza armi e armature',
         description:
-          'Il guerriero è competente in tutte le armature e scudi, nelle armi semplici e da guerra.'
+          'Il guerriero è competente in tutte le armature e scudi, nelle armi semplici e da guerra.',
+        extra: `competenza|{"armorList":["${ArmorType.Scudo}","${ArmorType.Leggera}","${ArmorType.Media}","${ArmorType.Pesante}"],"weaponList":["semplice","guerra"]}`
       },
       {
         lv: 1,
@@ -314,7 +362,37 @@ export default [
       AbilitiesEnum.Persuasione,
       AbilitiesEnum.RapiditaDiMano
     ],
+    multiclass: [
+      {
+        lv: 1,
+        type: 'competenza',
+        name: 'Competenza armi e armature (Ladro)',
+        description: 'Un Ladro è competente nelle armature leggere',
+        extra: `competenza|{"armorList":["${ArmorType.Leggera}"]}`
+      },
+      {
+        lv: 1,
+        type: 'skill',
+        name: 'Abilità aggiuntiva (Ladro)',
+        description: "Un Ladro ottiene un'abilità aggiuntiva",
+        extra: `abilities|{"count":1}`
+      }
+    ],
     privileges: [
+      {
+        lv: 1,
+        type: 'competenzaBase',
+        name: 'Competenza armi e armature',
+        description:
+          'Un Ladro è competente nelle armature leggere, armi semplici, balestre a mano, spada corte, spade lunghe e stocchi',
+        extra: `competenza|{"armorList":["${ArmorType.Leggera}"],"weaponList":["semplice","balestra a mano","spada corta","spada lunga","stocco"]}`
+      },
+      {
+        lv: 1,
+        type: 'competenzaArnesi',
+        name: 'Competenza Arnesi da Scasso',
+        description: 'Un Ladro è competente negli arnesi da scasso'
+      },
       {
         lv: 1,
         type: 'maestria',
@@ -463,6 +541,14 @@ export default [
     ],
     privileges: [
       {
+        lv: 1,
+        type: 'competenzaBase',
+        name: 'Competenza armi e armature',
+        description:
+          'Uno Stregone è competente nelle balestre leggere, bastoni ferrati, dardi, fionde, pugnali',
+        extra: `competenza|{"weaponList":["balestra leggera","bastone ferrato","dardi","fionda","pugnale"]}`
+      },
+      {
         lv: 3,
         type: 'metamagia',
         name: 'Metamagia',
@@ -549,7 +635,25 @@ export default [
         slot: 2
       }
     ],
+    multiclass: [
+      {
+        lv: 1,
+        type: 'competenza',
+        name: 'Competenza armi e armature (Warlock)',
+        description:
+          'Un Warlock è competente nelle armature leggere e nelle armi semplici',
+        extra: `competenza|{"armorList":["${ArmorType.Leggera}"],"weaponList":["semplice"]}`
+      }
+    ],
     privileges: [
+      {
+        lv: 1,
+        type: 'competenzaBase',
+        name: 'Competenza armi e armature',
+        description:
+          'Un Warlock è competente nelle armature leggere e nelle armi semplici',
+        extra: `competenza|{"armorList":["${ArmorType.Leggera}"],"weaponList":["semplice"]}`
+      },
       {
         lv: 1,
         type: 'patrono',

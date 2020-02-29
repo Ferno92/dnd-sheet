@@ -23,7 +23,9 @@ class BattleUtils {
     level: number,
     pgClass: JobsEnum,
     subClass: SubJobsEnum,
-    background?: string
+    background?: string,
+    pgClass2?: JobsEnum,
+    multiclass?: boolean
   ): Privileges[] {
     const jobsData = DataUtils.JobMapper(JobsJSON as any)
     const subJobsData = DataUtils.JobMapper(SubJobsJSON as any)
@@ -53,6 +55,24 @@ class BattleUtils {
         })
       }
     })
+    if (multiclass) {
+      jobsData.forEach(job => {
+        if (job.type === pgClass2 && job.multiclass) {
+          job.multiclass.forEach(privilege => {
+            if (privilege.lv <= level) {
+              const index = privileges.findIndex(
+                item => item.type === privilege.type
+              )
+              if (index < 0) {
+                privileges.push(privilege)
+              } else {
+                privileges[index] = privilege
+              }
+            }
+          })
+        }
+      })
+    }
     const filtered = subJobsData.filter(
       subJob =>
         subJob.type.toLowerCase().indexOf(subClass.toString().toLowerCase()) >=
