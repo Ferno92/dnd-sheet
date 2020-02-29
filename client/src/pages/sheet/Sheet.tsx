@@ -262,7 +262,8 @@ class Sheet extends Component<
       temp,
       pgClass2,
       subClass2,
-      multiclass
+      multiclass,
+      levelFirstClass
     } = this.state.pg
 
     if (this.pg) {
@@ -292,7 +293,8 @@ class Sheet extends Component<
             temp,
             pgClass2,
             subClass2,
-            multiclass
+            multiclass,
+            levelFirstClass
           })
           .then(() => {
             console.log('update done')
@@ -326,7 +328,8 @@ class Sheet extends Component<
             temp,
             pgClass2,
             subClass2,
-            multiclass
+            multiclass,
+            levelFirstClass
           })
           .then(() => {
             console.log('create done')
@@ -989,6 +992,16 @@ class Sheet extends Component<
     })
   }
 
+  onUpdateFirstClassLevel = (level: number) => {
+    const { pg } = this.state
+    this.setState({
+      pg: {
+        ...pg,
+        levelFirstClass: level
+      }
+    })
+  }
+
   render() {
     const { classes, theme } = this.props
     const { pageIndex, onEdit, sheetId, pg, exist, snackMessage } = this.state
@@ -1017,6 +1030,7 @@ class Sheet extends Component<
           onAddEquipment={this.onAddEquipment}
           onChangeGeneralInfo={this.onChangeGeneralInfo}
           onChangeMulticlass={this.onChangeMulticlass}
+          onUpdateFirstClassLevel={this.onUpdateFirstClassLevel}
         />
       </div>,
       <div key={'slide2'}>

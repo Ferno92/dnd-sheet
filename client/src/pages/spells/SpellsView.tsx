@@ -96,14 +96,15 @@ const SpellsView: React.FC<SpellsViewProps> = (props: SpellsViewProps) => {
   useEffect(() => {
     if (
       spellByJobLevel === undefined ||
-      spellByJobLevel.id !== StatsUtils.getPgLevel(pg)
+      spellByJobLevel.id !== StatsUtils.getPgLevel(pg.pe)
     ) {
       let spellByJobLevel: SpellsByJobLevel | undefined
       const jobsData = DataUtils.JobMapper(jobsJSON as any)
       jobsData.forEach(job => {
         if (job.type === pg.pgClass && job.spellsByJobLevel) {
           spellByJobLevel = job.spellsByJobLevel.find(
-            spellByJobLevel => spellByJobLevel.id === StatsUtils.getPgLevel(pg)
+            spellByJobLevel =>
+              spellByJobLevel.id === StatsUtils.getPgLevel(pg.pe)
           )
         }
       })
@@ -143,7 +144,7 @@ const SpellsView: React.FC<SpellsViewProps> = (props: SpellsViewProps) => {
             {
               type: `Comp`,
               value: StatsUtils.getProficiency(
-                StatsUtils.getPgLevel(pg),
+                StatsUtils.getPgLevel(pg.pe),
                 pg.pgClass
               )
             },
@@ -182,7 +183,7 @@ const SpellsView: React.FC<SpellsViewProps> = (props: SpellsViewProps) => {
             {
               type: `Comp`,
               value: StatsUtils.getProficiency(
-                StatsUtils.getPgLevel(pg),
+                StatsUtils.getPgLevel(pg.pe),
                 pg.pgClass
               )
             }

@@ -213,6 +213,14 @@ const StatsViewStyles = (theme: Theme) =>
     },
     multiclass: {
       marginBottom: 10
+    },
+    multiLevelContainer: {
+      display: 'flex',
+      alignItems: 'center'
+    },
+    secondClassLevel: {
+      flexShrink: 0,
+      margin: '0 52px'
     }
   })
 

@@ -107,9 +107,20 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
               </ListItemIcon>
               <ListItemText
                 primary={pg.name}
-                secondary={`${pg.race} ${pg.pgClass} Lv.${StatsUtils.getPgLevel(
-                  pg
-                )}`}
+                secondary={
+                  pg.multiclass && pg.pgClass2
+                    ? `${pg.race} ${pg.pgClass} Lv. ${pg.levelFirstClass ||
+                        StatsUtils.getPgLevel(pg.pe) - 1} - ${
+                        pg.pgClass2
+                      } Lv. ${
+                        pg.levelFirstClass
+                          ? StatsUtils.getPgLevel(pg.pe) - pg.levelFirstClass
+                          : 1
+                      }`
+                    : `${pg.race || ''} ${pg.pgClass || ''} ${
+                        pg.pgClass ? `Lv.${StatsUtils.getPgLevel(pg.pe)}` : ''
+                      }`
+                }
               />
               <ListItemSecondaryAction>
                 <IconButton onClick={() => setPgToDelete(i)}>

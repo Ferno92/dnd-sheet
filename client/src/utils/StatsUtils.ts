@@ -195,8 +195,7 @@ class StatsUtils {
     return text
   }
 
-  static getPgLevel = (pg: PG, next?: boolean) => {
-    const { pe } = pg
+  static getPgLevel = (pe: number, next?: boolean) => {
     const level = StatsUtils.getLevelPgFromPE(pe)
     return next ? level + 1 : level
   }

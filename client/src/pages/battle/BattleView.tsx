@@ -176,7 +176,7 @@ function BattleView(props: BattleViewProps) {
       const { pgClass } = pg
       let tpc =
         weaponInfo.bonus +
-        StatsUtils.getProficiency(StatsUtils.getPgLevel(pg), pgClass)
+        StatsUtils.getProficiency(StatsUtils.getPgLevel(pg.pe), pgClass)
       const forza = StatsUtils.getStatModifierFromName(StatsType.Forza, pg)
       const destrezza = StatsUtils.getStatModifierFromName(
         StatsType.Destrezza,
@@ -278,13 +278,13 @@ function BattleView(props: BattleViewProps) {
         secondary !== '' && primary !== secondary ? `/${secondary}` : ''
       }`
     )
-  }, [pg.race, pg.pgClass])
+  }, [pg.race, pg.pgClass, pg.pgClass2])
 
   useEffect(() => {
     if (pg.pgClass && pg.subClass) {
       setPrivileges(
         BattleUtils.getPrivileges(
-          StatsUtils.getPgLevel(pg),
+          StatsUtils.getPgLevel(pg.pe),
           pg.pgClass,
           pg.subClass,
           pg.background
@@ -350,7 +350,6 @@ function BattleView(props: BattleViewProps) {
           {dv.split('/').length > 1 ? (
             <Grid item xs={3} className={classes.gridItem}>
               {[...Array(2).keys()].map(i => {
-                console.log(dv, dv.split('/'), dv.split('/')[0], i)
                 return (
                   <TextFieldString
                     key={`${dv.split('/')[i]}`}

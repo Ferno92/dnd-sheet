@@ -34,6 +34,7 @@ interface PG {
   generalInfo?: PgGeneralInfo
   temp?: any
   multiclass?: boolean
+  levelFirstClass?: number
 }
 
 export default PG

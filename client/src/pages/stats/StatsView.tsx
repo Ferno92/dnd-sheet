@@ -62,6 +62,7 @@ import GeneralInfoDialog from 'components/general-info-dialog/GeneralInfoDialog'
 import PgGeneralInfo from 'data/types/PgGeneralInfo'
 import ConfirmDialog from 'components/confirm-dialog/ConfirmDialog'
 import Job from 'data/types/Job'
+import ClassLevel from './components/ClassLevel'
 
 interface StatsViewProps {
   onEdit: boolean
@@ -104,6 +105,7 @@ interface StatsViewProps {
   onAddEquipment: (equipments: EquipmentObject[]) => void
   onChangeGeneralInfo: (info: PgGeneralInfo) => void
   onChangeMulticlass: (multi: boolean) => void
+  onUpdateFirstClassLevel: (level: number) => void
 }
 
 interface StatsViewState {
@@ -174,7 +176,10 @@ class StatsView extends Component<
       })
     }
     return hasProficiency
-      ? StatsUtils.getProficiency(StatsUtils.getPgLevel(this.props.pg), pgClass)
+      ? StatsUtils.getProficiency(
+          StatsUtils.getPgLevel(this.props.pg.pe),
+          pgClass
+        )
       : 0
   }
 
@@ -523,7 +528,6 @@ class StatsView extends Component<
   getSecondaryJobsData = (): Job[] => {
     const { pgClass } = this.props.pg
     const filtered: Job[] = this.jobsData.filter(job => job.type !== pgClass)
-    console.log('filtered', filtered)
     const mapped: Job[] = filtered.map(x => {
       const req = this.getJobRequirement(x.type as JobsEnum)
       return {
@@ -533,6 +537,26 @@ class StatsView extends Component<
       } as Job
     })
     return mapped || []
+  }
+
+  onAddLevel = (first: boolean) => {
+    const { levelFirstClass } = this.props.pg
+    const { onUpdateFirstClassLevel } = this.props
+    let level = StatsUtils.getPgLevel(this.props.pg.pe) - 1
+    if (levelFirstClass) {
+      level = levelFirstClass + 1
+    }
+    onUpdateFirstClassLevel(level)
+  }
+
+  onRemoveLevel = (first: boolean) => {
+    const { levelFirstClass } = this.props.pg
+    const { onUpdateFirstClassLevel } = this.props
+    let level = StatsUtils.getPgLevel(this.props.pg.pe) - 2
+    if (levelFirstClass && levelFirstClass > 1) {
+      level = levelFirstClass - 1
+    }
+    onUpdateFirstClassLevel(level)
   }
 
   render() {
@@ -548,7 +572,8 @@ class StatsView extends Component<
       generalInfo,
       multiclass,
       pgClass2,
-      subClass2
+      subClass2,
+      levelFirstClass
     } = this.props.pg
     const {
       classes,
@@ -564,7 +589,8 @@ class StatsView extends Component<
       onEditName,
       onEditStats,
       onChangePE,
-      onChangeMulticlass
+      onChangeMulticlass,
+      onUpdateFirstClassLevel
     } = this.props
     const {
       dialogInfoAbilitiesOpen,
@@ -630,14 +656,29 @@ class StatsView extends Component<
                     `${subRace}`,
                     this.getSubRacesData()
                   )}`}</Typography>
-                  <Typography variant="body2">
-                    {StatsUtils.getInfoName(`${pgClass}`, this.jobsData)
-                      ? `${StatsUtils.getInfoName(
-                          `${pgClass}`,
-                          this.jobsData
-                        )} Lv. ${StatsUtils.getPgLevel(this.props.pg)}`
-                      : ''}
-                  </Typography>
+                  {multiclass && pgClass && pgClass2 ? (
+                    <Typography variant="body2">
+                      {StatsUtils.getInfoName(`${pgClass}`, this.jobsData)
+                        ? `${pgClass} Lv. ${levelFirstClass ||
+                            StatsUtils.getPgLevel(this.props.pg.pe) -
+                              1} - ${pgClass2} Lv. ${
+                            levelFirstClass
+                              ? StatsUtils.getPgLevel(this.props.pg.pe) -
+                                levelFirstClass
+                              : 1
+                          }`
+                        : ''}
+                    </Typography>
+                  ) : (
+                    <Typography variant="body2">
+                      {StatsUtils.getInfoName(`${pgClass}`, this.jobsData)
+                        ? `${StatsUtils.getInfoName(
+                            `${pgClass}`,
+                            this.jobsData
+                          )} Lv. ${StatsUtils.getPgLevel(this.props.pg.pe)}`
+                        : ''}
+                    </Typography>
+                  )}
                 </div>
               </div>
             </ExpansionPanelSummary>
@@ -677,13 +718,27 @@ class StatsView extends Component<
                   label={'Multiclasse'}
                 />
               )}
-              <SimpleSelect<JobsEnum>
-                label={multiclass ? 'Classe Primaria' : 'Classe'}
-                item={pgClass}
-                data={this.jobsData}
-                onEdit={onEdit}
-                onChange={e => onChangeJob(e.target.value as JobsEnum)}
-              />
+              <div className={classes.multiLevelContainer}>
+                <SimpleSelect<JobsEnum>
+                  label={multiclass ? 'Classe Primaria' : 'Classe'}
+                  item={pgClass}
+                  data={this.jobsData}
+                  onEdit={onEdit}
+                  onChange={e => onChangeJob(e.target.value as JobsEnum)}
+                />
+                {multiclass && pgClass && (
+                  <ClassLevel
+                    level={
+                      levelFirstClass ||
+                      StatsUtils.getPgLevel(this.props.pg.pe) - 1
+                    }
+                    max={StatsUtils.getPgLevel(this.props.pg.pe)}
+                    onAdd={() => this.onAddLevel(true)}
+                    onRemove={() => this.onRemoveLevel(true)}
+                    readOnly={!onEdit}
+                  />
+                )}
+              </div>
               {pgClass && (
                 <SimpleSelect<SubJobsEnum>
                   label={
@@ -699,15 +754,26 @@ class StatsView extends Component<
               )}
               {multiclass && (
                 <React.Fragment>
-                  <SimpleSelect<JobsEnum>
-                    label={'Classe Secondaria'}
-                    item={pgClass2}
-                    data={this.getSecondaryJobsData()}
-                    onEdit={onEdit}
-                    onChange={e =>
-                      onChangeJob(e.target.value as JobsEnum, true)
-                    }
-                  />
+                  <div className={classes.multiLevelContainer}>
+                    <SimpleSelect<JobsEnum>
+                      label={'Classe Secondaria'}
+                      item={pgClass2}
+                      data={this.getSecondaryJobsData()}
+                      onEdit={onEdit}
+                      onChange={e =>
+                        onChangeJob(e.target.value as JobsEnum, true)
+                      }
+                    />
+                    {pgClass2 && (
+                      <Typography
+                        variant="body1"
+                        className={classes.secondClassLevel}
+                      >{`LV. ${StatsUtils.getPgLevel(this.props.pg.pe) -
+                        (this.props.pg.levelFirstClass ||
+                          StatsUtils.getPgLevel(this.props.pg.pe) -
+                            1)}`}</Typography>
+                    )}
+                  </div>
                   {pgClass2 && (
                     <SimpleSelect<SubJobsEnum>
                       label={'Specializzazione Secondaria'}
@@ -793,7 +859,7 @@ class StatsView extends Component<
                 <TextFieldNumber
                   label="Competenza"
                   value={StatsUtils.getProficiency(
-                    StatsUtils.getPgLevel(this.props.pg),
+                    StatsUtils.getPgLevel(this.props.pg.pe),
                     pgClass
                   )}
                   onChange={() => {}}
@@ -831,6 +897,7 @@ class StatsView extends Component<
                     const newPE = parseInt(event.target.value)
                     this.setState({ peFromState: newPE })
                     onChangePE(newPE)
+                    onUpdateFirstClassLevel(StatsUtils.getPgLevel(newPE))
                   }}
                   value={peFromState}
                   fullWidth
@@ -855,7 +922,7 @@ class StatsView extends Component<
               <Grid item xs={12} className={classes.gridItem}>
                 <div className={classes.peContainer}>
                   <Typography variant="body1">{`Lv. ${StatsUtils.getPgLevel(
-                    this.props.pg
+                    this.props.pg.pe
                   )}`}</Typography>
                   <LinearProgress
                     value={this.getPePerc()}
@@ -864,7 +931,7 @@ class StatsView extends Component<
                     className={classes.peProgress}
                   />
                   <Typography variant="body1">{`Lv. ${StatsUtils.getPgLevel(
-                    this.props.pg,
+                    this.props.pg.pe,
                     true
                   )}`}</Typography>
                 </div>
@@ -1066,7 +1133,7 @@ class StatsView extends Component<
                 ) +
                 (this.hasProficiency(ability.type)
                   ? StatsUtils.getProficiency(
-                      StatsUtils.getPgLevel(this.props.pg),
+                      StatsUtils.getPgLevel(this.props.pg.pe),
                       pgClass
                     )
                   : 0) +
@@ -1128,7 +1195,7 @@ class StatsView extends Component<
                           ) +
                           (this.hasProficiency(ability.type)
                             ? StatsUtils.getProficiency(
-                                StatsUtils.getPgLevel(this.props.pg),
+                                StatsUtils.getPgLevel(this.props.pg.pe),
                                 pgClass
                               )
                             : 0)
