@@ -53,6 +53,7 @@ import 'firebase/firestore'
 import PgGeneralInfo from 'data/types/PgGeneralInfo'
 import RestType from 'data/types/RestType'
 import MuiAlert from '@material-ui/lab/Alert'
+import BattleUtils from 'utils/BattleUtils'
 
 interface SheetProps {
   id: number
@@ -218,12 +219,12 @@ class Sheet extends Component<
       {
         icon: <Restaurant />,
         name: 'Riposo Breve',
-        onClick: this.shortRest
+        onClick: () => this.rest(false)
       },
       {
         icon: <Hotel />,
         name: 'Riposo Lungo',
-        onClick: this.longRest
+        onClick: () => this.rest(true)
       }
     ]
   }
@@ -872,7 +873,6 @@ class Sheet extends Component<
         pg.levelFirstClass +
         (StatsUtils.getPgLevel(value) - StatsUtils.getPgLevel(pg.pe))
     }
-    console.log('changed')
     const clear =
       levelFirstClass === undefined &&
       (pg.pgClass2 !== undefined || pg.subClass2 !== undefined) &&
@@ -973,25 +973,43 @@ class Sheet extends Component<
     )
   }
 
-  shortRest = () => {}
-
-  longRest = () => {
+  rest = (long: boolean) => {
     const { pg } = this.state
     let newTemp = pg.temp
     if (pg.temp) {
       Object.keys(pg.temp).forEach(key => {
-        if (pg.temp[key].rest === RestType.Long) {
+        if (
+          (long &&
+            (pg.temp[key].rest === RestType.Long ||
+              pg.temp[key].rest === undefined)) ||
+          (!long && pg.temp[key].rest === RestType.Short)
+        ) {
           delete newTemp[key]
         }
       })
     }
-
+    let pf = 0
+    if (long) {
+      pf = pg.pfTot
+    } else {
+      const level = StatsUtils.getPgLevel(pg.pe)
+      if (pg.levelFirstClass) {
+        const pf1 =
+          (BattleUtils.getDVvalue(pg.pgClass) / 2 + 1) * pg.levelFirstClass
+        const pf2 =
+          (BattleUtils.getDVvalue(pg.pgClass2) / 2 + 1) *
+          (level - pg.levelFirstClass)
+        pf = pg.currentPF + pf1 + pf2
+      } else {
+        pf = pg.currentPF + (BattleUtils.getDVvalue(pg.pgClass) / 2 + 1) * level
+      }
+    }
     this.setState(
       {
         pg: {
           ...pg,
           temp: newTemp,
-          currentPF: pg.pfTot
+          currentPF: pf > pg.pfTot ? pg.pfTot : pf
         }
       },
       () => {
@@ -999,7 +1017,11 @@ class Sheet extends Component<
         if (!onEdit) {
           this.updateDB()
         }
-        this.setState({ snackMessage: 'Riposo lungo effettuato!' })
+        this.setState({
+          snackMessage: long
+            ? 'Riposo lungo effettuato!'
+            : 'Riposo corto effettuato!'
+        })
       }
     )
   }

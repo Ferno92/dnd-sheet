@@ -58,6 +58,7 @@ const GeneralInfoDialog: React.FC<GeneralInfoDialogProps> = (
   const [languages, setLanguages] = useState<string[]>([])
   const [showErrorMessage, setShowErrorMessage] = useState(false)
   const [otherLanguages, setOtherLanguages] = useState<string[]>([])
+  const [initialized, setInitialized] = useState(false)
   const alignmentTypes = Alignment as any
   const styles = useStyles()
 
@@ -150,14 +151,15 @@ const GeneralInfoDialog: React.FC<GeneralInfoDialogProps> = (
   }
 
   useEffect(() => {
-    if (pg.generalInfo) {
+    if (pg.generalInfo && !initialized) {
+      setInitialized(true)
       setWeight(pg.generalInfo.weight)
       setHeight(pg.generalInfo.height)
       setAlignment(pg.generalInfo.alignment)
       setLanguages(pg.generalInfo.languages)
       setAge(pg.generalInfo.age)
     }
-  }, [pg.generalInfo, racesData])
+  }, [pg.generalInfo, racesData, initialized])
 
   useEffect(() => {
     setOtherLanguages(getLanguages(pg.race, racesData))
@@ -184,6 +186,7 @@ const GeneralInfoDialog: React.FC<GeneralInfoDialogProps> = (
               label={'Peso'}
               value={weight}
               min={0}
+              max={1000}
               onChange={e => setWeight(parseFloat(e.currentTarget.value))}
               step={'1'}
             />
@@ -197,6 +200,7 @@ const GeneralInfoDialog: React.FC<GeneralInfoDialogProps> = (
               label={'Altezza'}
               value={height}
               min={0}
+              max={10}
               onChange={e => setHeight(parseFloat(e.currentTarget.value))}
               step={'1'}
             />
@@ -210,6 +214,7 @@ const GeneralInfoDialog: React.FC<GeneralInfoDialogProps> = (
               label={'Età'}
               value={age}
               min={0}
+              max={10000}
               onChange={e => setAge(parseFloat(e.currentTarget.value))}
               step={'1'}
             />

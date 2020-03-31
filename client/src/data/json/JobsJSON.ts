@@ -667,7 +667,8 @@ export default [
         name: 'Suppliche Occulte',
         description:
           "Dedicandosi allo studio delle scienze occulte, un warlock ha scoperto come usare alcune suppliche occulte, frammenti di conoscenze proibite che gli conferiscono persistenti doti magiche.Inoltre, quando acquisisce un nuovo livello, il warlock può scegliere una delle suppliche che conosce e sostituirla con un'altra che potrebbe imparare a quel livello.",
-        counter: 2
+        counter: 2,
+        rest: RestType.Long
       },
       {
         lv: 3,

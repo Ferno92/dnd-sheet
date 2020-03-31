@@ -19,6 +19,19 @@ class BattleUtils {
     return dv
   }
 
+  static getDVvalue(jobType?: JobsEnum) {
+    let dv = -1
+    if (jobType !== undefined) {
+      const jobsData = DataUtils.JobMapper(JobsJSON as any)
+      jobsData.forEach(job => {
+        if (job.type === jobType.toString()) {
+          dv = job.dice
+        }
+      })
+    }
+    return dv
+  }
+
   static getPrivileges(
     level: number,
     pgClass: JobsEnum,
@@ -42,6 +55,7 @@ class BattleUtils {
     jobsData.forEach(job => {
       if (job.type === pgClass) {
         job.privileges.forEach(privilege => {
+          console.log(privilege)
           if (privilege.lv <= level) {
             const index = privileges.findIndex(
               item => item.type === privilege.type

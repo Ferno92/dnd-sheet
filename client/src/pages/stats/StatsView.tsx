@@ -114,6 +114,7 @@ interface StatsViewState {
   tsExpanded?: string
   abilityExpanded?: string
   peFromState: number
+  tempPE?: number
   backgroundFromState: string
   showBackgroundItems: boolean
   generalInfoDialogOpen: boolean
@@ -613,7 +614,8 @@ class StatsView extends Component<
       showBackgroundItems,
       generalInfoDialogOpen,
       tempStatMode,
-      askDeleteTempStat
+      askDeleteTempStat,
+      tempPE
     } = this.state
     const currentRaceObj = StatsUtils.getCurrentRace(race)
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
@@ -929,6 +931,40 @@ class StatsView extends Component<
                   label="Ispirazione"
                 />
               </Grid>
+              {onEdit && (
+                <React.Fragment>
+                  <Grid item xs={6} className={classes.gridItem}>
+                    <TextFieldNumber
+                      disabled={!onEdit}
+                      label={'Aggiungi nuovi PE'}
+                      step={'1'}
+                      min={0}
+                      max={355000 - peFromState}
+                      onChange={(
+                        event: React.ChangeEvent<HTMLInputElement>
+                      ) => {
+                        const newPE = parseInt(event.target.value)
+                        this.setState({ tempPE: newPE })
+                      }}
+                      value={tempPE}
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item xs={6} className={classes.gridItem}>
+                    <Button
+                      onClick={() => {
+                        this.setState({
+                          peFromState: peFromState + (tempPE || 0),
+                          tempPE: undefined
+                        })
+                        onChangePE(peFromState + (tempPE || 0))
+                      }}
+                    >
+                      Aggiungi PE
+                    </Button>
+                  </Grid>
+                </React.Fragment>
+              )}
               <Grid item xs={12} className={classes.gridItem}>
                 <div className={classes.peContainer}>
                   <Typography variant="body1">{`Lv. ${StatsUtils.getPgLevel(
