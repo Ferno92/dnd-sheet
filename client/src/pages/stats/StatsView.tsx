@@ -19,7 +19,9 @@ import {
   DialogTitle,
   DialogContent,
   DialogContentText,
-  Tooltip
+  Tooltip,
+  withWidth,
+  WithWidth
 } from '@material-ui/core'
 import StatsViewStyles from './StatsView.styles'
 import TextFieldString from 'components/text-field-string/TextFieldString'
@@ -123,7 +125,7 @@ interface StatsViewState {
 }
 
 class StatsView extends Component<
-  StatsViewProps & WithStyles<typeof StatsViewStyles>,
+  StatsViewProps & WithWidth & WithStyles<typeof StatsViewStyles>,
   StatsViewState
 > {
   inputLabel = createRef<any>()
@@ -134,7 +136,9 @@ class StatsView extends Component<
   abilitiesData = DataUtils.AbilityMapper(abilitiesJSON as any)
   subJobsData = DataUtils.JobMapper(subJobsJSON as any)
 
-  constructor(props: StatsViewProps & WithStyles<typeof StatsViewStyles>) {
+  constructor(
+    props: StatsViewProps & WithWidth & WithStyles<typeof StatsViewStyles>
+  ) {
     super(props)
 
     this.state = {
@@ -602,7 +606,8 @@ class StatsView extends Component<
       onEditName,
       onEditStats,
       onChangePE,
-      onChangeMulticlass
+      onChangeMulticlass,
+      width
     } = this.props
     const {
       dialogInfoAbilitiesOpen,
@@ -621,197 +626,229 @@ class StatsView extends Component<
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
       navigator.userAgent
     )
+    const infoReadOnly = (
+      <div className={classes.infoReadOnly}>
+        <Typography variant={width === 'xs' || width === 'sm' ? 'body1' : 'h2'}>
+          {name || ''}
+        </Typography>
+        <Typography variant="body2">{`${StatsUtils.getInfoName(
+          `${race}`,
+          this.racesData
+        )} ${StatsUtils.getInfoName(
+          `${subRace}`,
+          this.getSubRacesData()
+        )}`}</Typography>
+        {multiclass && pgClass && pgClass2 ? (
+          <Typography variant="body2">
+            {StatsUtils.getInfoName(`${pgClass}`, this.jobsData)
+              ? `${pgClass} Lv. ${levelFirstClass ||
+                  StatsUtils.getPgLevel(this.props.pg.pe) -
+                    1} - ${pgClass2} Lv. ${
+                  levelFirstClass
+                    ? StatsUtils.getPgLevel(this.props.pg.pe) - levelFirstClass
+                    : 1
+                }`
+              : ''}
+          </Typography>
+        ) : (
+          <Typography variant="body2">
+            {StatsUtils.getInfoName(`${pgClass}`, this.jobsData)
+              ? `${StatsUtils.getInfoName(
+                  `${pgClass}`,
+                  this.jobsData
+                )} Lv. ${StatsUtils.getPgLevel(this.props.pg.pe)}`
+              : ''}
+          </Typography>
+        )}
+      </div>
+    )
+    const summary = (
+      <div className={classes.infoSummary}>
+        <div className={classes.infoAvatar}>
+          <Avatar
+            className={classes.avatar}
+            src={image}
+            style={{ opacity: onEdit ? 0.5 : 1 }}
+          >
+            {!image && (
+              <AccountCircle className={classes.emptyImage} color="secondary" />
+            )}
+          </Avatar>
+          <input
+            className="hidden-input"
+            accept="image/*"
+            type="file"
+            style={{ display: 'none' }}
+            onChange={this.inputImageCallback}
+          />
+          {onEdit && (
+            <IconButton
+              className={classes.editAvatar}
+              onClick={this.onEditAvatar}
+            >
+              <Edit />
+            </IconButton>
+          )}
+        </div>
+        {width === 'xs' || width === 'sm' ? infoReadOnly : undefined}
+      </div>
+    )
+    const panelDetail = (
+      <React.Fragment>
+        <TextFieldString
+          label="Nome Personaggio"
+          value={name}
+          onChange={onEditName}
+          disabled={!onEdit}
+          name={'name'}
+          root={classes.infoDetailsItem}
+        />
+        <SimpleSelect<RacesEnum>
+          label={'Razza'}
+          item={race}
+          data={this.racesData}
+          onEdit={onEdit}
+          onChange={onChangeRace}
+          root={classes.infoDetailsItem}
+        />
+        {currentRaceObj && currentRaceObj.subraces.length > 0 && (
+          <SimpleSelect<SubRacesEnum>
+            label={'Sotto-razza'}
+            item={subRace}
+            data={this.getSubRacesData()}
+            onEdit={onEdit}
+            onChange={onChangeSubRace}
+            root={classes.infoDetailsItem}
+          />
+        )}
+        {onEdit && StatsUtils.getPgLevel(this.props.pg.pe) !== 1 && (
+          <FormControlLabel
+            className={clsx(classes.multiclass, classes.infoDetailsItem)}
+            control={
+              <Checkbox
+                checked={multiclass || false}
+                onChange={() => onChangeMulticlass(!multiclass)}
+              />
+            }
+            label={'Multiclasse'}
+          />
+        )}
+        <div
+          className={clsx(
+            classes.multiLevelContainer,
+            multiclass ? classes.multiLevelContainerOnEdit : undefined
+          )}
+        >
+          <SimpleSelect<JobsEnum>
+            label={multiclass ? 'Classe Primaria' : 'Classe'}
+            item={pgClass}
+            data={this.jobsData}
+            onEdit={onEdit}
+            onChange={e => onChangeJob(e.target.value as JobsEnum)}
+            root={multiclass ? classes.infoDetailsItem : undefined}
+          />
+          {multiclass && pgClass && (
+            <ClassLevel
+              level={
+                levelFirstClass || StatsUtils.getPgLevel(this.props.pg.pe) - 1
+              }
+              max={StatsUtils.getPgLevel(this.props.pg.pe)}
+              onAdd={() => this.onAddLevel(true)}
+              onRemove={() => this.onRemoveLevel(true)}
+              readOnly={!onEdit}
+            />
+          )}
+        </div>
+        {pgClass && (
+          <SimpleSelect<SubJobsEnum>
+            label={
+              multiclass ? 'Specializzazione Primaria' : 'Specializzazione'
+            }
+            item={subClass}
+            data={this.getSubJobsData()}
+            onEdit={onEdit}
+            onChange={e => onChangeSubJob(e.target.value as SubJobsEnum)}
+            root={classes.infoDetailsItem}
+          />
+        )}
+        {multiclass && (
+          <React.Fragment>
+            <div
+              className={clsx(
+                classes.multiLevelContainer,
+                multiclass ? classes.multiLevelContainerOnEdit : undefined
+              )}
+            >
+              <SimpleSelect<JobsEnum>
+                label={'Classe Secondaria'}
+                item={pgClass2}
+                data={this.getSecondaryJobsData()}
+                onEdit={onEdit}
+                onChange={e => onChangeJob(e.target.value as JobsEnum, true)}
+                root={multiclass ? classes.infoDetailsItem : undefined}
+              />
+              {pgClass2 && (
+                <Typography
+                  variant="body1"
+                  className={classes.secondClassLevel}
+                >{`LV. ${StatsUtils.getPgLevel(this.props.pg.pe) -
+                  (this.props.pg.levelFirstClass ||
+                    StatsUtils.getPgLevel(this.props.pg.pe) - 1)}`}</Typography>
+              )}
+            </div>
+            {pgClass2 && (
+              <SimpleSelect<SubJobsEnum>
+                label={'Specializzazione Secondaria'}
+                item={subClass2}
+                data={this.getSecondarySubJobsData()}
+                onEdit={onEdit}
+                onChange={e =>
+                  onChangeSubJob(e.target.value as SubJobsEnum, true)
+                }
+                root={classes.infoDetailsItem}
+              />
+            )}
+          </React.Fragment>
+        )}
+        <SimpleSelect<string>
+          label={'Background'}
+          item={backgroundFromState}
+          data={this.backgroundData}
+          onEdit={onEdit}
+          onChange={event => {
+            this.setState({ showBackgroundItems: true })
+            onChangeBackground(event)
+          }}
+          root={classes.infoDetailsItem}
+        />{' '}
+      </React.Fragment>
+    )
+    console.log('width', width)
     return (
       <div className={classes.container}>
         <div className={classes.inputContainer}>
-          <ExpansionPanel
-            square
-            expanded={infoExpanded}
-            onChange={() => this.setState({ infoExpanded: !infoExpanded })}
-          >
-            <ExpansionPanelSummary expandIcon={<ExpandMore />}>
-              <div className={classes.infoSummary}>
-                <div className={classes.infoAvatar}>
-                  <Avatar
-                    className={classes.avatar}
-                    src={image}
-                    style={{ opacity: onEdit ? 0.5 : 1 }}
-                  >
-                    {!image && (
-                      <AccountCircle
-                        className={classes.emptyImage}
-                        color="secondary"
-                      />
-                    )}
-                  </Avatar>
-                  <input
-                    className="hidden-input"
-                    accept="image/*"
-                    type="file"
-                    style={{ display: 'none' }}
-                    onChange={this.inputImageCallback}
-                  />
-                  {onEdit && (
-                    <IconButton
-                      className={classes.editAvatar}
-                      onClick={this.onEditAvatar}
-                    >
-                      <Edit />
-                    </IconButton>
-                  )}
-                </div>
-                <div>
-                  <Typography variant="body1">{name || ''}</Typography>
-                  <Typography variant="body2">{`${StatsUtils.getInfoName(
-                    `${race}`,
-                    this.racesData
-                  )} ${StatsUtils.getInfoName(
-                    `${subRace}`,
-                    this.getSubRacesData()
-                  )}`}</Typography>
-                  {multiclass && pgClass && pgClass2 ? (
-                    <Typography variant="body2">
-                      {StatsUtils.getInfoName(`${pgClass}`, this.jobsData)
-                        ? `${pgClass} Lv. ${levelFirstClass ||
-                            StatsUtils.getPgLevel(this.props.pg.pe) -
-                              1} - ${pgClass2} Lv. ${
-                            levelFirstClass
-                              ? StatsUtils.getPgLevel(this.props.pg.pe) -
-                                levelFirstClass
-                              : 1
-                          }`
-                        : ''}
-                    </Typography>
-                  ) : (
-                    <Typography variant="body2">
-                      {StatsUtils.getInfoName(`${pgClass}`, this.jobsData)
-                        ? `${StatsUtils.getInfoName(
-                            `${pgClass}`,
-                            this.jobsData
-                          )} Lv. ${StatsUtils.getPgLevel(this.props.pg.pe)}`
-                        : ''}
-                    </Typography>
-                  )}
-                </div>
+          {width === 'xs' || width === 'sm' ? (
+            <ExpansionPanel
+              square
+              expanded={infoExpanded}
+              onChange={() => this.setState({ infoExpanded: !infoExpanded })}
+            >
+              <ExpansionPanelSummary expandIcon={<ExpandMore />}>
+                {summary}
+              </ExpansionPanelSummary>
+              <ExpansionPanelDetails className={classes.infoDetails}>
+                {panelDetail}
+              </ExpansionPanelDetails>
+            </ExpansionPanel>
+          ) : (
+            <div>
+              {infoReadOnly}
+              <div className={classes.infoBigScreen}>
+                {summary}
+                <div className={classes.infoBigPanelDetail}>{panelDetail}</div>
               </div>
-            </ExpansionPanelSummary>
-            <ExpansionPanelDetails className={classes.infoDetails}>
-              <TextFieldString
-                label="Nome Personaggio"
-                value={name}
-                onChange={onEditName}
-                disabled={!onEdit}
-                name={'name'}
-              />
-              <SimpleSelect<RacesEnum>
-                label={'Razza'}
-                item={race}
-                data={this.racesData}
-                onEdit={onEdit}
-                onChange={onChangeRace}
-              />
-              {currentRaceObj && currentRaceObj.subraces.length > 0 && (
-                <SimpleSelect<SubRacesEnum>
-                  label={'Sotto-razza'}
-                  item={subRace}
-                  data={this.getSubRacesData()}
-                  onEdit={onEdit}
-                  onChange={onChangeSubRace}
-                />
-              )}
-              {onEdit && StatsUtils.getPgLevel(this.props.pg.pe) !== 1 && (
-                <FormControlLabel
-                  className={classes.multiclass}
-                  control={
-                    <Checkbox
-                      checked={multiclass || false}
-                      onChange={() => onChangeMulticlass(!multiclass)}
-                    />
-                  }
-                  label={'Multiclasse'}
-                />
-              )}
-              <div className={classes.multiLevelContainer}>
-                <SimpleSelect<JobsEnum>
-                  label={multiclass ? 'Classe Primaria' : 'Classe'}
-                  item={pgClass}
-                  data={this.jobsData}
-                  onEdit={onEdit}
-                  onChange={e => onChangeJob(e.target.value as JobsEnum)}
-                />
-                {multiclass && pgClass && (
-                  <ClassLevel
-                    level={
-                      levelFirstClass ||
-                      StatsUtils.getPgLevel(this.props.pg.pe) - 1
-                    }
-                    max={StatsUtils.getPgLevel(this.props.pg.pe)}
-                    onAdd={() => this.onAddLevel(true)}
-                    onRemove={() => this.onRemoveLevel(true)}
-                    readOnly={!onEdit}
-                  />
-                )}
-              </div>
-              {pgClass && (
-                <SimpleSelect<SubJobsEnum>
-                  label={
-                    multiclass
-                      ? 'Specializzazione Primaria'
-                      : 'Specializzazione'
-                  }
-                  item={subClass}
-                  data={this.getSubJobsData()}
-                  onEdit={onEdit}
-                  onChange={e => onChangeSubJob(e.target.value as SubJobsEnum)}
-                />
-              )}
-              {multiclass && (
-                <React.Fragment>
-                  <div className={classes.multiLevelContainer}>
-                    <SimpleSelect<JobsEnum>
-                      label={'Classe Secondaria'}
-                      item={pgClass2}
-                      data={this.getSecondaryJobsData()}
-                      onEdit={onEdit}
-                      onChange={e =>
-                        onChangeJob(e.target.value as JobsEnum, true)
-                      }
-                    />
-                    {pgClass2 && (
-                      <Typography
-                        variant="body1"
-                        className={classes.secondClassLevel}
-                      >{`LV. ${StatsUtils.getPgLevel(this.props.pg.pe) -
-                        (this.props.pg.levelFirstClass ||
-                          StatsUtils.getPgLevel(this.props.pg.pe) -
-                            1)}`}</Typography>
-                    )}
-                  </div>
-                  {pgClass2 && (
-                    <SimpleSelect<SubJobsEnum>
-                      label={'Specializzazione Secondaria'}
-                      item={subClass2}
-                      data={this.getSecondarySubJobsData()}
-                      onEdit={onEdit}
-                      onChange={e =>
-                        onChangeSubJob(e.target.value as SubJobsEnum, true)
-                      }
-                    />
-                  )}
-                </React.Fragment>
-              )}
-              <SimpleSelect<string>
-                label={'Background'}
-                item={backgroundFromState}
-                data={this.backgroundData}
-                onEdit={onEdit}
-                onChange={event => {
-                  this.setState({ showBackgroundItems: true })
-                  onChangeBackground(event)
-                }}
-              />
-            </ExpansionPanelDetails>
-          </ExpansionPanel>
+            </div>
+          )}
 
           <div className={classes.generalInfo}>
             <Typography variant="subtitle1">Info generali</Typography>
@@ -1330,4 +1367,4 @@ class StatsView extends Component<
   }
 }
 
-export default withStyles(StatsViewStyles)(StatsView)
+export default withWidth()(withStyles(StatsViewStyles)(StatsView))

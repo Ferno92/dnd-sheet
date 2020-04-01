@@ -212,15 +212,75 @@ const StatsViewStyles = (theme: Theme) =>
       color: theme.palette.warning.main
     },
     multiclass: {
-      marginBottom: 10
+      marginBottom: 10,
+      marginLeft: 0
     },
     multiLevelContainer: {
       display: 'flex',
-      alignItems: 'center'
+      alignItems: 'center',
+      width: '100%'
     },
     secondClassLevel: {
       flexShrink: 0,
       margin: '0 52px'
+    },
+    infoBigScreen: {
+      display: 'flex',
+      width: '100%',
+      marginTop: 16,
+      alignItems: 'center'
+    },
+    infoBigPanelDetail: {
+      flex: 1,
+      display: 'flex',
+      flexWrap: 'wrap'
+    },
+    [theme.breakpoints.up('sm')]: {
+      infoDetails: {
+        flexDirection: 'row',
+        flexWrap: 'wrap'
+      },
+      infoDetailsItem: {
+        width: 'calc(50% - 8px)',
+        marginTop: 0,
+        marginRight: 8
+      },
+      multiLevelContainer: {
+        width: 'calc(50% - 8px)',
+        marginRight: 8
+      },
+      multiLevelContainerOnEdit: {
+        width: '100%',
+        marginRight: 0
+      },
+      secondClassLevel: {
+        marginBottom: 10
+      }
+    },
+    [theme.breakpoints.up('md')]: {
+      infoSummary: {
+        flexDirection: 'column',
+        marginRight: 16
+      },
+      infoAvatar: {
+        height: 180,
+        width: 180,
+        marginRight: 0
+      },
+      inputContainer: {
+        padding: 16
+      },
+      infoReadOnly: {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center'
+      }
+    },
+    [theme.breakpoints.up('lg')]: {
+      infoAvatar: {
+        height: 320,
+        width: 320
+      }
     }
   })
 

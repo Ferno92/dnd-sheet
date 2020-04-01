@@ -18,7 +18,11 @@ const DashboardStyles = makeStyles((theme: Theme) =>
       bottom: 20,
       right: 20
     },
+    root: {},
     list: {
+      display: 'flex',
+      width: '100%',
+      flexDirection: 'column',
       '& .MuiListItem-container': {
         display: 'block'
       }
@@ -43,6 +47,37 @@ const DashboardStyles = makeStyles((theme: Theme) =>
     },
     skeleton: {
       marginBottom: 8
+    },
+    [theme.breakpoints.up('md')]: {
+      item: {},
+      list: {
+        flexWrap: 'wrap',
+        flexDirection: 'row',
+        padding: 8,
+        '& .MuiListItem-container': {
+          width: 'calc(50% - 16px)',
+          borderRadius: 3,
+          border: `solid 1px ${theme.palette.border.main}`,
+          marginBottom: 8,
+          marginRight: 8
+        }
+      },
+      fab: {
+        bottom: undefined,
+        top: 40,
+        right: 20
+      },
+      title: {
+        marginBottom: 24
+      }
+    },
+    [theme.breakpoints.up('lg')]: {
+      item: {},
+      list: {
+        '& .MuiListItem-container': {
+          width: 'calc(33% - 8px)'
+        }
+      }
     }
   })
 )

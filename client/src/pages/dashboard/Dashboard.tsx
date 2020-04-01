@@ -11,7 +11,8 @@ import {
   ListItemText,
   ListItemIcon,
   IconButton,
-  ListItemSecondaryAction
+  ListItemSecondaryAction,
+  Tooltip
 } from '@material-ui/core'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
 import DashboardStyles from './Dashboard.styles'
@@ -70,85 +71,88 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
   }, [pgs, dbInstance, pgToDelete])
 
   return (
-    <div className={classes.list}>
+    <div className={classes.root}>
       <Typography variant="h5" className={classes.title}>
         I tuoi personaggi
       </Typography>
-      {loading ? (
-        [...Array(3).keys()].map(i => {
-          return (
-            <div className={classes.skeletonContainer} key={i}>
-              <Skeleton variant="circle" height={50} width={50} />
-              <div className={classes.skeletonInfo}>
-                <Skeleton
-                  variant="rect"
-                  height={24}
-                  width={200}
-                  className={classes.skeleton}
+      <div className={classes.list}>
+        {loading
+          ? [...Array(3).keys()].map(i => {
+              return (
+                <div className={classes.skeletonContainer} key={i}>
+                  <Skeleton variant="circle" height={50} width={50} />
+                  <div className={classes.skeletonInfo}>
+                    <Skeleton
+                      variant="rect"
+                      height={24}
+                      width={200}
+                      className={classes.skeleton}
+                    />
+                    <Skeleton variant="rect" height={16} width={160} />
+                  </div>
+                </div>
+              )
+            })
+          : pgs.map((pg: PG, i: number) => (
+              <ListItem
+                key={pg.id}
+                dense
+                button
+                onClick={() => props.history.push(`/sheet/${pg.id}/${0}`)}
+                className={classes.item}
+              >
+                <ListItemIcon>
+                  <Avatar className={classes.avatar} src={pg.image}>
+                    {pg.image ? '' : getFirstLetters(pg.name)}
+                  </Avatar>
+                </ListItemIcon>
+                <ListItemText
+                  primary={pg.name}
+                  secondary={
+                    pg.multiclass && pg.pgClass2
+                      ? `${pg.race} ${pg.pgClass} Lv. ${pg.levelFirstClass ||
+                          StatsUtils.getPgLevel(pg.pe) - 1} - ${
+                          pg.pgClass2
+                        } Lv. ${
+                          pg.levelFirstClass
+                            ? StatsUtils.getPgLevel(pg.pe) - pg.levelFirstClass
+                            : 1
+                        }`
+                      : `${pg.race || ''} ${pg.pgClass || ''} ${
+                          pg.pgClass ? `Lv.${StatsUtils.getPgLevel(pg.pe)}` : ''
+                        }`
+                  }
                 />
-                <Skeleton variant="rect" height={16} width={160} />
-              </div>
-            </div>
-          )
-        })
-      ) : (
-        <React.Fragment>
-          {pgs.map((pg: PG, i: number) => (
-            <ListItem
-              key={pg.id}
-              dense
-              button
-              onClick={() => props.history.push(`/sheet/${pg.id}/${0}`)}
-            >
-              <ListItemIcon>
-                <Avatar className={classes.avatar} src={pg.image}>
-                  {pg.image ? '' : getFirstLetters(pg.name)}
-                </Avatar>
-              </ListItemIcon>
-              <ListItemText
-                primary={pg.name}
-                secondary={
-                  pg.multiclass && pg.pgClass2
-                    ? `${pg.race} ${pg.pgClass} Lv. ${pg.levelFirstClass ||
-                        StatsUtils.getPgLevel(pg.pe) - 1} - ${
-                        pg.pgClass2
-                      } Lv. ${
-                        pg.levelFirstClass
-                          ? StatsUtils.getPgLevel(pg.pe) - pg.levelFirstClass
-                          : 1
-                      }`
-                    : `${pg.race || ''} ${pg.pgClass || ''} ${
-                        pg.pgClass ? `Lv.${StatsUtils.getPgLevel(pg.pe)}` : ''
-                      }`
-                }
-              />
-              <ListItemSecondaryAction>
-                <IconButton onClick={() => setPgToDelete(i)}>
-                  <Delete />
-                </IconButton>
-              </ListItemSecondaryAction>
-            </ListItem>
-          ))}
-          {pgs.length === 0 && (
-            <div className={classes.emptyDescription}>
-              <OrcIcon />
-              <Typography variant="body1">
-                Non hai ancora dei personaggi, creane subito uno!
-              </Typography>
-            </div>
-          )}
-
-          <Fab
-            color="primary"
-            aria-label="Add"
-            size="medium"
-            onClick={addPG}
-            className={classes.fab}
-          >
-            <Add />
-          </Fab>
-        </React.Fragment>
+                <ListItemSecondaryAction>
+                  <Tooltip title="Elimina personaggio">
+                    <IconButton onClick={() => setPgToDelete(i)}>
+                      <Delete />
+                    </IconButton>
+                  </Tooltip>
+                </ListItemSecondaryAction>
+              </ListItem>
+            ))}
+      </div>
+      {pgs.length === 0 && (
+        <div className={classes.emptyDescription}>
+          <OrcIcon />
+          <Typography variant="body1">
+            Non hai ancora dei personaggi, creane subito uno!
+          </Typography>
+        </div>
       )}
+
+      <Tooltip title="Crea nuovo personaggio">
+        <Fab
+          color="primary"
+          aria-label="Add"
+          size="medium"
+          onClick={addPG}
+          className={classes.fab}
+        >
+          <Add />
+        </Fab>
+      </Tooltip>
 
       <ConfirmDialog
         open={pgToDelete !== undefined}

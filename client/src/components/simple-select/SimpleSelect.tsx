@@ -10,12 +10,14 @@ import {
 import { createRef, useState, useEffect } from 'react'
 import SimpleSelectStyles from './SimpleSelect.styles'
 import SimpleSelectItem from 'data/types/SimpleSelectItem'
+import clsx from 'clsx'
 
 interface SimpleSelectProps<T> {
   item?: T
   data: SimpleSelectItem[]
   label: string
   onEdit: boolean
+  root?: string
   onChange(
     event: React.ChangeEvent<{
       name?: string | undefined
@@ -25,7 +27,7 @@ interface SimpleSelectProps<T> {
 }
 
 function SimpleSelect<T>(props: SimpleSelectProps<T>) {
-  const { item, data: dataList, onEdit, onChange, label } = props
+  const { item, data: dataList, onEdit, onChange, label, root } = props
   const inputLabelRef = createRef<any>()
   const classes = SimpleSelectStyles()
   const [labelWidth, setLabelWidth] = useState(0)
@@ -39,7 +41,7 @@ function SimpleSelect<T>(props: SimpleSelectProps<T>) {
   return (
     <FormControl
       variant="outlined"
-      className={classes.raceInputField}
+      className={clsx(classes.raceInputField, root)}
       fullWidth
     >
       <InputLabel htmlFor="outlined-select-simple" ref={inputLabelRef}>

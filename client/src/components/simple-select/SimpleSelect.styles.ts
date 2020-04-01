@@ -1,16 +1,17 @@
-import Theme from "assets/styles/Theme";
-import { makeStyles } from "@material-ui/styles";
+import Theme from 'assets/styles/Theme'
+import { makeStyles } from '@material-ui/styles'
 
-const SimpleSelectStyles = makeStyles((theme: Theme) => ({    
-    raceInputField: {
-        marginBottom: 10,
-        '& .MuiSelect-root': {
-            height: 56
-        },
-        '& .MuiSelect-selectMenu': {
-            height: 20
-        }
+const SimpleSelectStyles = makeStyles((theme: Theme) => ({
+  raceInputField: {
+    marginBottom: 10,
+    '& .MuiSelect-root': {
+      height: 56
+    },
+    '& .MuiSelect-selectMenu': {
+      height: 20,
+      padding: 12
     }
-}));
+  }
+}))
 
-export default SimpleSelectStyles;
+export default SimpleSelectStyles

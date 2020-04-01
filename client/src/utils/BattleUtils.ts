@@ -55,7 +55,6 @@ class BattleUtils {
     jobsData.forEach(job => {
       if (job.type === pgClass) {
         job.privileges.forEach(privilege => {
-          console.log(privilege)
           if (privilege.lv <= level) {
             const index = privileges.findIndex(
               item => item.type === privilege.type
