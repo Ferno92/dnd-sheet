@@ -19,6 +19,10 @@ import DashboardStyles from './Dashboard.styles'
 import ConfirmDialog from 'components/confirm-dialog/ConfirmDialog'
 import Skeleton from '@material-ui/lab/Skeleton'
 import StatsUtils from 'utils/StatsUtils'
+import GoogleLogin, {
+  GoogleLoginResponse,
+  GoogleLoginResponseOffline
+} from 'react-google-login'
 
 interface DashboardProps {}
 
@@ -70,11 +74,32 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
     }
   }, [pgs, dbInstance, pgToDelete])
 
+  const responseGoogle = (
+    response: GoogleLoginResponse | GoogleLoginResponseOffline
+  ) => {
+    console.log(response)
+  }
+
   return (
     <div className={classes.root}>
+      <div className={classes.login}>
+        <Typography variant="h5">CIAO</Typography>
+        <Typography variant="body1">
+          Non hai ancora effettuato il login. Se vuoi usare i tuoi personaggi su
+          più dispositivi, ti consigliamo di farlo. E' semplice e veloce!
+        </Typography>
+        <GoogleLogin
+          clientId="301028242623-nbso2movb7a8iuc4vd1oscanfnfh8m4g.apps.googleusercontent.com"
+          buttonText="Login"
+          onSuccess={responseGoogle}
+          onFailure={responseGoogle}
+          cookiePolicy={'single_host_origin'}
+        />
+      </div>
       <Typography variant="h5" className={classes.title}>
         I tuoi personaggi
       </Typography>
+
       <div className={classes.list}>
         {loading
           ? [...Array(3).keys()].map(i => {

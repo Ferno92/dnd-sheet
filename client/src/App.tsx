@@ -9,6 +9,7 @@ import { HighlightOff } from '@material-ui/icons'
 import useStyles from 'App.styles'
 import firebase from 'firebase/app'
 import DownloadPG from 'pages/download/DownloadPG'
+import PrivacyPolicy from 'pages/privacy/PrivacyPolicy'
 
 export const firebaseConfig = {
   apiKey: 'AIzaSyB1kmz-zbEFRX72gkvxWTHg8CW0I6Qk9As',
@@ -88,6 +89,7 @@ const App: React.FC = () => {
           <Route exact path="/" component={Dashboard} />
           <Route exact path="/sheet/:id/:page" component={Sheet} />
           <Route exact path="/download/:id" component={DownloadPG} />
+          <Route exact path="/privacy" component={PrivacyPolicy} />
         </Switch>
       </BrowserRouter>
     </MuiThemeProvider>
