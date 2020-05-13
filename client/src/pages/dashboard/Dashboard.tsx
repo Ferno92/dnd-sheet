@@ -12,19 +12,26 @@ import {
   ListItemIcon,
   IconButton,
   ListItemSecondaryAction,
-  Tooltip
+  Tooltip,
+  Button
 } from '@material-ui/core'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
 import DashboardStyles from './Dashboard.styles'
 import ConfirmDialog from 'components/confirm-dialog/ConfirmDialog'
 import Skeleton from '@material-ui/lab/Skeleton'
 import StatsUtils from 'utils/StatsUtils'
-import GoogleLogin, {
-  GoogleLoginResponse,
-  GoogleLoginResponseOffline
-} from 'react-google-login'
+import LoginDialog from 'components/login-dialog/LoginDialog'
 
 interface DashboardProps {}
+
+export interface BasicProfile {
+  getId(): string
+  getEmail(): string
+  getName(): string
+  getGivenName(): string
+  getFamilyName(): string
+  getImageUrl(): string
+}
 
 function Dashboard(props: DashboardProps & RouteComponentProps) {
   // Declare a new state variable, which we'll call "count"
@@ -32,6 +39,8 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
   const [pgToDelete, setPgToDelete] = useState<number>()
   const [dbInstance, setDbInstance] = useState<Dexie>()
   const [loading, setLoading] = useState<boolean>(true)
+  const [user, setUser] = useState<BasicProfile>()
+  const [showLoginDialog, setShowLoginDialog] = useState(false)
   const classes = DashboardStyles()
 
   useEffect(() => {
@@ -74,31 +83,28 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
     }
   }, [pgs, dbInstance, pgToDelete])
 
-  const responseGoogle = (
-    response: GoogleLoginResponse | GoogleLoginResponseOffline
-  ) => {
-    console.log(response)
-  }
+  const onLogin = useCallback((profile?: BasicProfile) => {
+    setUser(profile)
+    setShowLoginDialog(false)
+  }, [])
 
   return (
     <div className={classes.root}>
-      <div className={classes.login}>
-        <Typography variant="h5">CIAO</Typography>
-        <Typography variant="body1">
-          Non hai ancora effettuato il login. Se vuoi usare i tuoi personaggi su
-          più dispositivi, ti consigliamo di farlo. E' semplice e veloce!
+      <div className={classes.header}>
+        <div className={classes.loginButtonContainer}>
+          <Button
+            onClick={() => setShowLoginDialog(true)}
+            variant="outlined"
+            className={classes.loginButton}
+          >
+            {user ? `Ciao ${user.getGivenName()}` : 'Login'}
+          </Button>
+        </div>
+        <Typography variant="h5" className={classes.title}>
+          I tuoi personaggi
         </Typography>
-        <GoogleLogin
-          clientId="301028242623-nbso2movb7a8iuc4vd1oscanfnfh8m4g.apps.googleusercontent.com"
-          buttonText="Login"
-          onSuccess={responseGoogle}
-          onFailure={responseGoogle}
-          cookiePolicy={'single_host_origin'}
-        />
+        <div className={classes.rightAction} />
       </div>
-      <Typography variant="h5" className={classes.title}>
-        I tuoi personaggi
-      </Typography>
 
       <div className={classes.list}>
         {loading
@@ -185,6 +191,13 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
         description={'Sei sicuro di voler eliminare questo pg?'}
         noCallback={() => setPgToDelete(undefined)}
         yesCallback={onDeleteItem}
+      />
+
+      <LoginDialog
+        user={user}
+        open={showLoginDialog}
+        onClose={() => setShowLoginDialog(false)}
+        onLogin={onLogin}
       />
     </div>
   )

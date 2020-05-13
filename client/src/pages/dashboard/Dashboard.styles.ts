@@ -2,11 +2,27 @@ import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
 
 const DashboardStyles = makeStyles((theme: Theme) =>
   createStyles({
+    header: {
+      display: 'flex',
+      alignItems: 'center',
+      background: theme.palette.secondary.light
+    },
+    loginButtonContainer: {
+      flex: 1
+    },
+    loginButton: {
+      color: '#fff',
+      padding: 8,
+      margin: 8
+    },
+    rightAction: {
+      flex: 1
+    },
     title: {
       textAlign: 'center',
       padding: '16px 0',
-      background: theme.palette.secondary.light,
-      color: '#fff'
+      color: '#fff',
+      flex: 2
     },
     avatar: {
       height: 50,
