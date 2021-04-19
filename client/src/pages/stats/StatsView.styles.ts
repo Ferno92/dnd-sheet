@@ -56,6 +56,8 @@ const StatsViewStyles = (theme: Theme) =>
     },
     modifier: {
       border: 'solid',
+      borderColor: theme.palette.border.main,
+      color: theme.palette.text.primary,
       borderRadius: '50%',
       borderWidth: 1,
       height: 30,
@@ -63,7 +65,7 @@ const StatsViewStyles = (theme: Theme) =>
       marginLeft: -10,
       textAlign: 'center',
       lineHeight: '30px',
-      backgroundColor: '#fff',
+      backgroundColor: theme.palette.background.paper,
       zIndex: 1
     },
     stat: {
@@ -168,7 +170,8 @@ const StatsViewStyles = (theme: Theme) =>
       marginTop: 8
     },
     infoIcon: {
-      marginRight: 8
+      marginRight: 8,
+      color: theme.palette.text.primary
     },
     generalInfo: {
       display: 'flex',

@@ -9,7 +9,10 @@ const useStyles = makeStyles((theme: Theme) => ({
       textAlign: 'center',
       width: props.fullWidth ? '100%' : 50
     }
-  })
+  }),
+  label: {
+      color: `${theme.palette.text.primary} !important`
+  }
 }))
 
 export default useStyles

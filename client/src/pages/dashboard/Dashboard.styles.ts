@@ -11,7 +11,7 @@ const DashboardStyles = makeStyles((theme: Theme) =>
       flex: 1
     },
     loginButton: {
-      color: '#fff',
+      color: theme.palette.text.light,
       padding: 8,
       margin: 8
     },
@@ -21,7 +21,7 @@ const DashboardStyles = makeStyles((theme: Theme) =>
     title: {
       textAlign: 'center',
       padding: '16px 0',
-      color: '#fff',
+      color: theme.palette.text.light,
       flex: 2
     },
     avatar: {
@@ -34,7 +34,8 @@ const DashboardStyles = makeStyles((theme: Theme) =>
       bottom: 20,
       right: 20
     },
-    root: {},
+    root: {
+    },
     list: {
       display: 'flex',
       width: '100%',
@@ -63,6 +64,13 @@ const DashboardStyles = makeStyles((theme: Theme) =>
     },
     skeleton: {
       marginBottom: 8
+    },
+    listItemText: {
+      color: theme.palette.text.primary
+    },
+    listItemSecondaryText: {
+      color: theme.palette.text.primary,
+      opacity: 0.6
     },
     [theme.breakpoints.up('md')]: {
       item: {},

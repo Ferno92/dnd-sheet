@@ -44,7 +44,8 @@ const TextFieldNumber: React.FC<TextFieldNumberProps> = (
       type="number"
       inputProps={{ min: min, max: max, step: step }}
       InputLabelProps={{
-        shrink: true
+        shrink: true,
+        className: styles.label
       }}
       disabled={disabled}
       onFocus={event => {

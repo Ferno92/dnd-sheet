@@ -44,7 +44,7 @@ function SimpleSelect<T>(props: SimpleSelectProps<T>) {
       className={clsx(classes.raceInputField, root)}
       fullWidth
     >
-      <InputLabel htmlFor="outlined-select-simple" ref={inputLabelRef}>
+      <InputLabel htmlFor="outlined-select-simple" ref={inputLabelRef} className={classes.label}>
         {label}
       </InputLabel>
       <Select

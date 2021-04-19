@@ -22,10 +22,12 @@ export enum Colors {
   DndRedDark = '#8a1e1c',
   DndBlack = '#212121',
   DndBlackLight = '#4d4d4d',
-  DndBlackDark = '#171717'
+  DndBlackDark = '#171717',
+  DirtyBlack = '#303030'
 }
 
-const palette: Palette = createPalette({
+export const palette: Palette = createPalette({
+  type: 'light',
   background: {
     default: Colors.DndRed,
     paper: Colors.DirtyWhite
@@ -36,11 +38,80 @@ const palette: Palette = createPalette({
   },
   text: {
     primary: Colors.Black,
-    secondary: Colors.Black50
+    secondary: Colors.Black50,
+    light: Colors.BrightWhite
   },
   primary: {
     light: Colors.DndRedLight,
     main: Colors.DndRed,
+    dark: Colors.DndRedDark,
+    contrastText: Colors.BrightWhite
+  },
+  secondary: {
+    light: Colors.DndBlackLight,
+    main: Colors.DndBlack,
+    dark: Colors.DndBlackDark,
+    contrastText: Colors.BrightWhite
+  },
+  success: {
+    main: Colors.Fern,
+    light: Colors.Fern,
+    dark: Colors.Fern,
+    contrastText: Colors.BrightWhite
+  },
+  info: {
+    main: Colors.BrightWhite,
+    light: Colors.BrightWhite,
+    dark: Colors.BrightWhite,
+    contrastText: Colors.Black
+  },
+  warning: {
+    main: Colors.SunYellow,
+    light: Colors.SunYellow,
+    dark: Colors.SunYellow,
+    contrastText: Colors.BrightWhite
+  },
+  error: {
+    main: Colors.Cherry,
+    light: Colors.Cherry,
+    dark: Colors.Cherry,
+    contrastText: Colors.BrightWhite
+  },
+  picture: {
+    dark: Colors.SilverGrey50,
+    main: Colors.SilverGrey50,
+    light: Colors.SilverGrey50,
+    contrastText: Colors.Black
+  },
+  divider: Colors.SilverGrey50,
+  border: {
+    main: Colors.SilverGrey,
+    light: Colors.SilverGrey50,
+    dark: Colors.Black30,
+    contrastText: Colors.BrightWhite
+  },
+  highlight: Colors.DndRedLight,
+  hover: Colors.DndRedLight
+})
+
+export const darkPalette: Palette = createPalette({
+  type: 'dark',
+  background: {
+    default: Colors.DndRed,
+    paper: Colors.DirtyBlack
+  },
+  backgroundSecondary: {
+    default: Colors.DirtyBlack,
+    paper: Colors.DirtyBlack
+  },
+  text: {
+    primary: Colors.BrightWhite,
+    secondary: Colors.BrightWhite,
+    light: Colors.BrightWhite
+  },
+  primary: {
+    light: Colors.DndRed,
+    main: Colors.DndRedLight,
     dark: Colors.DndRedDark,
     contrastText: Colors.BrightWhite
   },
@@ -173,7 +244,7 @@ const typography = createTypography(palette, {
   }
 })
 
-const ThemeLight = createMuiTheme({
+export const Theme = (palette: Palette) => createMuiTheme({
   palette: palette,
   typography: typography,
   shape: {
@@ -394,5 +465,3 @@ const ThemeLight = createMuiTheme({
     color: palette.text.primary
   }
 })
-
-export default ThemeLight

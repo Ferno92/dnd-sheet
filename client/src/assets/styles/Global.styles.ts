@@ -11,6 +11,7 @@ const GlobalStyles = (theme: Theme) =>
         margin: 0,
         padding: 0,
         overflow: 'hidden',
+        background: theme.palette.background.paper,
         // 10px simplification, https://www.sitepoint.com/understanding-and-using-rem-units-in-css
         // 62.5% of 16px = 10px
         fontSize: '75%'

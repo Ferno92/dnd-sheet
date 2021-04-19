@@ -12,6 +12,9 @@ const SheetStyles = (theme: Theme) =>
       right: 0,
       left: 0,
       height: 76,
+      '& svg': {
+        fill: theme.palette.text.primary
+      },
       '& .Mui-selected svg': {
         fill: theme.palette.background.default
       },

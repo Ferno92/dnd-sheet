@@ -29,6 +29,7 @@ const useStyles = makeStyles((theme: Theme) =>
       color: theme.palette.primary.contrastText,
       marginLeft: 8
     }
+
   })
 )
 

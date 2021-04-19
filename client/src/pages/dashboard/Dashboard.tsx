@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useContext } from 'react'
 import Dexie from 'dexie'
 import PG from 'pages/stats/models/PG'
 import { Add, Delete } from '@material-ui/icons'
@@ -21,6 +21,8 @@ import ConfirmDialog from 'components/confirm-dialog/ConfirmDialog'
 import Skeleton from '@material-ui/lab/Skeleton'
 import StatsUtils from 'utils/StatsUtils'
 import LoginDialog from 'components/login-dialog/LoginDialog'
+import BrightnessIcon from '@material-ui/icons/Brightness6'
+import { ThemeContext } from 'index'
 
 interface DashboardProps {}
 
@@ -42,6 +44,7 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
   const [user, setUser] = useState<BasicProfile>()
   const [showLoginDialog, setShowLoginDialog] = useState(false)
   const classes = DashboardStyles()
+  const {mode, setMode} = useContext(ThemeContext)
 
   useEffect(() => {
     //load only once
@@ -88,6 +91,10 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
     setShowLoginDialog(false)
   }, [])
 
+  const toggleDarkMode = ()=> {
+    setMode(mode === 'light' ? 'dark' : 'light')
+  }
+
   return (
     <div className={classes.root}>
       <div className={classes.header}>
@@ -99,6 +106,7 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
           >
             {user ? `Ciao ${user.getGivenName()}` : 'Login'}
           </Button>
+          <IconButton onClick={toggleDarkMode}><BrightnessIcon/></IconButton>
         </div>
         <Typography variant="h5" className={classes.title}>
           I tuoi personaggi
@@ -153,6 +161,10 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
                           pg.pgClass ? `Lv.${StatsUtils.getPgLevel(pg.pe)}` : ''
                         }`
                   }
+                  classes={{
+                    primary: classes.listItemText,
+                    secondary: classes.listItemSecondaryText
+                  }}
                 />
                 <ListItemSecondaryAction>
                   <Tooltip title="Elimina personaggio">

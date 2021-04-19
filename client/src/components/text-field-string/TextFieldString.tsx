@@ -43,6 +43,9 @@ class TextFieldString extends Component<
         onFocus={event => {
           event.target.select()
         }}
+        InputLabelProps={{
+          className: classes.label
+        }}
       />
     );
   }

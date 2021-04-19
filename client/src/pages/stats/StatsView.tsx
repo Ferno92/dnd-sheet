@@ -628,10 +628,10 @@ class StatsView extends Component<
     )
     const infoReadOnly = (
       <div className={classes.infoReadOnly}>
-        <Typography variant={width === 'xs' || width === 'sm' ? 'body1' : 'h2'}>
+        <Typography variant={width === 'xs' || width === 'sm' ? 'body1' : 'h2'} color='textPrimary'>
           {name || ''}
         </Typography>
-        <Typography variant="body2">{`${StatsUtils.getInfoName(
+        <Typography variant="body2" color='textPrimary'>{`${StatsUtils.getInfoName(
           `${race}`,
           this.racesData
         )} ${StatsUtils.getInfoName(
@@ -639,7 +639,7 @@ class StatsView extends Component<
           this.getSubRacesData()
         )}`}</Typography>
         {multiclass && pgClass && pgClass2 ? (
-          <Typography variant="body2">
+          <Typography variant="body2" color='textPrimary'>
             {StatsUtils.getInfoName(`${pgClass}`, this.jobsData)
               ? `${pgClass} Lv. ${levelFirstClass ||
                   StatsUtils.getPgLevel(this.props.pg.pe) -
@@ -651,7 +651,7 @@ class StatsView extends Component<
               : ''}
           </Typography>
         ) : (
-          <Typography variant="body2">
+          <Typography variant="body2" color='textPrimary'>
             {StatsUtils.getInfoName(`${pgClass}`, this.jobsData)
               ? `${StatsUtils.getInfoName(
                   `${pgClass}`,
@@ -851,7 +851,7 @@ class StatsView extends Component<
           )}
 
           <div className={classes.generalInfo}>
-            <Typography variant="subtitle1">Info generali</Typography>
+            <Typography variant="subtitle1" color='textPrimary'>Info generali</Typography>
             {onEdit && (
               <Tooltip title="Modifica info generali">
                 <IconButton
@@ -865,32 +865,32 @@ class StatsView extends Component<
           </div>
           <div className={classes.moreInfos}>
             <div className={classes.moreInfo}>
-              <FitnessCenter className={classes.infoIcon} />
-              <Typography variant="body1">{`${
+              <FitnessCenter className={classes.infoIcon}/>
+              <Typography variant="body1" color='textPrimary'>{`${
                 generalInfo ? generalInfo.weight : '__'
               } kg`}</Typography>
             </div>
             <div className={classes.moreInfo}>
               <Height className={classes.infoIcon} />
-              <Typography variant="body1">{`${
+              <Typography variant="body1" color='textPrimary'>{`${
                 generalInfo ? generalInfo.height : '__'
               } m`}</Typography>
             </div>
             <div className={classes.moreInfo}>
               <DateRange className={classes.infoIcon} />
-              <Typography variant="body1">{`${
+              <Typography variant="body1" color='textPrimary'>{`${
                 generalInfo ? generalInfo.age : '__'
               } anni`}</Typography>
             </div>
             <div className={classes.moreInfo}>
               <Mood className={classes.infoIcon} />
-              <Typography variant="body1">{`${
+              <Typography variant="body1" color='textPrimary'>{`${
                 generalInfo ? generalInfo.alignment : 'Allineamento'
               }`}</Typography>
             </div>
             <div className={classes.moreInfo}>
               <Translate className={classes.infoIcon} />
-              <Typography variant="body1">
+              <Typography variant="body1" color='textPrimary'>
                 {this.getLanguages().length !== 0
                   ? this.getLanguages().map(
                       (item, i) =>
@@ -931,7 +931,7 @@ class StatsView extends Component<
               </Grid>
               <Grid item xs={4} className={classes.gridItem}>
                 <div className={classes.taglia}>
-                  <Typography variant="body1">{`Taglia: ${StatsUtils.getRaceSize(
+                  <Typography variant="body1" color='textPrimary'>{`Taglia: ${StatsUtils.getRaceSize(
                     this.props.pg
                   )}`}</Typography>
                 </div>
@@ -966,6 +966,9 @@ class StatsView extends Component<
                     />
                   }
                   label="Ispirazione"
+                  classes={{
+                    label: classes.infoIcon
+                  }}
                 />
               </Grid>
               {onEdit && (
@@ -1004,7 +1007,7 @@ class StatsView extends Component<
               )}
               <Grid item xs={12} className={classes.gridItem}>
                 <div className={classes.peContainer}>
-                  <Typography variant="body1">{`Lv. ${StatsUtils.getPgLevel(
+                  <Typography variant="body1" color='textPrimary'>{`Lv. ${StatsUtils.getPgLevel(
                     this.props.pg.pe
                   )}`}</Typography>
                   <LinearProgress
@@ -1013,7 +1016,7 @@ class StatsView extends Component<
                     color="primary"
                     className={classes.peProgress}
                   />
-                  <Typography variant="body1">{`Lv. ${StatsUtils.getPgLevel(
+                  <Typography variant="body1" color='textPrimary'>{`Lv. ${StatsUtils.getPgLevel(
                     this.props.pg.pe,
                     true
                   )}`}</Typography>
@@ -1023,7 +1026,7 @@ class StatsView extends Component<
           </div>
           <Divider className={classes.divider} />
           <div className={classes.statTitleContainer}>
-            <Typography variant="h6" className={classes.title}>
+            <Typography variant="h6" className={classes.title} color='textPrimary'>
               Caratteristiche
             </Typography>
             {onEdit && (
@@ -1117,7 +1120,7 @@ class StatsView extends Component<
             </Grid>
           </div>
           <Divider className={classes.divider} />
-          <Typography variant="h6" className={classes.title}>
+          <Typography variant="h6" className={classes.title} color='textPrimary'>
             Tiri Salvezza
           </Typography>
           <div className={classes.gridContainer}>
@@ -1190,7 +1193,7 @@ class StatsView extends Component<
           </div>
           <Divider className={classes.divider} />
           <div className={classes.abilitiesHeader}>
-            <Typography variant="h6" className={classes.title}>
+            <Typography variant="h6" className={classes.title} color='textPrimary'>
               Abilità
             </Typography>
             {pgClass && this.missingAbilitiesToSelect() !== 0 && (
