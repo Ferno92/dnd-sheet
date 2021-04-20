@@ -39,7 +39,7 @@ export const palette: Palette = createPalette({
   text: {
     primary: Colors.Black,
     secondary: Colors.Black50,
-    light: Colors.BrightWhite
+    hint: Colors.BrightWhite
   },
   primary: {
     light: Colors.DndRedLight,
@@ -107,7 +107,7 @@ export const darkPalette: Palette = createPalette({
   text: {
     primary: Colors.BrightWhite,
     secondary: Colors.BrightWhite,
-    light: Colors.BrightWhite
+    hint: Colors.BrightWhite
   },
   primary: {
     light: Colors.DndRed,

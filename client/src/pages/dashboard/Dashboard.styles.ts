@@ -11,7 +11,7 @@ const DashboardStyles = makeStyles((theme: Theme) =>
       flex: 1
     },
     loginButton: {
-      color: theme.palette.text.light,
+      color: theme.palette.text.hint,
       padding: 8,
       margin: 8
     },
@@ -21,7 +21,7 @@ const DashboardStyles = makeStyles((theme: Theme) =>
     title: {
       textAlign: 'center',
       padding: '16px 0',
-      color: theme.palette.text.light,
+      color: theme.palette.text.hint,
       flex: 2
     },
     avatar: {
