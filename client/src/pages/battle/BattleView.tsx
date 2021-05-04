@@ -568,6 +568,7 @@ function BattleView(props: BattleViewProps) {
                   <Typography
                     variant="h2"
                     className={clsx(classes.currentPf, getPFColorClass())}
+                    color='textPrimary'
                   >
                     {pg.currentPF}
                   </Typography>
