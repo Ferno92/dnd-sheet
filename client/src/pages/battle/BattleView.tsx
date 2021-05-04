@@ -395,7 +395,7 @@ function BattleView(props: BattleViewProps) {
   return (
     <div className={classes.container}>
       <div className={classes.inputContainer}>
-        <Typography variant="h6" className={classes.title}>
+        <Typography variant="h6" className={classes.title} color='textPrimary'>
           Combattimento
         </Typography>
         <Grid container spacing={1}>
@@ -472,35 +472,36 @@ function BattleView(props: BattleViewProps) {
 
           <Grid item xs={5} className={classes.gridItem}>
             <div className={classes.tsContainer}>
-              <Typography variant="body1" itemType="span">
+              <Typography variant="body1" itemType="span" color='textPrimary'>
                 TS vs Morte
               </Typography>
               <div className={classes.flexRow}>
                 <Typography
                   variant="body1"
                   itemType="span"
-                  className={classes.tslabel}
+                  className={classes.tslabel} 
+                  color='textPrimary'
                 >
                   S
                 </Typography>
                 <div className={classes.checkboxContainer}>
                   <Checkbox
                     className={classes.checkbox}
-                    checkedIcon={<Check />}
+                    checkedIcon={<Check color="primary" />}
                     checked={pg.tsMorte[0]}
                     onChange={() => onChangeTsMorte(0)}
                     disabled={onEdit}
                   />
                   <Checkbox
                     className={classes.checkbox}
-                    checkedIcon={<Check />}
+                    checkedIcon={<Check color='primary' />}
                     checked={pg.tsMorte[1]}
                     onChange={() => onChangeTsMorte(1)}
                     disabled={onEdit}
                   />
                   <Checkbox
                     className={classes.checkbox}
-                    checkedIcon={<Check />}
+                    checkedIcon={<Check color='primary'/>}
                     checked={pg.tsMorte[2]}
                     onChange={() => onChangeTsMorte(2)}
                     disabled={onEdit}
@@ -512,27 +513,28 @@ function BattleView(props: BattleViewProps) {
                   variant="body1"
                   itemType="span"
                   className={classes.tslabel}
+                  color='textPrimary'
                 >
                   F
                 </Typography>
                 <div className={classes.checkboxContainer}>
                   <Checkbox
                     className={classes.checkbox}
-                    checkedIcon={<Close />}
+                    checkedIcon={<Close color='primary' />}
                     checked={pg.tsMorte[3]}
                     onChange={() => onChangeTsMorte(3)}
                     disabled={onEdit}
                   />
                   <Checkbox
                     className={classes.checkbox}
-                    checkedIcon={<Close />}
+                    checkedIcon={<Close color='primary' />}
                     checked={pg.tsMorte[4]}
                     onChange={() => onChangeTsMorte(4)}
                     disabled={onEdit}
                   />
                   <Checkbox
                     className={classes.checkbox}
-                    checkedIcon={<Close />}
+                    checkedIcon={<Close color='primary' />}
                     checked={pg.tsMorte[5]}
                     onChange={() => onChangeTsMorte(5)}
                     disabled={onEdit}
@@ -561,7 +563,7 @@ function BattleView(props: BattleViewProps) {
                 })}
               </div>
               <div className={classes.pf}>
-                <Typography variant="subtitle2">PF Attuali</Typography>
+                <Typography variant="subtitle2" color='textPrimary'>PF Attuali</Typography>
                 <div>
                   <Typography
                     variant="h2"
@@ -572,6 +574,7 @@ function BattleView(props: BattleViewProps) {
                   <Typography
                     variant="body2"
                     className={clsx(classes.pfTot, getPFColorClass())}
+                    color='textPrimary'
                   >{`/${pg.pfTot}`}</Typography>
                 </div>
               </div>
@@ -597,7 +600,7 @@ function BattleView(props: BattleViewProps) {
 
         <Divider className={classes.divider} />
         <div className={classes.armorTitle}>
-          <Typography variant="h5">Armature e scudi</Typography>
+          <Typography variant="h5" color='textPrimary'>Armature e scudi</Typography>
           <Tooltip title="Aggiungi armatura o scudo">
             <IconButton onClick={() => setArmorDialogOpen(!armorDialogOpen)}>
               <Add />
@@ -736,7 +739,7 @@ function BattleView(props: BattleViewProps) {
           )
         })}
         {pg.armors.length === 0 && (
-          <Typography variant="body2">Nessuna armatura o scudo</Typography>
+          <Typography variant="body2" color='textPrimary'>Nessuna armatura o scudo</Typography>
         )}
 
         {/* ________________ Armor dialog _____________ */}
@@ -754,7 +757,7 @@ function BattleView(props: BattleViewProps) {
         <Divider className={classes.divider} />
         {/* ________________ Weapon sections _____________ */}
         <div className={classes.armorTitle}>
-          <Typography variant="h5">Armi</Typography>
+          <Typography variant="h5" color='textPrimary'>Armi</Typography>
           <Tooltip title="Aggiungi armi">
             <IconButton onClick={() => setWeaponDialogOpen(!weaponDialogOpen)}>
               <Add />
@@ -878,7 +881,7 @@ function BattleView(props: BattleViewProps) {
           )
         })}
         {pg.weapons.length === 0 && (
-          <Typography variant="body2">Nessuna arma</Typography>
+          <Typography variant="body2" color='textPrimary'>Nessuna arma</Typography>
         )}
 
         {/* ________________ Weapon dialog _____________ */}
@@ -909,12 +912,12 @@ function BattleView(props: BattleViewProps) {
 
         <Divider className={classes.divider} />
         {/* ________________ Abilità speciali di razza _____________ */}
-        <Typography variant="subtitle1" className={classes.specialAbilityTitle}>
+        <Typography variant="subtitle1" className={classes.specialAbilityTitle} color='textPrimary'>
           Abilità razziali
         </Typography>
 
         {raceAbilities.length === 0 && (
-          <Typography variant="body2">Nessuna abilità</Typography>
+          <Typography variant="body2" color='textPrimary'>Nessuna abilità</Typography>
         )}
         {raceAbilities.map(raceAbility => {
           return (
@@ -949,6 +952,7 @@ function BattleView(props: BattleViewProps) {
             <Typography
               variant="subtitle1"
               className={classes.specialAbilityTitle}
+              color='textPrimary'
             >
               Privilegi di classe
             </Typography>

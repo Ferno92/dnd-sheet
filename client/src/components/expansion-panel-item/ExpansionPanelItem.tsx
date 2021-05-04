@@ -79,6 +79,7 @@ const ExpansionPanelItem: React.FC<ExpansionPanelItemProps> = (
                     ) => onChangeCheckbox(id, checked)}
                     disabled={!onEdit || checkboxDisabled}
                     onClick={e => e.stopPropagation()}
+                    color='primary'
                   />
                 ) : !checkboxHidden ? (
                   <div className={styles.noCheckbox} />

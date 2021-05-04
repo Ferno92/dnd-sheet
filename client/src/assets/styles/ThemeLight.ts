@@ -105,9 +105,9 @@ export const darkPalette: Palette = createPalette({
     paper: Colors.DirtyBlack
   },
   text: {
-    primary: Colors.BrightWhite,
-    secondary: Colors.BrightWhite,
-    hint: Colors.BrightWhite
+    primary: Colors.DirtyWhite,
+    secondary: Colors.DirtyWhite,
+    hint: Colors.DirtyWhite
   },
   primary: {
     light: Colors.DndRed,

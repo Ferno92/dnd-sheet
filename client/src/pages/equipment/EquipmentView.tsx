@@ -74,7 +74,7 @@ const EquipmentView: React.FC<EquipmentViewProps> = (
   return (
     <div className={styles.root}>
       <div className={styles.inputContainer}>
-        <Typography variant="h5">Equipaggiamento</Typography>
+        <Typography variant="h5"color='textPrimary'>Equipaggiamento</Typography>
         <div className={styles.moneys}>
           <TextFieldNumber
             label="MR"
@@ -128,7 +128,7 @@ const EquipmentView: React.FC<EquipmentViewProps> = (
           />
         </div>
         <Divider className={styles.divider} />
-        <Typography variant="subtitle2">
+        <Typography variant="subtitle2" color='textPrimary'>
           Peso trasportato / Peso massimo{' '}
         </Typography>
         <div className={styles.capacity}>
@@ -138,27 +138,29 @@ const EquipmentView: React.FC<EquipmentViewProps> = (
               styles.currentCapacity,
               getCurrentCapacity() > getMaxCapacity() ? 'red' : undefined
             )}
+            color='textPrimary'
           >
             {getCurrentCapacity()}
           </Typography>
           <Typography
             variant="body2"
             className={styles.capacityTot}
+            color='textPrimary'
           >{`/${getMaxCapacity()}kg`}</Typography>
         </div>
 
         <Divider className={styles.divider} />
-        <Typography variant="subtitle2">Oggetti:</Typography>
+        <Typography variant="subtitle2"color='textPrimary'>Oggetti:</Typography>
         {pg.equipment.backpack.length > 0 && (
           <Grid container className={styles.equipmentHeader}>
             <Grid item xs={3}>
-              <Typography variant="subtitle2">Quantità</Typography>
+              <Typography variant="subtitle2"color='textPrimary'>Quantità</Typography>
             </Grid>
             <Grid item xs={5}>
-              <Typography variant="subtitle2">Nome</Typography>
+              <Typography variant="subtitle2"color='textPrimary'>Nome</Typography>
             </Grid>
             <Grid item xs={2}>
-              <Typography variant="subtitle2">Peso(kg)</Typography>
+              <Typography variant="subtitle2"color='textPrimary'>Peso(kg)</Typography>
             </Grid>
             <Grid item xs={2}></Grid>
           </Grid>
@@ -188,12 +190,13 @@ const EquipmentView: React.FC<EquipmentViewProps> = (
                   xs={5}
                   className={clsx(styles.gridItem, styles.equipmentName)}
                 >
-                  <Typography variant="caption">{item.name}</Typography>
+                  <Typography variant="caption" color='textPrimary'>{item.name}</Typography>
                 </Grid>
                 <Grid item xs={2} className={styles.gridItem}>
                   <Typography
                     variant="caption"
                     className={styles.centerGridValue}
+                    color='textPrimary'
                   >
                     {item.weight * item.quantity}
                   </Typography>
@@ -204,7 +207,7 @@ const EquipmentView: React.FC<EquipmentViewProps> = (
                     color="secondary"
                     onClick={() => onRemoveEquipment(index)}
                   >
-                    <CloseOutlined className={styles.itemInfoButton} />
+                    <CloseOutlined className={styles.itemInfoButton} color='primary'/>
                   </IconButton>
                 </Grid>
                 <Grid
@@ -212,7 +215,7 @@ const EquipmentView: React.FC<EquipmentViewProps> = (
                   xs={12}
                   className={clsx(styles.gridItem, styles.equipmentInfo)}
                 >
-                  <Typography variant="caption">{item.info}</Typography>
+                  <Typography variant="caption" color='textPrimary'>{item.info}</Typography>
                 </Grid>
               </React.Fragment>
             )

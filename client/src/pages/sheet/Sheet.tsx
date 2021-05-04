@@ -1127,7 +1127,7 @@ class Sheet extends Component<
         {this.actions.map(action => (
           <MenuItem key={action.name} onClick={action.onClick}>
             <ListItemIcon>{action.icon}</ListItemIcon>
-            <ListItemText>{action.name}</ListItemText>
+            <ListItemText className={classes.otherText}>{action.name}</ListItemText>
           </MenuItem>
         ))}
       </div>

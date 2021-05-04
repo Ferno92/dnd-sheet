@@ -38,6 +38,9 @@ const SheetStyles = (theme: Theme) =>
     },
     speedDial: {
       marginTop: 6
+    },
+    otherText: {
+      color: theme.palette.text.primary
     }
   })
 

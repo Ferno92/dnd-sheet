@@ -1135,6 +1135,7 @@ class StatsView extends Component<
                       ? this.setState({ tsExpanded: undefined })
                       : this.setState({ tsExpanded: stat.type })
                   }
+                  elevation={3}
                 >
                   <ExpansionPanelSummary>
                     <div className={classes.tsPanelTitle}>
@@ -1206,7 +1207,7 @@ class StatsView extends Component<
             )}
           </div>
           {this.missingAbilitiesToSelect() !== 0 && (
-            <Typography variant="body2" className={classes.title}>
+            <Typography variant="body2" className={classes.title} color='textPrimary'>
               {`Ancora ${this.missingAbilitiesToSelect()} da selezionare`}
             </Typography>
           )}
