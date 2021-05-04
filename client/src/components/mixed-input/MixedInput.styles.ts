@@ -16,7 +16,8 @@ const MixedInputStyles = makeStyles((theme: Theme) => ({
     flexDirection: 'column',
     margin: '0 8px',
     height: 60,
-    justifyContent: 'center'
+    justifyContent: 'center',
+    color: theme.palette.text.primary
   },
   flex: {
     display: 'flex',
@@ -42,7 +43,8 @@ const MixedInputStyles = makeStyles((theme: Theme) => ({
   },
   operation: {
     width: '5vw',
-    maxWidth: 35
+    maxWidth: 35,
+    color: theme.palette.text.primary
   },
   labelOnTop: {
     fontWeight: 'bold',

@@ -115,14 +115,14 @@ const SpellsView: React.FC<SpellsViewProps> = (props: SpellsViewProps) => {
   return (
     <div className={styles.root}>
       <div className={styles.inputContainer}>
-        <Typography variant="subtitle1" itemType="span">
+        <Typography variant="subtitle1" itemType="span" color='textPrimary'>
           Caratteristica da incantatore:
         </Typography>
-        <Typography variant="body1" itemType="span">
+        <Typography variant="body1" itemType="span" color='textPrimary'>
           {TextUtils.getFullStatsType(StatsUtils.getMainSpellStat(pg.pgClass))}
         </Typography>
         <Divider className={styles.divider} />
-        <Typography variant="subtitle1" itemType="span">
+        <Typography variant="subtitle1" itemType="span" color='textPrimary'>
           CD Tiro Salvezza Incantesimi:
         </Typography>
         <MixedInput
@@ -161,7 +161,7 @@ const SpellsView: React.FC<SpellsViewProps> = (props: SpellsViewProps) => {
           sign={false}
         />
         <Divider className={styles.divider} />
-        <Typography variant="subtitle1" itemType="span">
+        <Typography variant="subtitle1" itemType="span" color='textPrimary'>
           Bonus di Attacco Incantesimi:
         </Typography>
         <MixedInput
@@ -197,13 +197,13 @@ const SpellsView: React.FC<SpellsViewProps> = (props: SpellsViewProps) => {
         />
 
         <Divider className={styles.divider} />
-        <Typography variant="subtitle1" itemType="span">
+        <Typography variant="subtitle1" itemType="span" color='textPrimary'>
           Incantesimi
         </Typography>
         {spellByJobLevel && spellByJobLevel.known > pg.spellsByLevel.length && (
           <div className={styles.spellError}>
             <ErrorOutline color="error" className={styles.spellErrorIcon} />
-            <Typography variant="body2">{`Puoi ancora aggiungere ${spellByJobLevel.known -
+            <Typography variant="body2" color='textPrimary'>{`Puoi ancora aggiungere ${spellByJobLevel.known -
               pg.spellsByLevel.length} incantesimi`}</Typography>
           </div>
         )}
@@ -215,28 +215,30 @@ const SpellsView: React.FC<SpellsViewProps> = (props: SpellsViewProps) => {
             return (
               <div key={spellInfo.level} className={styles.spellInfoContainer}>
                 <div className={styles.spellInfo}>
-                  <Typography variant="body1" className={styles.spellLevel}>
+                  <Typography variant="body1" className={styles.spellLevel} color='textPrimary'>
                     {spellInfo.level}
                   </Typography>
                   {spellInfo.level === 0 ? (
-                    <Typography variant="body1">Trucchetti</Typography>
+                    <Typography variant="body1" color='textPrimary'>Trucchetti</Typography>
                   ) : (
                     <React.Fragment>
                       <div>
-                        <Typography variant="caption">Slot totali</Typography>
+                        <Typography variant="caption" color='textPrimary'>Slot totali</Typography>
                         <Typography
                           variant="body1"
                           className={styles.slotLabel}
+                          color='textPrimary'
                         >
                           {spellInfo.slot}
                         </Typography>
                       </div>
 
                       <div>
-                        <Typography variant="caption">Slot Spesi</Typography>
+                        <Typography variant="caption" color='textPrimary'>Slot Spesi</Typography>
                         <Typography
                           variant="body1"
                           className={styles.slotLabel}
+                          color='textPrimary'
                         >
                           {getSpellSlotSpent(spellInfo.level)}
                         </Typography>
@@ -254,7 +256,7 @@ const SpellsView: React.FC<SpellsViewProps> = (props: SpellsViewProps) => {
                         style={{ minWidth: 0 }}
                         onClick={() => onUseSlot(spellInfo.level, true)}
                       >
-                        <Typography variant="caption">Azzera</Typography>
+                        <Typography variant="caption" color='textPrimary'>Azzera</Typography>
                       </Button>
                     ) : (
                       <IconButton
@@ -352,13 +354,15 @@ const SpellsView: React.FC<SpellsViewProps> = (props: SpellsViewProps) => {
                       >
                         <Typography
                           variant={'body2'}
+                          color='textPrimary'
                         >{`${spell.type} di ${spell.level}° livello`}</Typography>
                         <div className={styles.spellLabel}>
                           <Typography
                             variant={'subtitle1'}
                             className={styles.spellDetailTitle}
+                            color='textPrimary'
                           >{`Tempo di lancio: `}</Typography>
-                          <Typography variant={'body2'}>
+                          <Typography variant={'body2'}  color='textPrimary'>
                             {spell.tempoDiLancio}
                           </Typography>
                         </div>
@@ -366,8 +370,9 @@ const SpellsView: React.FC<SpellsViewProps> = (props: SpellsViewProps) => {
                           <Typography
                             variant={'subtitle1'}
                             className={styles.spellDetailTitle}
+                            color='textPrimary'
                           >{`Gittata: `}</Typography>
-                          <Typography variant={'body2'}>
+                          <Typography variant={'body2'}  color='textPrimary'>
                             {spell.gittata}
                           </Typography>
                         </div>
@@ -375,8 +380,9 @@ const SpellsView: React.FC<SpellsViewProps> = (props: SpellsViewProps) => {
                           <Typography
                             variant={'subtitle1'}
                             className={styles.spellDetailTitle}
+                            color='textPrimary'
                           >{`Componenti: `}</Typography>
-                          <Typography variant={'body2'}>
+                          <Typography variant={'body2'}  color='textPrimary'>
                             {spell.componenti.map(
                               (material: string, index: number) =>
                                 `${index === 0 ? '' : ', '}${material}`
@@ -387,15 +393,16 @@ const SpellsView: React.FC<SpellsViewProps> = (props: SpellsViewProps) => {
                           <Typography
                             variant={'subtitle1'}
                             className={styles.spellDetailTitle}
+                            color='textPrimary'
                           >{`Durata: `}</Typography>
-                          <Typography variant={'body2'}>
+                          <Typography variant={'body2'}  color='textPrimary'>
                             {spell.durata}
                           </Typography>
                         </div>
-                        <Typography variant={'subtitle1'}>
+                        <Typography variant={'subtitle1'}  color='textPrimary'>
                           {'Descrizione:'}
                         </Typography>
-                        <Typography variant={'body2'}>
+                        <Typography variant={'body2'}  color='textPrimary'>
                           {spell.description}
                         </Typography>
                       </ExpansionPanelItem>

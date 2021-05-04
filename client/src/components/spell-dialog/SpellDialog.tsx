@@ -209,6 +209,7 @@ const SpellDialog: React.FC<SpellDialogProps> = (props: SpellDialogProps) => {
                       }
                       onChange={() => handleMaterials(item)}
                       value={item}
+                      color='primary'
                     />
                   }
                   label={item.toUpperCase()}

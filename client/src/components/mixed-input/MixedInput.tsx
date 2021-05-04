@@ -57,7 +57,7 @@ function MixedInput(props: MixedInputProps) {
   return (
     <div className={classes.mixedInputContainer}>
       {labelOnTop && (
-        <Typography variant="body1" className={classes.labelOnTop}>
+        <Typography variant="body1" className={classes.labelOnTop} color='textPrimary'>
           {label}
         </Typography>
       )}
@@ -101,6 +101,7 @@ function MixedInput(props: MixedInputProps) {
                   <Typography
                     variant="caption"
                     className={classes.modifierType}
+                    color='textPrimary'
                   >
                     {modifier.type}
                   </Typography>
@@ -115,7 +116,7 @@ function MixedInput(props: MixedInputProps) {
           {labelOnTop ? (
             ''
           ) : (
-            <Typography variant="caption" className={classes.label}>
+            <Typography variant="caption" className={classes.label}  color='textPrimary'>
               {label ? label.toUpperCase() : ''}
             </Typography>
           )}
