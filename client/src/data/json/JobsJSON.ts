@@ -227,7 +227,7 @@ export default [
         name: 'Competenza armi e armature (Chierico)',
         description:
           'Un Chierico è competente negli scudi, armature leggere e medie, armi semplici',
-        extra: `competenza|{"armorList":["${ArmorType.Leggera}","${ArmorType.Media}","${ArmorType.Scudo}"], weaponList:["semplice"]}`,
+        extra: `competenza|{"armorList":["${ArmorType.Leggera}","${ArmorType.Media}","${ArmorType.Scudo}"], "weaponList":["semplice"]}`,
       },
       {
         lv: 1,

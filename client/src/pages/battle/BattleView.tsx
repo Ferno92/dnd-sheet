@@ -15,7 +15,7 @@ import {
   ExpansionPanelDetails,
   Tooltip,
   Divider,
-  TextField
+  TextField,
 } from '@material-ui/core'
 import StatsType from 'data/types/StatsEnum'
 import { useTheme } from '@material-ui/core/styles'
@@ -24,7 +24,7 @@ import TextFieldNumber from 'components/text-field-number/TextFieldNumber'
 import TextFieldString from 'components/text-field-string/TextFieldString'
 import PG from 'pages/stats/models/PG'
 import SizeEnum from 'data/types/SizeEnum'
-import StatsUtils from 'utils/StatsUtils'
+import StatsUtils, { Proficiency } from 'utils/StatsUtils'
 import clsx from 'clsx'
 import BattleUtils from 'utils/BattleUtils'
 import WeaponDialog from 'components/weapon-dialog/WeaponDialog'
@@ -42,6 +42,9 @@ import Privileges from 'data/types/Privileges'
 import ExpansionPanelItem from 'components/expansion-panel-item/ExpansionPanelItem'
 import ConfirmDialog from 'components/confirm-dialog/ConfirmDialog'
 import RestType from 'data/types/RestType'
+import { firebaseConfig } from 'App'
+import { initializeApp } from 'firebase/app'
+import { getFirestore, doc, getDocs, collection } from 'firebase/firestore'
 
 export interface Modifier {
   type: string
@@ -53,6 +56,7 @@ interface BattleViewProps {
   onEdit: boolean
   id: number
   pg: PG
+  proficiency: Proficiency[]
   onChangeSpeed: (event: React.ChangeEvent<HTMLInputElement>) => void
   onChangePF: (event: React.ChangeEvent<HTMLInputElement>) => void
   onChangeTsMorte: (index: number) => void
@@ -74,6 +78,7 @@ function BattleView(props: BattleViewProps) {
   const {
     onEdit,
     pg,
+    proficiency,
     onChangeSpeed,
     onChangePF,
     onChangeTsMorte,
@@ -83,7 +88,7 @@ function BattleView(props: BattleViewProps) {
     onRemoveWeapon,
     onRemoveArmor,
     onSelectArmor,
-    onChangeTemp
+    onChangeTemp,
   } = props
   const classes = BattleViewStyles()
   const [caModifiersOpen, setCaModifiersOpen] = useState(false)
@@ -104,10 +109,10 @@ function BattleView(props: BattleViewProps) {
     {
       type: StatsType.Destrezza as string,
       value: StatsUtils.getStatModifier(
-        pg.stats.find(stat => stat.type === StatsType.Destrezza)!
+        pg.stats.find((stat) => stat.type === StatsType.Destrezza)!
       ),
-      canDelete: false
-    }
+      canDelete: false,
+    },
   ]
 
   if (StatsUtils.getRaceSize(pg) === SizeEnum.Piccola) {
@@ -119,7 +124,7 @@ function BattleView(props: BattleViewProps) {
     const { armors } = props.pg
     let wearing = false
     let desAlreadyAdded = false
-    armors.forEach(armorInfo => {
+    armors.forEach((armorInfo) => {
       if (armorInfo.isWearing) {
         count += armorInfo.armor.ca + armorInfo.bonus
         if (armorInfo.armor.ca >= 10) {
@@ -128,7 +133,7 @@ function BattleView(props: BattleViewProps) {
         if (armorInfo.armor.addDes && !desAlreadyAdded) {
           desAlreadyAdded = true
           count += StatsUtils.getStatModifier(
-            pg.stats.find(stat => stat.type === StatsType.Destrezza)!
+            pg.stats.find((stat) => stat.type === StatsType.Destrezza)!
           )
         }
       }
@@ -138,7 +143,7 @@ function BattleView(props: BattleViewProps) {
 
       if (privileges) {
         //barbaro
-        privileges.forEach(item => {
+        privileges.forEach((item) => {
           if (item.type === 'difesaSenzaArmatura') {
             count += StatsUtils.getStatModifierFromName(
               StatsType.Costituzione,
@@ -178,9 +183,9 @@ function BattleView(props: BattleViewProps) {
       let hasProficiency = false
 
       const jobsData = DataUtils.JobMapper(jobsJSON as any)
-      jobsData.forEach(job => {
+      jobsData.forEach((job) => {
         if (job.type === pgClass) {
-          job.privileges.forEach(item => {
+          job.privileges.forEach((item) => {
             if (item.extra) {
               const splitted = item.extra.split('|')
               if (splitted[0] === 'competenza') {
@@ -196,7 +201,7 @@ function BattleView(props: BattleViewProps) {
             }
           })
         } else if (job.type === pgClass2 && job.multiclass) {
-          job.multiclass.forEach(item => {
+          job.multiclass.forEach((item) => {
             if (item.extra) {
               const splitted = item.extra.split('|')
               if (splitted[0] === 'competenza') {
@@ -224,13 +229,14 @@ function BattleView(props: BattleViewProps) {
       let hasProficiency = false
 
       const jobsData = DataUtils.JobMapper(jobsJSON as any)
-      jobsData.forEach(job => {
+      jobsData.forEach((job) => {
         if (job.type === pgClass) {
-          job.privileges.forEach(item => {
+          job.privileges.forEach((item) => {
             if (item.extra) {
               const splitted = item.extra.split('|')
               if (splitted[0] === 'competenza') {
-                const obj = JSON.parse(splitted[1])
+                const objJson = splitted[1]
+                const obj = JSON.parse(objJson)
                 if (obj.weaponList !== undefined) {
                   hasProficiency = obj.weaponList.find(
                     (x: string) =>
@@ -242,7 +248,7 @@ function BattleView(props: BattleViewProps) {
             }
           })
         } else if (job.type === pgClass2 && job.multiclass) {
-          job.multiclass.forEach(item => {
+          job.multiclass.forEach((item) => {
             if (item.extra) {
               const splitted = item.extra.split('|')
               if (splitted[0] === 'competenza') {
@@ -268,10 +274,15 @@ function BattleView(props: BattleViewProps) {
     (weaponInfo: WeaponInfo) => {
       const { pgClass } = pg
       const hasProficiency = hasWeaponProficiency(weaponInfo)
+      console.log('getWeaponTPC', proficiency)
       let tpc =
         weaponInfo.bonus +
         (hasProficiency
-          ? StatsUtils.getProficiency(StatsUtils.getPgLevel(pg.pe), pgClass)
+          ? StatsUtils.getProficiency(
+              StatsUtils.getPgLevel(pg.pe),
+              proficiency,
+              pgClass
+            )
           : 0)
       const forza = StatsUtils.getStatModifierFromName(StatsType.Forza, pg)
       const destrezza = StatsUtils.getStatModifierFromName(
@@ -279,7 +290,7 @@ function BattleView(props: BattleViewProps) {
         pg
       )
       if (
-        weaponInfo.weapon.property.find(property => property === 'Accurata')
+        weaponInfo.weapon.property.find((property) => property === 'Accurata')
       ) {
         tpc += destrezza > forza ? destrezza : forza
       } else {
@@ -290,7 +301,7 @@ function BattleView(props: BattleViewProps) {
       }
       return `${tpc >= 0 ? '+' : '-'}${tpc}`
     },
-    [pg, hasWeaponProficiency]
+    [pg, hasWeaponProficiency, proficiency]
   )
 
   const getWeaponDamageBonus = useCallback(
@@ -298,7 +309,7 @@ function BattleView(props: BattleViewProps) {
       let damage = weaponInfo.bonus
       const forza = StatsUtils.getStatModifierFromName(StatsType.Forza, pg)
       if (
-        weaponInfo.weapon.property.find(property => property === 'Accurata')
+        weaponInfo.weapon.property.find((property) => property === 'Accurata')
       ) {
         const destrezza = StatsUtils.getStatModifierFromName(
           StatsType.Destrezza,
@@ -317,7 +328,7 @@ function BattleView(props: BattleViewProps) {
     (race: RacesEnum, subRace?: SubRacesEnum) => {
       let raceAbilities: RaceAbility[] = []
       const racesData = DataUtils.RaceMapper(racesJSON as any)
-      racesData.forEach(raceData => {
+      racesData.forEach((raceData) => {
         if (raceData.type === race.toString()) {
           raceAbilities.push.apply(raceAbilities, raceData.abilities)
         }
@@ -341,14 +352,14 @@ function BattleView(props: BattleViewProps) {
     if (weaponSelected) {
       onRemoveWeapon(
         pg.weapons.findIndex(
-          item => item.weapon.id === weaponSelected.weapon.id
+          (item) => item.weapon.id === weaponSelected.weapon.id
         )
       )
       setWeaponSelected(undefined)
       setAskDeleteArmorOrWeapon(false)
     } else if (armorSelected) {
       onRemoveArmor(
-        pg.armors.findIndex(item => item.armor.id === armorSelected.armor.id)
+        pg.armors.findIndex((item) => item.armor.id === armorSelected.armor.id)
       )
       setArmorSelected(undefined)
 
@@ -360,7 +371,7 @@ function BattleView(props: BattleViewProps) {
     onRemoveWeapon,
     onRemoveArmor,
     pg.armors,
-    pg.weapons
+    pg.weapons,
   ])
 
   useEffect(() => {
@@ -395,7 +406,7 @@ function BattleView(props: BattleViewProps) {
   return (
     <div className={classes.container}>
       <div className={classes.inputContainer}>
-        <Typography variant="h6" className={classes.title} color='textPrimary'>
+        <Typography variant="h6" className={classes.title} color="textPrimary">
           Combattimento
         </Typography>
         <Grid container spacing={1}>
@@ -447,7 +458,7 @@ function BattleView(props: BattleViewProps) {
 
           {dv.split('/').length > 1 ? (
             <Grid item xs={3} className={classes.gridItem}>
-              {[...Array(2).keys()].map(i => {
+              {[...Array(2).keys()].map((i) => {
                 return (
                   <TextFieldString
                     key={`${dv.split('/')[i]}`}
@@ -472,15 +483,15 @@ function BattleView(props: BattleViewProps) {
 
           <Grid item xs={5} className={classes.gridItem}>
             <div className={classes.tsContainer}>
-              <Typography variant="body1" itemType="span" color='textPrimary'>
+              <Typography variant="body1" itemType="span" color="textPrimary">
                 TS vs Morte
               </Typography>
               <div className={classes.flexRow}>
                 <Typography
                   variant="body1"
                   itemType="span"
-                  className={classes.tslabel} 
-                  color='textPrimary'
+                  className={classes.tslabel}
+                  color="textPrimary"
                 >
                   S
                 </Typography>
@@ -494,14 +505,14 @@ function BattleView(props: BattleViewProps) {
                   />
                   <Checkbox
                     className={classes.checkbox}
-                    checkedIcon={<Check color='primary' />}
+                    checkedIcon={<Check color="primary" />}
                     checked={pg.tsMorte[1]}
                     onChange={() => onChangeTsMorte(1)}
                     disabled={onEdit}
                   />
                   <Checkbox
                     className={classes.checkbox}
-                    checkedIcon={<Check color='primary'/>}
+                    checkedIcon={<Check color="primary" />}
                     checked={pg.tsMorte[2]}
                     onChange={() => onChangeTsMorte(2)}
                     disabled={onEdit}
@@ -513,28 +524,28 @@ function BattleView(props: BattleViewProps) {
                   variant="body1"
                   itemType="span"
                   className={classes.tslabel}
-                  color='textPrimary'
+                  color="textPrimary"
                 >
                   F
                 </Typography>
                 <div className={classes.checkboxContainer}>
                   <Checkbox
                     className={classes.checkbox}
-                    checkedIcon={<Close color='primary' />}
+                    checkedIcon={<Close color="primary" />}
                     checked={pg.tsMorte[3]}
                     onChange={() => onChangeTsMorte(3)}
                     disabled={onEdit}
                   />
                   <Checkbox
                     className={classes.checkbox}
-                    checkedIcon={<Close color='primary' />}
+                    checkedIcon={<Close color="primary" />}
                     checked={pg.tsMorte[4]}
                     onChange={() => onChangeTsMorte(4)}
                     disabled={onEdit}
                   />
                   <Checkbox
                     className={classes.checkbox}
-                    checkedIcon={<Close color='primary' />}
+                    checkedIcon={<Close color="primary" />}
                     checked={pg.tsMorte[5]}
                     onChange={() => onChangeTsMorte(5)}
                     disabled={onEdit}
@@ -548,7 +559,7 @@ function BattleView(props: BattleViewProps) {
             <Divider className={classes.divider} />
             <div className={classes.pfContainer}>
               <div className={classes.pfModifiers}>
-                {[...Array(3).keys()].map(i => {
+                {[...Array(3).keys()].map((i) => {
                   const value = i * 5 || 1
                   return (
                     <IconButton
@@ -563,24 +574,26 @@ function BattleView(props: BattleViewProps) {
                 })}
               </div>
               <div className={classes.pf}>
-                <Typography variant="subtitle2" color='textPrimary'>PF Attuali</Typography>
+                <Typography variant="subtitle2" color="textPrimary">
+                  PF Attuali
+                </Typography>
                 <div>
                   <Typography
                     variant="h2"
                     className={clsx(classes.currentPf, getPFColorClass())}
-                    color='textPrimary'
+                    color="textPrimary"
                   >
                     {pg.currentPF}
                   </Typography>
                   <Typography
                     variant="body2"
                     className={clsx(classes.pfTot, getPFColorClass())}
-                    color='textPrimary'
+                    color="textPrimary"
                   >{`/${pg.pfTot}`}</Typography>
                 </div>
               </div>
               <div className={classes.pfModifiers}>
-                {[...Array(3).keys()].map(i => {
+                {[...Array(3).keys()].map((i) => {
                   const value = i * 5 || 1
                   return (
                     <IconButton
@@ -601,7 +614,9 @@ function BattleView(props: BattleViewProps) {
 
         <Divider className={classes.divider} />
         <div className={classes.armorTitle}>
-          <Typography variant="h5" color='textPrimary'>Armature e scudi</Typography>
+          <Typography variant="h5" color="textPrimary">
+            Armature e scudi
+          </Typography>
           <Tooltip title="Aggiungi armatura o scudo">
             <IconButton onClick={() => setArmorDialogOpen(!armorDialogOpen)}>
               <Add />
@@ -648,7 +663,7 @@ function BattleView(props: BattleViewProps) {
                         >
                           <Delete />
                         </IconButton>
-                      </Tooltip>
+                      </Tooltip>,
                     ]
                   : undefined
               }
@@ -740,7 +755,9 @@ function BattleView(props: BattleViewProps) {
           )
         })}
         {pg.armors.length === 0 && (
-          <Typography variant="body2" color='textPrimary'>Nessuna armatura o scudo</Typography>
+          <Typography variant="body2" color="textPrimary">
+            Nessuna armatura o scudo
+          </Typography>
         )}
 
         {/* ________________ Armor dialog _____________ */}
@@ -758,7 +775,9 @@ function BattleView(props: BattleViewProps) {
         <Divider className={classes.divider} />
         {/* ________________ Weapon sections _____________ */}
         <div className={classes.armorTitle}>
-          <Typography variant="h5" color='textPrimary'>Armi</Typography>
+          <Typography variant="h5" color="textPrimary">
+            Armi
+          </Typography>
           <Tooltip title="Aggiungi armi">
             <IconButton onClick={() => setWeaponDialogOpen(!weaponDialogOpen)}>
               <Add />
@@ -807,7 +826,7 @@ function BattleView(props: BattleViewProps) {
                         >
                           <Delete />
                         </IconButton>
-                      </Tooltip>
+                      </Tooltip>,
                     ]
                   : undefined
               }
@@ -854,7 +873,7 @@ function BattleView(props: BattleViewProps) {
                     className={classes.armorDetailTitle}
                   >{`Proprietà: `}</Typography>
                   <Typography variant={'body2'}>
-                    {weaponInfo.weapon.property.map(property => property)}
+                    {weaponInfo.weapon.property.map((property) => property)}
                   </Typography>
                 </div>
                 <div className={classes.armorLabel}>
@@ -882,7 +901,9 @@ function BattleView(props: BattleViewProps) {
           )
         })}
         {pg.weapons.length === 0 && (
-          <Typography variant="body2" color='textPrimary'>Nessuna arma</Typography>
+          <Typography variant="body2" color="textPrimary">
+            Nessuna arma
+          </Typography>
         )}
 
         {/* ________________ Weapon dialog _____________ */}
@@ -913,14 +934,20 @@ function BattleView(props: BattleViewProps) {
 
         <Divider className={classes.divider} />
         {/* ________________ Abilità speciali di razza _____________ */}
-        <Typography variant="subtitle1" className={classes.specialAbilityTitle} color='textPrimary'>
+        <Typography
+          variant="subtitle1"
+          className={classes.specialAbilityTitle}
+          color="textPrimary"
+        >
           Abilità razziali
         </Typography>
 
         {raceAbilities.length === 0 && (
-          <Typography variant="body2" color='textPrimary'>Nessuna abilità</Typography>
+          <Typography variant="body2" color="textPrimary">
+            Nessuna abilità
+          </Typography>
         )}
-        {raceAbilities.map(raceAbility => {
+        {raceAbilities.map((raceAbility) => {
           return (
             <ExpansionPanel
               key={raceAbility.name}
@@ -953,12 +980,12 @@ function BattleView(props: BattleViewProps) {
             <Typography
               variant="subtitle1"
               className={classes.specialAbilityTitle}
-              color='textPrimary'
+              color="textPrimary"
             >
               Privilegi di classe
             </Typography>
 
-            {privileges.map(privilege => {
+            {privileges.map((privilege) => {
               return (
                 <ExpansionPanel
                   key={privilege.type}
@@ -999,7 +1026,7 @@ function BattleView(props: BattleViewProps) {
                             privilege.counter) && (
                           <Button
                             variant="text"
-                            onClick={e => {
+                            onClick={(e) => {
                               e.stopPropagation()
                               console.log('TODO')
                             }}
@@ -1029,7 +1056,7 @@ function BattleView(props: BattleViewProps) {
                       variant="body2"
                       itemType="span"
                       dangerouslySetInnerHTML={{
-                        __html: privilege.description
+                        __html: privilege.description,
                       }}
                     />
                   </ExpansionPanelDetails>
@@ -1094,14 +1121,14 @@ function BattleView(props: BattleViewProps) {
               <Grid item xs={2} className={classes.gridItem}>
                 <Typography variant="body1" itemType="span">
                   {StatsUtils.getStatModifier(
-                    pg.stats.find(stat => stat.type === StatsType.Destrezza)!
+                    pg.stats.find((stat) => stat.type === StatsType.Destrezza)!
                   )}
                 </Typography>
               </Grid>
               {privileges &&
-                privileges.find(x => x.type === 'difesaSenzaArmatura') !==
+                privileges.find((x) => x.type === 'difesaSenzaArmatura') !==
                   undefined &&
-                pg.armors.find(x => x.isWearing && x.armor.ca > 10) ===
+                pg.armors.find((x) => x.isWearing && x.armor.ca > 10) ===
                   undefined && (
                   <React.Fragment>
                     <Grid item xs={8}>
@@ -1113,7 +1140,7 @@ function BattleView(props: BattleViewProps) {
                       <Typography variant="body1" itemType="span">
                         {StatsUtils.getStatModifier(
                           pg.stats.find(
-                            stat => stat.type === StatsType.Costituzione
+                            (stat) => stat.type === StatsType.Costituzione
                           )!
                         )}
                       </Typography>

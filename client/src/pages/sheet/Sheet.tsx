@@ -11,7 +11,7 @@ import {
   MenuItem,
   ListItemIcon,
   ListItemText,
-  Snackbar
+  Snackbar,
 } from '@material-ui/core'
 import { ReactComponent as FightIcon } from 'assets/images/swords.svg'
 import { ReactComponent as ProfileIcon } from 'assets/images/viking.svg'
@@ -24,7 +24,7 @@ import {
   People,
   Share,
   Hotel,
-  Restaurant
+  Restaurant,
 } from '@material-ui/icons'
 import SwipeableViews from 'react-swipeable-views'
 import StatsView from 'pages/stats/StatsView'
@@ -37,7 +37,7 @@ import Dexie from 'dexie'
 import { JobsEnum, SubJobsEnum } from 'data/types/JobsEnum'
 import AbilitiesEnum from 'data/types/AbilitiesEnum'
 import PGAbility from 'pages/stats/models/PGAbility'
-import StatsUtils from 'utils/StatsUtils'
+import StatsUtils, { Proficiency } from 'utils/StatsUtils'
 import Weapon from 'data/types/Weapon'
 import WeaponInfo from 'data/types/WeaponInfo'
 import EquipmentView from 'pages/equipment/EquipmentView'
@@ -48,12 +48,19 @@ import SpellsView from 'pages/spells/SpellsView'
 import Spell from 'data/types/Spell'
 import SpellsByLevel from 'data/types/SpellsByLevel'
 import _ from 'lodash'
-import firebase from 'firebase/app'
-import 'firebase/firestore'
 import PgGeneralInfo from 'data/types/PgGeneralInfo'
 import RestType from 'data/types/RestType'
 import MuiAlert from '@material-ui/lab/Alert'
 import BattleUtils from 'utils/BattleUtils'
+import { initializeApp } from 'firebase/app'
+import { firebaseConfig } from 'App'
+import {
+  collection,
+  doc,
+  getDocs,
+  getFirestore,
+  setDoc,
+} from 'firebase/firestore'
 
 interface SheetProps {
   id: number
@@ -70,6 +77,7 @@ interface SheetState {
   exist: boolean
   initialPgJson: string
   snackMessage?: string
+  proficiency: Proficiency[]
 }
 
 interface LastPageAction {
@@ -115,7 +123,7 @@ class Sheet extends Component<
           { type: StatsType.Costituzione, value: 10 },
           { type: StatsType.Intelligenza, value: 10 },
           { type: StatsType.Saggezza, value: 10 },
-          { type: StatsType.Carisma, value: 10 }
+          { type: StatsType.Carisma, value: 10 },
         ],
         abilities: [],
         ispiration: false,
@@ -127,19 +135,20 @@ class Sheet extends Component<
         armors: [],
         equipment: {
           moneys: [0, 0, 0, 0, 0],
-          backpack: []
+          backpack: [],
         },
         spellsByLevel: [],
         image: '',
         pe: 0,
-        background: ''
+        background: '',
       },
       exist: false,
-      initialPgJson: ''
+      initialPgJson: '',
+      proficiency: [],
     }
     this.db = new Dexie('pg01_database')
     this.db.version(1).stores({
-      pg: 'id,name,race,pgClass,level,stats'
+      pg: 'id,name,race,pgClass,level,stats',
     })
     this.db.open().then(() => {
       this.pg = this.db.table('pg')
@@ -152,7 +161,7 @@ class Sheet extends Component<
           this.setState({
             pg: mergedPG,
             exist: true,
-            initialPgJson: JSON.stringify(mergedPG)
+            initialPgJson: JSON.stringify(mergedPG),
           })
         }
       })
@@ -180,12 +189,12 @@ class Sheet extends Component<
         onClick: () => {
           //go back
           this.props.history.goBack()
-        }
+        },
       },
       {
         icon: <Share />,
         name: 'Condividi personaggio',
-        onClick: () => {
+        onClick: async () => {
           const nav = navigator as any
           const pgEncoded = JSON.stringify(this.state.pg)
           const id = window.btoa(
@@ -193,39 +202,37 @@ class Sheet extends Component<
           )
           const url = `https://${window.location.hostname}/download/${id}`
 
-          firebase
-            .app()
-            .firestore()
-            .collection('sharing')
-            .doc(id)
-            .set({ data: pgEncoded })
+          const app = initializeApp(firebaseConfig)
+          const db = getFirestore(app)
+          const ref = doc(db, 'sharing', id)
+          setDoc(ref, { data: pgEncoded })
             .then(() => {
               console.log('url', url)
               if (nav.share) {
                 nav.share({
                   title: 'Condividi il personaggio',
-                  url: url
+                  url: url,
                 })
               } else {
                 navigator.clipboard.writeText(url)
                 alert('URL copied to clipboard')
               }
             })
-            .catch(error => {
+            .catch((error) => {
               console.log('db upload err: ', error)
             })
-        }
+        },
       },
       {
         icon: <Restaurant />,
         name: 'Riposo Breve',
-        onClick: () => this.rest(false)
+        onClick: () => this.rest(false),
       },
       {
         icon: <Hotel />,
         name: 'Riposo Lungo',
-        onClick: () => this.rest(true)
-      }
+        onClick: () => this.rest(true),
+      },
     ]
   }
 
@@ -264,7 +271,7 @@ class Sheet extends Component<
       pgClass2,
       subClass2,
       multiclass,
-      levelFirstClass
+      levelFirstClass,
     } = this.state.pg
 
     if (this.pg) {
@@ -295,13 +302,13 @@ class Sheet extends Component<
             pgClass2,
             subClass2,
             multiclass,
-            levelFirstClass
+            levelFirstClass,
           })
           .then(() => {
             console.log('update done')
             this.setState({ initialPgJson: JSON.stringify(this.state.pg) })
           })
-          .catch(err => console.log('err: ', err))
+          .catch((err) => console.log('err: ', err))
       } else {
         this.pg
           .put({
@@ -330,13 +337,13 @@ class Sheet extends Component<
             pgClass2,
             subClass2,
             multiclass,
-            levelFirstClass
+            levelFirstClass,
           })
           .then(() => {
             console.log('create done')
             this.setState({ initialPgJson: JSON.stringify(this.state.pg) })
           })
-          .catch(err => console.log('err: ', err))
+          .catch((err) => console.log('err: ', err))
       }
     }
   }
@@ -435,11 +442,11 @@ class Sheet extends Component<
     const { pg } = this.state
     if (secondary) {
       this.setState({
-        pg: { ...pg, pgClass2: job, subClass2: undefined, abilities: [] }
+        pg: { ...pg, pgClass2: job, subClass2: undefined, abilities: [] },
       })
     } else {
       this.setState({
-        pg: { ...pg, pgClass: job, subClass: undefined, abilities: [] }
+        pg: { ...pg, pgClass: job, subClass: undefined, abilities: [] },
       })
     }
   }
@@ -472,7 +479,7 @@ class Sheet extends Component<
       abilities.push({
         hasProficiency: checked,
         points: 0,
-        type: type
+        type: type,
       })
     }
     this.setState({ pg: { ...pg, abilities } })
@@ -493,7 +500,7 @@ class Sheet extends Component<
       abilities.push({
         hasProficiency: false,
         points: value,
-        type: type
+        type: type,
       })
     }
 
@@ -513,7 +520,7 @@ class Sheet extends Component<
   onChangePF = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { pg } = this.state
     this.setState({
-      pg: { ...pg, pfTot: parseInt(event.currentTarget.value) }
+      pg: { ...pg, pfTot: parseInt(event.currentTarget.value) },
     })
   }
 
@@ -545,7 +552,7 @@ class Sheet extends Component<
     if (weapon) {
       const weapons = [...pg.weapons]
       if (prevId) {
-        const index = weapons.findIndex(item => item.weapon.id === prevId)
+        const index = weapons.findIndex((item) => item.weapon.id === prevId)
         weapons[index].weapon = weapon
         weapons[index].bonus = bonus
         weapons[index].notes = notes
@@ -553,7 +560,7 @@ class Sheet extends Component<
         const weaponInfo: WeaponInfo = {
           weapon: weapon,
           bonus: bonus,
-          notes: notes
+          notes: notes,
         }
         weapons.push(weaponInfo)
       }
@@ -575,7 +582,7 @@ class Sheet extends Component<
     if (armor) {
       const armors = [...pg.armors]
       if (prevId) {
-        const index = armors.findIndex(item => item.armor.id === prevId)
+        const index = armors.findIndex((item) => item.armor.id === prevId)
         armors[index].armor = armor
         armors[index].bonus = bonus
         armors[index].notes = notes
@@ -583,7 +590,7 @@ class Sheet extends Component<
         const armorInfo: ArmorInfo = {
           armor: armor,
           bonus: bonus,
-          notes: notes
+          notes: notes,
         }
         armors.push(armorInfo)
       }
@@ -635,7 +642,7 @@ class Sheet extends Component<
     const { pg } = this.state
     let tempBackpack = pg.equipment.backpack ? [...pg.equipment.backpack] : []
     let tempMoneys = [...pg.equipment.moneys]
-    equipments.forEach(equipment => {
+    equipments.forEach((equipment) => {
       if (equipment.name.indexOf('{1}') !== -1) {
         const index =
           equipment.id === 'mr'
@@ -649,7 +656,7 @@ class Sheet extends Component<
             : 4
         tempMoneys[index] = tempMoneys[index] + equipment.quantity
       } else {
-        const index = tempBackpack.findIndex(item => item.id === equipment.id)
+        const index = tempBackpack.findIndex((item) => item.id === equipment.id)
         if (index !== -1) {
           tempBackpack[index] = equipment
         } else {
@@ -664,9 +671,9 @@ class Sheet extends Component<
           equipment: {
             ...pg.equipment,
             backpack: tempBackpack,
-            moneys: tempMoneys
-          }
-        }
+            moneys: tempMoneys,
+          },
+        },
       },
       () => {
         const { onEdit } = this.state
@@ -687,9 +694,9 @@ class Sheet extends Component<
           ...pg,
           equipment: {
             ...pg.equipment,
-            backpack: tempBackpack
-          }
-        }
+            backpack: tempBackpack,
+          },
+        },
       },
       () => {
         const { onEdit } = this.state
@@ -714,12 +721,12 @@ class Sheet extends Component<
       spellsByLevelCopy.push({
         level: spell.level,
         slotSpent: 0,
-        spells: []
+        spells: [],
       })
     } else {
       if (prevId) {
         const editIndex = spellsByLevelCopy[index].spells.findIndex(
-          item => item.id === prevId
+          (item) => item.id === prevId
         )
         spellsByLevelCopy[index].spells[editIndex] = spell
       } else {
@@ -731,8 +738,8 @@ class Sheet extends Component<
       {
         pg: {
           ...pg,
-          spellsByLevel: spellsByLevelCopy
-        }
+          spellsByLevel: spellsByLevelCopy,
+        },
       },
       () => {
         const { onEdit } = this.state
@@ -753,7 +760,7 @@ class Sheet extends Component<
       }
     })
     const spellIndex = spellsByLevelCopy[index].spells.findIndex(
-      item => item.id === spell.id
+      (item) => item.id === spell.id
     )
 
     if (spellIndex >= 0) {
@@ -764,8 +771,8 @@ class Sheet extends Component<
       {
         pg: {
           ...pg,
-          spellsByLevel: spellsByLevelCopy
-        }
+          spellsByLevel: spellsByLevelCopy,
+        },
       },
       () => {
         const { onEdit } = this.state
@@ -796,8 +803,8 @@ class Sheet extends Component<
         {
           pg: {
             ...pg,
-            spellsByLevel: spellsByLevelCopy
-          }
+            spellsByLevel: spellsByLevelCopy,
+          },
         },
         () => {
           const { onEdit } = this.state
@@ -829,8 +836,8 @@ class Sheet extends Component<
       {
         pg: {
           ...pg,
-          spellsByLevel: spellsByLevelCopy
-        }
+          spellsByLevel: spellsByLevelCopy,
+        },
       },
       () => {
         const { onEdit } = this.state
@@ -857,8 +864,8 @@ class Sheet extends Component<
     this.setState({
       pg: {
         ...pg,
-        image: url
-      }
+        image: url,
+      },
     })
   }
 
@@ -888,8 +895,8 @@ class Sheet extends Component<
             : undefined,
         // pgClass2: clear ? undefined : pg.pgClass2,
         // subClass2: clear ? undefined : pg.subClass2,
-        multiclass: clear ? false : pg.multiclass
-      }
+        multiclass: clear ? false : pg.multiclass,
+      },
     })
   }
 
@@ -905,8 +912,8 @@ class Sheet extends Component<
       pg: {
         ...pg,
         background: background,
-        abilities: pg.background !== background ? [] : pg.abilities
-      }
+        abilities: pg.background !== background ? [] : pg.abilities,
+      },
     })
   }
 
@@ -925,8 +932,8 @@ class Sheet extends Component<
     this.setState({
       pg: {
         ...pg,
-        armors: armorsCopy
-      }
+        armors: armorsCopy,
+      },
     })
   }
 
@@ -935,8 +942,8 @@ class Sheet extends Component<
     this.setState({
       pg: {
         ...pg,
-        generalInfo: info
-      }
+        generalInfo: info,
+      },
     })
   }
 
@@ -946,14 +953,14 @@ class Sheet extends Component<
     if (pg.temp) {
       newTemp[type] = {
         value: value,
-        rest: rest
+        rest: rest,
       }
     } else {
       newTemp = {
         [type]: {
           value: value,
-          rest: rest
-        }
+          rest: rest,
+        },
       }
     }
 
@@ -961,8 +968,8 @@ class Sheet extends Component<
       {
         pg: {
           ...pg,
-          temp: newTemp
-        }
+          temp: newTemp,
+        },
       },
       () => {
         const { onEdit } = this.state
@@ -977,7 +984,7 @@ class Sheet extends Component<
     const { pg } = this.state
     let newTemp = pg.temp
     if (pg.temp) {
-      Object.keys(pg.temp).forEach(key => {
+      Object.keys(pg.temp).forEach((key) => {
         if (
           (long &&
             (pg.temp[key].rest === RestType.Long ||
@@ -1009,8 +1016,8 @@ class Sheet extends Component<
         pg: {
           ...pg,
           temp: newTemp,
-          currentPF: pf > pg.pfTot ? pg.pfTot : pf
-        }
+          currentPF: pf > pg.pfTot ? pg.pfTot : pf,
+        },
       },
       () => {
         const { onEdit } = this.state
@@ -1020,7 +1027,7 @@ class Sheet extends Component<
         this.setState({
           snackMessage: long
             ? 'Riposo lungo effettuato!'
-            : 'Riposo corto effettuato!'
+            : 'Riposo corto effettuato!',
         })
       }
     )
@@ -1031,8 +1038,8 @@ class Sheet extends Component<
     this.setState({
       pg: {
         ...pg,
-        multiclass: multi
-      }
+        multiclass: multi,
+      },
     })
   }
 
@@ -1041,14 +1048,34 @@ class Sheet extends Component<
     this.setState({
       pg: {
         ...pg,
-        levelFirstClass: level
-      }
+        levelFirstClass: level,
+      },
     })
+  }
+
+  getProficiency = async () => {
+    const app = initializeApp(firebaseConfig)
+    const db = getFirestore(app)
+    const response = await getDocs(collection(db, 'data'))
+    const proficiency = response.docs
+      .find((doc) => doc.id == 'proficiency')
+      ?.data()
+
+    if (proficiency) {
+      const data = JSON.parse(proficiency.data)
+      console.log('proficiency', data)
+      this.setState({ proficiency: data })
+    }
+  }
+
+  componentDidMount() {
+    this.getProficiency()
   }
 
   render() {
     const { classes, theme } = this.props
-    const { pageIndex, onEdit, sheetId, pg, exist, snackMessage } = this.state
+    const { pageIndex, onEdit, sheetId, pg, exist, snackMessage, proficiency } =
+      this.state
 
     let swipeableViews = [
       <div key={'slide1'}>
@@ -1075,6 +1102,7 @@ class Sheet extends Component<
           onChangeGeneralInfo={this.onChangeGeneralInfo}
           onChangeMulticlass={this.onChangeMulticlass}
           onUpdateFirstClassLevel={this.onUpdateFirstClassLevel}
+          proficiency={proficiency}
         />
       </div>,
       <div key={'slide2'}>
@@ -1093,6 +1121,7 @@ class Sheet extends Component<
           onAddArmor={this.onAddArmor}
           onSelectArmor={this.onSelectArmor}
           onChangeTemp={this.onChangeTemp}
+          proficiency={proficiency}
         />
       </div>,
       <div key={'slide3'}>
@@ -1104,7 +1133,7 @@ class Sheet extends Component<
           onAddEquipment={this.onAddEquipment}
           onRemoveEquipment={this.onRemoveEquipment}
         />
-      </div>
+      </div>,
     ]
     if (this.hasSpells()) {
       swipeableViews.push(
@@ -1113,6 +1142,7 @@ class Sheet extends Component<
           <SpellsView
             onEdit={onEdit}
             pg={pg}
+            proficiency={proficiency}
             onAddSpell={this.onAddSpell}
             onRemoveSpell={this.onRemoveSpell}
             onUpdateSpell={this.onUpdateSpell}
@@ -1124,10 +1154,12 @@ class Sheet extends Component<
     swipeableViews.push(
       <div key={'slide5'}>
         {/* slide n°5 */}
-        {this.actions.map(action => (
+        {this.actions.map((action) => (
           <MenuItem key={action.name} onClick={action.onClick}>
             <ListItemIcon>{action.icon}</ListItemIcon>
-            <ListItemText className={classes.otherText}>{action.name}</ListItemText>
+            <ListItemText className={classes.otherText}>
+              {action.name}
+            </ListItemText>
           </MenuItem>
         ))}
       </div>
@@ -1148,7 +1180,7 @@ class Sheet extends Component<
         key={'Zaino'}
         label="Zaino"
         icon={<BackpackIcon className={classes.navigationIcon} />}
-      />
+      />,
     ]
     if (this.hasSpells()) {
       bottomNavigations.push(
@@ -1172,14 +1204,14 @@ class Sheet extends Component<
           //   this.state.onEdit &&
           //   JSON.stringify(this.state.pg) !== this.state.initialPgJson
           // }
-          message={location => {
+          message={(location) => {
             const nextLocationPath = location.pathname.split('/')
             const currentLocationPath = this.props.match.url.split('/')
             const shouldPrompt =
               this.state.onEdit &&
               JSON.stringify(this.state.pg) !== this.state.initialPgJson &&
               (nextLocationPath[1] !== currentLocationPath[1] || //different page (not sheet anymore)
-              nextLocationPath.length < currentLocationPath.length || //different page (not sheet anymore)
+                nextLocationPath.length < currentLocationPath.length || //different page (not sheet anymore)
                 (nextLocationPath.length > 1 &&
                   nextLocationPath[2] !== currentLocationPath[2])) //different pg (still sheet page)
                 ? 'Ci sono dei dati che non hai salvato, sei sicuro di voler lasciare la pagina?'
@@ -1211,7 +1243,7 @@ class Sheet extends Component<
           onChangeIndex={this.onSwipePage}
           className="tab-container"
         >
-          {swipeableViews.map(item => item)}
+          {swipeableViews.map((item) => item)}
         </SwipeableViews>
 
         <BottomNavigation
@@ -1219,7 +1251,7 @@ class Sheet extends Component<
           onChange={this.onChangePage}
           className={classes.bottomNavigation}
         >
-          {bottomNavigations.map(item => item)}
+          {bottomNavigations.map((item) => item)}
         </BottomNavigation>
 
         <Snackbar

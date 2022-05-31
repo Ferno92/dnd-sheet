@@ -21,7 +21,7 @@ import {
   DialogContentText,
   Tooltip,
   withWidth,
-  WithWidth
+  WithWidth,
 } from '@material-ui/core'
 import StatsViewStyles from './StatsView.styles'
 import TextFieldString from 'components/text-field-string/TextFieldString'
@@ -51,10 +51,10 @@ import {
   Mood,
   Translate,
   DateRange,
-  AccessTime
+  AccessTime,
 } from '@material-ui/icons'
 import InfoDialog from 'components/info-dialog/InfoDialog'
-import StatsUtils from 'utils/StatsUtils'
+import StatsUtils, { Proficiency } from 'utils/StatsUtils'
 import Ability from 'data/types/Ability'
 import ImageCompressor from 'image-compressor.js'
 import ExpansionPanelItem from 'components/expansion-panel-item/ExpansionPanelItem'
@@ -70,6 +70,7 @@ interface StatsViewProps {
   onEdit: boolean
   id: number
   pg: PG
+  proficiency: Proficiency[]
   exist: boolean
   onEditName: (value: string) => void
   onEditLevel: (lv: number) => void
@@ -149,8 +150,8 @@ class StatsView extends Component<
       showBackgroundItems: false,
       generalInfoDialogOpen: false,
       tempStatMode:
-        props.pg.stats.find(stat => stat.temp !== undefined) !== undefined,
-      askDeleteTempStat: false
+        props.pg.stats.find((stat) => stat.temp !== undefined) !== undefined,
+      askDeleteTempStat: false,
     }
   }
 
@@ -163,7 +164,8 @@ class StatsView extends Component<
       this.setState({ backgroundFromState: newProps.pg.background })
     }
     if (
-      newProps.pg.stats.filter(stat => stat.temp === undefined).length !== 6 &&
+      newProps.pg.stats.filter((stat) => stat.temp === undefined).length !==
+        6 &&
       !tempStatMode
     ) {
       this.setState({ tempStatMode: true })
@@ -172,17 +174,19 @@ class StatsView extends Component<
 
   getTSProficiency = (type: StatsType) => {
     const { pgClass } = this.props.pg
+    const { proficiency } = this.props
     let hasProficiency = false
     if (pgClass) {
-      this.jobsData.forEach(job => {
+      this.jobsData.forEach((job) => {
         if (job.type === pgClass) {
-          hasProficiency = job.ts.filter(ts => ts === type).length > 0
+          hasProficiency = job.ts.filter((ts) => ts === type).length > 0
         }
       })
     }
     return hasProficiency
       ? StatsUtils.getProficiency(
           StatsUtils.getPgLevel(this.props.pg.pe),
+          proficiency,
           pgClass
         )
       : 0
@@ -193,10 +197,12 @@ class StatsView extends Component<
     excludeBackground?: boolean
   ): boolean => {
     const { abilities } = this.props.pg
-    const filteredAbilities = abilities.filter(ability => ability.type === type)
+    const filteredAbilities = abilities.filter(
+      (ability) => ability.type === type
+    )
     const abilitiesFromBG = this.getAbilitiesListFromBackground()
     let fromBG = false
-    if (abilitiesFromBG.find(ab => ab === type) && !excludeBackground) {
+    if (abilitiesFromBG.find((ab) => ab === type) && !excludeBackground) {
       fromBG = true
     }
     return fromBG || filteredAbilities.length > 0
@@ -207,7 +213,7 @@ class StatsView extends Component<
   getAbilityPoints = (type: AbilitiesEnum): number => {
     const { abilities } = this.props.pg
     let points = 0
-    abilities.forEach(ability => {
+    abilities.forEach((ability) => {
       if (ability.type === type) {
         points += ability.points
       }
@@ -227,7 +233,7 @@ class StatsView extends Component<
     const { pgClass } = this.props.pg
     let abilitiesList: AbilitiesEnum[] = []
     if (pgClass) {
-      this.jobsData.forEach(job => {
+      this.jobsData.forEach((job) => {
         if (job.type === pgClass) {
           abilitiesList = job.abilities
         }
@@ -240,7 +246,7 @@ class StatsView extends Component<
     const { background } = this.props.pg
     let abilitiesList: AbilitiesEnum[] = []
     if (background) {
-      this.backgroundData.forEach(data => {
+      this.backgroundData.forEach((data) => {
         if (data.type === background) {
           abilitiesList = data.abilities
         }
@@ -253,7 +259,7 @@ class StatsView extends Component<
     const { background } = this.props.pg
     let eqList: EquipmentObject[] = []
     if (background) {
-      this.backgroundData.forEach(data => {
+      this.backgroundData.forEach((data) => {
         if (data.type === background) {
           eqList = data.equip
         }
@@ -274,11 +280,11 @@ class StatsView extends Component<
     const { pgClass, race, pgClass2, multiclass } = this.props.pg
     let count = 0
     if (pgClass) {
-      this.jobsData.forEach(job => {
+      this.jobsData.forEach((job) => {
         if (job.type === pgClass) {
           count = job.abilitiesCount
         } else if (job.type === pgClass2 && multiclass && job.multiclass) {
-          job.multiclass.forEach(privilege => {
+          job.multiclass.forEach((privilege) => {
             if (privilege.extra) {
               const splitted = privilege.extra.split('|')
               if (splitted[0] === 'abilities') {
@@ -292,9 +298,9 @@ class StatsView extends Component<
         }
       })
     }
-    this.racesData.forEach(data => {
+    this.racesData.forEach((data) => {
       if (data.type === race.toString()) {
-        data.abilities.forEach(item => {
+        data.abilities.forEach((item) => {
           if (item.extra) {
             const splitted = item.extra.split('|')
             if (splitted[0] === 'abilities') {
@@ -313,7 +319,7 @@ class StatsView extends Component<
   missingAbilitiesToSelect = (): number => {
     let count = 0
     const abilities = this.getAbilitiesListFromClass()
-    abilities.forEach(ability => {
+    abilities.forEach((ability) => {
       if (this.hasProficiency(ability, true)) {
         count++
       }
@@ -326,8 +332,8 @@ class StatsView extends Component<
     const abilitiesFromBG = this.getAbilitiesListFromBackground()
     let found = false
     if (
-      !abilitiesFromBG.find(item => item === ability.type) &&
-      abilities.find(item => item === ability.type)
+      !abilitiesFromBG.find((item) => item === ability.type) &&
+      abilities.find((item) => item === ability.type)
     ) {
       found = true
     }
@@ -337,7 +343,7 @@ class StatsView extends Component<
   getSubRacesData = () => {
     const { race } = this.props.pg
     const filtered = this.subRacesData.filter(
-      subRace => subRace.type.indexOf(race.toString().toLowerCase()) >= 0
+      (subRace) => subRace.type.indexOf(race.toString().toLowerCase()) >= 0
     )
     return filtered || ''
   }
@@ -346,7 +352,7 @@ class StatsView extends Component<
     const { pgClass } = this.props.pg
     if (pgClass) {
       const filtered = this.subJobsData.filter(
-        subJob =>
+        (subJob) =>
           subJob.type.toLowerCase().indexOf(pgClass.toString().toLowerCase()) >=
           0
       )
@@ -360,7 +366,7 @@ class StatsView extends Component<
     const { pgClass2 } = this.props.pg
     if (pgClass2) {
       const filtered = this.subJobsData.filter(
-        subJob =>
+        (subJob) =>
           subJob.type
             .toLowerCase()
             .indexOf(pgClass2.toString().toLowerCase()) >= 0
@@ -385,7 +391,7 @@ class StatsView extends Component<
       if (imageFile && imageFile.type.indexOf('image/') !== -1) {
         new ImageCompressor(imageFile, {
           quality: 0.5,
-          success: this.imageCompressCallback
+          success: this.imageCompressCallback,
         })
       } else {
         //TODO error
@@ -413,7 +419,7 @@ class StatsView extends Component<
   isArmorHeavy = (): boolean => {
     const { armors } = this.props.pg
     return (
-      armors.find(armor => armor.isWearing && armor.armor.noFurtivity) !==
+      armors.find((armor) => armor.isWearing && armor.armor.noFurtivity) !==
       undefined
     )
   }
@@ -432,9 +438,9 @@ class StatsView extends Component<
   getLanguages = () => {
     const { generalInfo, race } = this.props.pg
     let languages: string[] = []
-    this.racesData.forEach(data => {
+    this.racesData.forEach((data) => {
       if (data.type === race.toString()) {
-        data.abilities.forEach(item => {
+        data.abilities.forEach((item) => {
           if (item.extra) {
             const splitted = item.extra.split('|')
             if (splitted[0] === 'languages') {
@@ -544,13 +550,13 @@ class StatsView extends Component<
 
   getSecondaryJobsData = (): Job[] => {
     const { pgClass } = this.props.pg
-    const filtered: Job[] = this.jobsData.filter(job => job.type !== pgClass)
-    const mapped: Job[] = filtered.map(x => {
+    const filtered: Job[] = this.jobsData.filter((job) => job.type !== pgClass)
+    const mapped: Job[] = filtered.map((x) => {
       const req = this.getJobRequirement(x.type as JobsEnum)
       return {
         ...x,
         disabled: req !== undefined,
-        extra: req ? req : undefined
+        extra: req ? req : undefined,
       } as Job
     })
     return mapped || []
@@ -590,7 +596,7 @@ class StatsView extends Component<
       multiclass,
       pgClass2,
       subClass2,
-      levelFirstClass
+      levelFirstClass,
     } = this.props.pg
     const {
       classes,
@@ -607,7 +613,8 @@ class StatsView extends Component<
       onEditStats,
       onChangePE,
       onChangeMulticlass,
-      width
+      width,
+      proficiency,
     } = this.props
     const {
       dialogInfoAbilitiesOpen,
@@ -620,18 +627,25 @@ class StatsView extends Component<
       generalInfoDialogOpen,
       tempStatMode,
       askDeleteTempStat,
-      tempPE
+      tempPE,
     } = this.state
     const currentRaceObj = StatsUtils.getCurrentRace(race)
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-      navigator.userAgent
-    )
+    const isMobile =
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        navigator.userAgent
+      )
     const infoReadOnly = (
       <div className={classes.infoReadOnly}>
-        <Typography variant={width === 'xs' || width === 'sm' ? 'body1' : 'h2'} color='textPrimary'>
+        <Typography
+          variant={width === 'xs' || width === 'sm' ? 'body1' : 'h2'}
+          color="textPrimary"
+        >
           {name || ''}
         </Typography>
-        <Typography variant="body2" color='textPrimary'>{`${StatsUtils.getInfoName(
+        <Typography
+          variant="body2"
+          color="textPrimary"
+        >{`${StatsUtils.getInfoName(
           `${race}`,
           this.racesData
         )} ${StatsUtils.getInfoName(
@@ -639,11 +653,11 @@ class StatsView extends Component<
           this.getSubRacesData()
         )}`}</Typography>
         {multiclass && pgClass && pgClass2 ? (
-          <Typography variant="body2" color='textPrimary'>
+          <Typography variant="body2" color="textPrimary">
             {StatsUtils.getInfoName(`${pgClass}`, this.jobsData)
-              ? `${pgClass} Lv. ${levelFirstClass ||
-                  StatsUtils.getPgLevel(this.props.pg.pe) -
-                    1} - ${pgClass2} Lv. ${
+              ? `${pgClass} Lv. ${
+                  levelFirstClass || StatsUtils.getPgLevel(this.props.pg.pe) - 1
+                } - ${pgClass2} Lv. ${
                   levelFirstClass
                     ? StatsUtils.getPgLevel(this.props.pg.pe) - levelFirstClass
                     : 1
@@ -651,7 +665,7 @@ class StatsView extends Component<
               : ''}
           </Typography>
         ) : (
-          <Typography variant="body2" color='textPrimary'>
+          <Typography variant="body2" color="textPrimary">
             {StatsUtils.getInfoName(`${pgClass}`, this.jobsData)
               ? `${StatsUtils.getInfoName(
                   `${pgClass}`,
@@ -744,7 +758,7 @@ class StatsView extends Component<
             item={pgClass}
             data={this.jobsData}
             onEdit={onEdit}
-            onChange={e => onChangeJob(e.target.value as JobsEnum)}
+            onChange={(e) => onChangeJob(e.target.value as JobsEnum)}
             root={multiclass ? classes.infoDetailsItem : undefined}
           />
           {multiclass && pgClass && (
@@ -767,7 +781,7 @@ class StatsView extends Component<
             item={subClass}
             data={this.getSubJobsData()}
             onEdit={onEdit}
-            onChange={e => onChangeSubJob(e.target.value as SubJobsEnum)}
+            onChange={(e) => onChangeSubJob(e.target.value as SubJobsEnum)}
             root={classes.infoDetailsItem}
           />
         )}
@@ -784,16 +798,18 @@ class StatsView extends Component<
                 item={pgClass2}
                 data={this.getSecondaryJobsData()}
                 onEdit={onEdit}
-                onChange={e => onChangeJob(e.target.value as JobsEnum, true)}
+                onChange={(e) => onChangeJob(e.target.value as JobsEnum, true)}
                 root={multiclass ? classes.infoDetailsItem : undefined}
               />
               {pgClass2 && (
                 <Typography
                   variant="body1"
                   className={classes.secondClassLevel}
-                >{`LV. ${StatsUtils.getPgLevel(this.props.pg.pe) -
+                >{`LV. ${
+                  StatsUtils.getPgLevel(this.props.pg.pe) -
                   (this.props.pg.levelFirstClass ||
-                    StatsUtils.getPgLevel(this.props.pg.pe) - 1)}`}</Typography>
+                    StatsUtils.getPgLevel(this.props.pg.pe) - 1)
+                }`}</Typography>
               )}
             </div>
             {pgClass2 && (
@@ -802,7 +818,7 @@ class StatsView extends Component<
                 item={subClass2}
                 data={this.getSecondarySubJobsData()}
                 onEdit={onEdit}
-                onChange={e =>
+                onChange={(e) =>
                   onChangeSubJob(e.target.value as SubJobsEnum, true)
                 }
                 root={classes.infoDetailsItem}
@@ -815,7 +831,7 @@ class StatsView extends Component<
           item={backgroundFromState}
           data={this.backgroundData}
           onEdit={onEdit}
-          onChange={event => {
+          onChange={(event) => {
             this.setState({ showBackgroundItems: true })
             onChangeBackground(event)
           }}
@@ -851,7 +867,9 @@ class StatsView extends Component<
           )}
 
           <div className={classes.generalInfo}>
-            <Typography variant="subtitle1" color='textPrimary'>Info generali</Typography>
+            <Typography variant="subtitle1" color="textPrimary">
+              Info generali
+            </Typography>
             {onEdit && (
               <Tooltip title="Modifica info generali">
                 <IconButton
@@ -865,32 +883,32 @@ class StatsView extends Component<
           </div>
           <div className={classes.moreInfos}>
             <div className={classes.moreInfo}>
-              <FitnessCenter className={classes.infoIcon}/>
-              <Typography variant="body1" color='textPrimary'>{`${
+              <FitnessCenter className={classes.infoIcon} />
+              <Typography variant="body1" color="textPrimary">{`${
                 generalInfo ? generalInfo.weight : '__'
               } kg`}</Typography>
             </div>
             <div className={classes.moreInfo}>
               <Height className={classes.infoIcon} />
-              <Typography variant="body1" color='textPrimary'>{`${
+              <Typography variant="body1" color="textPrimary">{`${
                 generalInfo ? generalInfo.height : '__'
               } m`}</Typography>
             </div>
             <div className={classes.moreInfo}>
               <DateRange className={classes.infoIcon} />
-              <Typography variant="body1" color='textPrimary'>{`${
+              <Typography variant="body1" color="textPrimary">{`${
                 generalInfo ? generalInfo.age : '__'
               } anni`}</Typography>
             </div>
             <div className={classes.moreInfo}>
               <Mood className={classes.infoIcon} />
-              <Typography variant="body1" color='textPrimary'>{`${
+              <Typography variant="body1" color="textPrimary">{`${
                 generalInfo ? generalInfo.alignment : 'Allineamento'
               }`}</Typography>
             </div>
             <div className={classes.moreInfo}>
               <Translate className={classes.infoIcon} />
-              <Typography variant="body1" color='textPrimary'>
+              <Typography variant="body1" color="textPrimary">
                 {this.getLanguages().length !== 0
                   ? this.getLanguages().map(
                       (item, i) =>
@@ -910,6 +928,7 @@ class StatsView extends Component<
                   label="Competenza"
                   value={StatsUtils.getProficiency(
                     StatsUtils.getPgLevel(this.props.pg.pe),
+                    proficiency,
                     pgClass
                   )}
                   onChange={() => {}}
@@ -931,7 +950,10 @@ class StatsView extends Component<
               </Grid>
               <Grid item xs={4} className={classes.gridItem}>
                 <div className={classes.taglia}>
-                  <Typography variant="body1" color='textPrimary'>{`Taglia: ${StatsUtils.getRaceSize(
+                  <Typography
+                    variant="body1"
+                    color="textPrimary"
+                  >{`Taglia: ${StatsUtils.getRaceSize(
                     this.props.pg
                   )}`}</Typography>
                 </div>
@@ -967,7 +989,7 @@ class StatsView extends Component<
                   }
                   label="Ispirazione"
                   classes={{
-                    label: classes.infoIcon
+                    label: classes.infoIcon,
                   }}
                 />
               </Grid>
@@ -995,7 +1017,7 @@ class StatsView extends Component<
                       onClick={() => {
                         this.setState({
                           peFromState: peFromState + (tempPE || 0),
-                          tempPE: undefined
+                          tempPE: undefined,
                         })
                         onChangePE(peFromState + (tempPE || 0))
                       }}
@@ -1007,7 +1029,10 @@ class StatsView extends Component<
               )}
               <Grid item xs={12} className={classes.gridItem}>
                 <div className={classes.peContainer}>
-                  <Typography variant="body1" color='textPrimary'>{`Lv. ${StatsUtils.getPgLevel(
+                  <Typography
+                    variant="body1"
+                    color="textPrimary"
+                  >{`Lv. ${StatsUtils.getPgLevel(
                     this.props.pg.pe
                   )}`}</Typography>
                   <LinearProgress
@@ -1016,7 +1041,10 @@ class StatsView extends Component<
                     color="primary"
                     className={classes.peProgress}
                   />
-                  <Typography variant="body1" color='textPrimary'>{`Lv. ${StatsUtils.getPgLevel(
+                  <Typography
+                    variant="body1"
+                    color="textPrimary"
+                  >{`Lv. ${StatsUtils.getPgLevel(
                     this.props.pg.pe,
                     true
                   )}`}</Typography>
@@ -1026,7 +1054,11 @@ class StatsView extends Component<
           </div>
           <Divider className={classes.divider} />
           <div className={classes.statTitleContainer}>
-            <Typography variant="h6" className={classes.title} color='textPrimary'>
+            <Typography
+              variant="h6"
+              className={classes.title}
+              color="textPrimary"
+            >
               Caratteristiche
             </Typography>
             {onEdit && (
@@ -1120,7 +1152,11 @@ class StatsView extends Component<
             </Grid>
           </div>
           <Divider className={classes.divider} />
-          <Typography variant="h6" className={classes.title} color='textPrimary'>
+          <Typography
+            variant="h6"
+            className={classes.title}
+            color="textPrimary"
+          >
             Tiri Salvezza
           </Typography>
           <div className={classes.gridContainer}>
@@ -1168,20 +1204,20 @@ class StatsView extends Component<
                         type: 'Temp',
                         value: stat.tsTemp,
                         min: -20,
-                        max: 20
+                        max: 20,
                       }}
                       inputPos={InputPosition.End}
                       modifiers={[
                         {
                           type: 'Comp',
-                          value: this.getTSProficiency(stat.type)
+                          value: this.getTSProficiency(stat.type),
                         },
                         {
                           type: 'Mod',
-                          value: StatsUtils.getStatModifier(stat)
-                        }
+                          value: StatsUtils.getStatModifier(stat),
+                        },
                       ]}
-                      onChange={value =>
+                      onChange={(value) =>
                         onEditStats(index, value.toString(), false, true)
                       }
                       onEdit={onEdit}
@@ -1194,7 +1230,11 @@ class StatsView extends Component<
           </div>
           <Divider className={classes.divider} />
           <div className={classes.abilitiesHeader}>
-            <Typography variant="h6" className={classes.title} color='textPrimary'>
+            <Typography
+              variant="h6"
+              className={classes.title}
+              color="textPrimary"
+            >
               Abilità
             </Typography>
             {pgClass && this.missingAbilitiesToSelect() !== 0 && (
@@ -1207,7 +1247,11 @@ class StatsView extends Component<
             )}
           </div>
           {this.missingAbilitiesToSelect() !== 0 && (
-            <Typography variant="body2" className={classes.title} color='textPrimary'>
+            <Typography
+              variant="body2"
+              className={classes.title}
+              color="textPrimary"
+            >
               {`Ancora ${this.missingAbilitiesToSelect()} da selezionare`}
             </Typography>
           )}
@@ -1221,6 +1265,7 @@ class StatsView extends Component<
                 (this.hasProficiency(ability.type)
                   ? StatsUtils.getProficiency(
                       StatsUtils.getPgLevel(this.props.pg.pe),
+                      proficiency,
                       pgClass
                     )
                   : 0) +
@@ -1259,7 +1304,7 @@ class StatsView extends Component<
                         ? classes.tsPositive
                         : this.getAbilityPoints(ability.type) < 0
                         ? classes.tsNegative
-                        : ''
+                        : '',
                   }}
                 >
                   <MixedInput
@@ -1267,7 +1312,7 @@ class StatsView extends Component<
                       type: 'Extra',
                       value: this.getAbilityPoints(ability.type),
                       min: -20,
-                      max: 20
+                      max: 20,
                     }}
                     inputPos={InputPosition.End}
                     modifiers={[
@@ -1283,10 +1328,11 @@ class StatsView extends Component<
                           (this.hasProficiency(ability.type)
                             ? StatsUtils.getProficiency(
                                 StatsUtils.getPgLevel(this.props.pg.pe),
+                                proficiency,
                                 pgClass
                               )
-                            : 0)
-                      }
+                            : 0),
+                      },
                     ]}
                     onChange={(value: number) => {
                       onChangeAbilityPoints(ability.type, value)

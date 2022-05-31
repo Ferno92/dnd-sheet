@@ -13,7 +13,7 @@ import {
   IconButton,
   ListItemSecondaryAction,
   Tooltip,
-  Button
+  Button,
 } from '@material-ui/core'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
 import DashboardStyles from './Dashboard.styles'
@@ -44,13 +44,13 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
   const [user, setUser] = useState<BasicProfile>()
   const [showLoginDialog, setShowLoginDialog] = useState(false)
   const classes = DashboardStyles()
-  const {mode, setMode} = useContext(ThemeContext)
+  const { mode, setMode } = useContext(ThemeContext)
 
   useEffect(() => {
     //load only once
     const db = new Dexie('pg01_database')
     db.version(1).stores({
-      pg: 'id,name,race,pgClass,level,stats'
+      pg: 'id,name,race,pgClass,level,stats',
     })
     db.open().then(() => {
       const pgTable = db.table('pg')
@@ -78,9 +78,10 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
 
   const onDeleteItem = useCallback(() => {
     if (dbInstance && pgToDelete !== undefined) {
-      dbInstance.table('pg').delete(pgToDelete + 1)
+      dbInstance.table('pg').delete(pgToDelete)
       const temp = [...pgs]
-      temp.splice(pgToDelete, 1)
+      const pgIndex = pgs.findIndex((pg) => pg.id)
+      temp.splice(pgIndex, 1)
       setPGIds(temp)
       setPgToDelete(undefined)
     }
@@ -91,7 +92,7 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
     setShowLoginDialog(false)
   }, [])
 
-  const toggleDarkMode = ()=> {
+  const toggleDarkMode = () => {
     setMode(mode === 'light' ? 'dark' : 'light')
   }
 
@@ -106,7 +107,9 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
           >
             {user ? `Ciao ${user.getGivenName()}` : 'Login'}
           </Button>
-          <IconButton onClick={toggleDarkMode}><BrightnessIcon/></IconButton>
+          <IconButton onClick={toggleDarkMode}>
+            <BrightnessIcon />
+          </IconButton>
         </div>
         <Typography variant="h5" className={classes.title}>
           I tuoi personaggi
@@ -116,7 +119,7 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
 
       <div className={classes.list}>
         {loading
-          ? [...Array(3).keys()].map(i => {
+          ? [...Array(3).keys()].map((i) => {
               return (
                 <div className={classes.skeletonContainer} key={i}>
                   <Skeleton variant="circle" height={50} width={50} />
@@ -149,10 +152,9 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
                   primary={pg.name}
                   secondary={
                     pg.multiclass && pg.pgClass2
-                      ? `${pg.race} ${pg.pgClass} Lv. ${pg.levelFirstClass ||
-                          StatsUtils.getPgLevel(pg.pe) - 1} - ${
-                          pg.pgClass2
-                        } Lv. ${
+                      ? `${pg.race} ${pg.pgClass} Lv. ${
+                          pg.levelFirstClass || StatsUtils.getPgLevel(pg.pe) - 1
+                        } - ${pg.pgClass2} Lv. ${
                           pg.levelFirstClass
                             ? StatsUtils.getPgLevel(pg.pe) - pg.levelFirstClass
                             : 1
@@ -163,12 +165,12 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
                   }
                   classes={{
                     primary: classes.listItemText,
-                    secondary: classes.listItemSecondaryText
+                    secondary: classes.listItemSecondaryText,
                   }}
                 />
                 <ListItemSecondaryAction>
                   <Tooltip title="Elimina personaggio">
-                    <IconButton onClick={() => setPgToDelete(i)}>
+                    <IconButton onClick={() => setPgToDelete(pg.id)}>
                       <Delete />
                     </IconButton>
                   </Tooltip>

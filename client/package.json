@@ -14,7 +14,7 @@
     "@types/shortid": "0.0.29",
     "clsx": "^1.0.4",
     "dexie": "^2.0.4",
-    "firebase": "^7.8.1",
+    "firebase": "^9.8.2",
     "image-compressor.js": "^1.1.4",
     "lodash": "^4.17.20",
     "react": "^16.8.6",
@@ -24,7 +24,7 @@
     "react-scripts": "^3.4.3",
     "react-swipeable-views": "^0.13.3",
     "shortid": "^2.2.15",
-    "typescript": "^3.5.2"
+    "typescript": "^4.7.2"
   },
   "scripts": {
     "start": "react-scripts start",

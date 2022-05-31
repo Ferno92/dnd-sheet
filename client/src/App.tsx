@@ -5,7 +5,6 @@ import Dashboard from 'pages/dashboard/Dashboard'
 import { Typography, Button, IconButton } from '@material-ui/core'
 import { HighlightOff } from '@material-ui/icons'
 import useStyles from 'App.styles'
-import firebase from 'firebase/app'
 import DownloadPG from 'pages/download/DownloadPG'
 import PrivacyPolicy from 'pages/privacy/PrivacyPolicy'
 
@@ -17,7 +16,7 @@ export const firebaseConfig = {
   storageBucket: 'dnd-sheet-f7049.appspot.com',
   messagingSenderId: '301028242623',
   appId: '1:301028242623:web:66f946f5d29caa2656420a',
-  measurementId: 'G-L2099R8SDB'
+  measurementId: 'G-L2099R8SDB',
 }
 
 const App: React.FC = () => {
@@ -42,10 +41,10 @@ const App: React.FC = () => {
   }
 
   useEffect(() => {
-    if (!firebase.apps.length) {
+    /*if (!firebase.apps.length) {
       firebase.initializeApp(firebaseConfig)
       // firebase.analytics()
-    }
+    }*/
     window.addEventListener('sw-installed', onNewServiceWorkerInstalled, false)
 
     return () => {
@@ -53,7 +52,7 @@ const App: React.FC = () => {
     }
   }, [])
   return (
-      <>
+    <>
       {/* <BottomAppBar
               logged={this.state.logged}
               logout={this.logout}
@@ -90,7 +89,7 @@ const App: React.FC = () => {
           <Route exact path="/privacy" component={PrivacyPolicy} />
         </Switch>
       </BrowserRouter>
-      </>
+    </>
   )
 }
 
