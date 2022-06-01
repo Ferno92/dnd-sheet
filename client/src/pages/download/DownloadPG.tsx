@@ -1,11 +1,10 @@
 import React, { useEffect } from 'react'
 import { CircularProgress } from '@material-ui/core'
 import { RouteComponentProps } from 'react-router-dom'
-import { firebaseConfig } from 'App'
+import { firebaseApp, firebaseConfig } from 'App'
 import Dexie from 'dexie'
 import PG from 'pages/stats/models/PG'
 import { collection, getDocs, getFirestore } from 'firebase/firestore'
-import { initializeApp } from 'firebase/app'
 
 interface DownloadPGProps {
   id: string
@@ -21,8 +20,7 @@ const DownloadPG: React.FC<
     let didCancel = false
 
     const getFirestoreData = async () => {
-      const app = initializeApp(firebaseConfig)
-      const db = getFirestore(app)
+      const db = getFirestore(firebaseApp)
       const response = await getDocs(collection(db, 'sharing'))
       const data = response.docs.find((doc) => doc.id == id)?.data()
       console.log('Response', data)

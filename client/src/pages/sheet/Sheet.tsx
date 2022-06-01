@@ -52,8 +52,7 @@ import PgGeneralInfo from 'data/types/PgGeneralInfo'
 import RestType from 'data/types/RestType'
 import MuiAlert from '@material-ui/lab/Alert'
 import BattleUtils from 'utils/BattleUtils'
-import { initializeApp } from 'firebase/app'
-import { firebaseConfig } from 'App'
+import { firebaseApp } from 'App'
 import {
   collection,
   doc,
@@ -202,8 +201,7 @@ class Sheet extends Component<
           )
           const url = `https://${window.location.hostname}/download/${id}`
 
-          const app = initializeApp(firebaseConfig)
-          const db = getFirestore(app)
+          const db = getFirestore(firebaseApp)
           const ref = doc(db, 'sharing', id)
           setDoc(ref, { data: pgEncoded })
             .then(() => {
@@ -1054,8 +1052,7 @@ class Sheet extends Component<
   }
 
   getProficiency = async () => {
-    const app = initializeApp(firebaseConfig)
-    const db = getFirestore(app)
+    const db = getFirestore(firebaseApp)
     const response = await getDocs(collection(db, 'data'))
     const proficiency = response.docs
       .find((doc) => doc.id == 'proficiency')
@@ -1063,7 +1060,6 @@ class Sheet extends Component<
 
     if (proficiency) {
       const data = JSON.parse(proficiency.data)
-      console.log('proficiency', data)
       this.setState({ proficiency: data })
     }
   }

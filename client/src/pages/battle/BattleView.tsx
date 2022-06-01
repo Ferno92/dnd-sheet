@@ -42,9 +42,6 @@ import Privileges from 'data/types/Privileges'
 import ExpansionPanelItem from 'components/expansion-panel-item/ExpansionPanelItem'
 import ConfirmDialog from 'components/confirm-dialog/ConfirmDialog'
 import RestType from 'data/types/RestType'
-import { firebaseConfig } from 'App'
-import { initializeApp } from 'firebase/app'
-import { getFirestore, doc, getDocs, collection } from 'firebase/firestore'
 
 export interface Modifier {
   type: string
@@ -274,7 +271,6 @@ function BattleView(props: BattleViewProps) {
     (weaponInfo: WeaponInfo) => {
       const { pgClass } = pg
       const hasProficiency = hasWeaponProficiency(weaponInfo)
-      console.log('getWeaponTPC', proficiency)
       let tpc =
         weaponInfo.bonus +
         (hasProficiency

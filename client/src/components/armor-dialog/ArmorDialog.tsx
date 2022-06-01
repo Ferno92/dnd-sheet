@@ -8,18 +8,18 @@ import {
   Grid,
   Button,
   DialogActions,
-  TextField
+  TextField,
 } from '@material-ui/core'
 import { Close } from '@material-ui/icons'
 import useStyles from './ArmorDialog.styles'
 import SimpleSelect from 'components/simple-select/SimpleSelect'
-import { default as armorsJSON } from 'data/json/ArmorsJSON'
-import DataUtils from 'data/DataUtils'
 import Armor from 'data/types/Armor'
 import ArmorEnum from 'data/types/ArmorEnum'
 import TextFieldNumber from 'components/text-field-number/TextFieldNumber'
 import ArmorInfo from 'data/types/ArmorInfo'
 import ArmorType from 'data/types/ArmorType'
+import { firebaseApp } from 'App'
+import { getFirestore, getDocs, collection } from 'firebase/firestore'
 
 interface ArmorDialogProps {
   open: boolean
@@ -39,30 +39,41 @@ const ArmorDialog: React.FC<ArmorDialogProps> = (props: ArmorDialogProps) => {
   const [armor, setArmor] = useState<Armor>()
   const [bonus, setBonus] = useState(0)
   const [notes, setNotes] = useState('')
+  const [armors, setArmors] = useState<Armor[]>([])
   const styles = useStyles()
 
-  const getArmorsData = useCallback(() => {
-    const armorsData = DataUtils.ArmorsMapper(armorsJSON as any)
+  const fetchArmors = useCallback(async () => {
+    const db = getFirestore(firebaseApp)
+    const response = await getDocs(collection(db, 'data'))
+    const armors = response.docs.find((doc) => doc.id == 'armors')?.data()
+
     const armorsDataTemp: Armor[] = []
-    armorsData.forEach((item, index) => {
-      const prevType = index > 0 ? armorsData[index - 1].armorType : ''
-      const currentType = item.armorType
-      if (currentType !== prevType) {
-        armorsDataTemp.push({
-          name: currentType,
-          value: currentType,
-          id: ArmorEnum.SubHeader,
-          type: ArmorEnum.SubHeader,
-          armorType: ArmorType.Leggera,
-          ca: 0,
-          noFurtivity: false,
-          weight: 0,
-          addDes: false
-        })
-      }
-      armorsDataTemp.push(item)
-    })
-    return armorsDataTemp
+    if (armors) {
+      const data = JSON.parse(armors.data) as Armor[]
+      data.forEach((item, index) => {
+        const prevType = index > 0 ? data[index - 1].armorType : ''
+        const currentType = item.armorType
+        if (currentType !== prevType) {
+          armorsDataTemp.push({
+            name: currentType,
+            value: currentType,
+            id: ArmorEnum.SubHeader,
+            type: ArmorEnum.SubHeader,
+            armorType: ArmorType.Leggera,
+            ca: 0,
+            noFurtivity: false,
+            weight: 0,
+            addDes: false,
+          })
+        }
+
+        item.value = item.name
+        item.type = item.id
+
+        armorsDataTemp.push(item)
+      })
+    }
+    setArmors(armorsDataTemp)
   }, [])
 
   const onChangeArmor = useCallback(
@@ -73,14 +84,14 @@ const ArmorDialog: React.FC<ArmorDialogProps> = (props: ArmorDialogProps) => {
       }>
     ) => {
       const id = event.target.value
-      const found = getArmorsData().find(armorData => armorData.id === id)
+      const found = armors.find((armorData) => armorData.id === id)
       if (armorSelected === undefined) {
         setBonus(0)
         setNotes('')
       }
       setArmor(found)
     },
-    [getArmorsData, armorSelected]
+    [armorSelected, armors]
   )
 
   const onChangeNotes = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -139,6 +150,10 @@ const ArmorDialog: React.FC<ArmorDialogProps> = (props: ArmorDialogProps) => {
     }
   }, [armorSelected])
 
+  useEffect(() => {
+    fetchArmors()
+  }, [])
+
   return (
     <Dialog
       fullScreen={fullScreen}
@@ -159,7 +174,7 @@ const ArmorDialog: React.FC<ArmorDialogProps> = (props: ArmorDialogProps) => {
         <SimpleSelect<ArmorEnum>
           label={'Armatura o scudo'}
           item={armor ? armor.id : undefined}
-          data={getArmorsData()}
+          data={armors}
           onEdit={true}
           onChange={onChangeArmor}
         />
@@ -172,7 +187,7 @@ const ArmorDialog: React.FC<ArmorDialogProps> = (props: ArmorDialogProps) => {
             ) : (
               <TextField
                 className={styles.armorName}
-                onChange={e => onChangeOtherName(e.currentTarget.value)}
+                onChange={(e) => onChangeOtherName(e.currentTarget.value)}
                 variant="outlined"
                 label={'Nome'}
               />
@@ -193,7 +208,7 @@ const ArmorDialog: React.FC<ArmorDialogProps> = (props: ArmorDialogProps) => {
                 ) : (
                   <TextFieldNumber
                     label={'CA'}
-                    onChange={e => onChangeOtherCA(e.currentTarget.value)}
+                    onChange={(e) => onChangeOtherCA(e.currentTarget.value)}
                     value={armor.ca}
                     min={0}
                     max={20}
@@ -246,7 +261,7 @@ const ArmorDialog: React.FC<ArmorDialogProps> = (props: ArmorDialogProps) => {
                 ) : (
                   <TextFieldNumber
                     label={'Peso (kg)'}
-                    onChange={e => onChangeOtherWeight(e.currentTarget.value)}
+                    onChange={(e) => onChangeOtherWeight(e.currentTarget.value)}
                     value={armor.weight}
                     min={0}
                     disabled={false}
