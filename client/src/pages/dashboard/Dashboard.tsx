@@ -13,7 +13,6 @@ import {
   IconButton,
   ListItemSecondaryAction,
   Tooltip,
-  Button,
 } from '@material-ui/core'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
 import DashboardStyles from './Dashboard.styles'
@@ -24,9 +23,21 @@ import LoginDialog from 'components/login-dialog/LoginDialog'
 import BrightnessIcon from '@material-ui/icons/Brightness6'
 import { ThemeContext } from 'index'
 import { useGoogleOneTapLogin } from 'react-google-one-tap-login'
-import { IGoogleEndPointResponse } from 'react-google-one-tap-login/dist/types/types'
+import { firebaseApp } from 'App'
+import {
+  getFirestore,
+  getDocs,
+  collection,
+  doc,
+  setDoc,
+} from 'firebase/firestore'
 
 interface DashboardProps {}
+
+interface GoogleUser {
+  id: string | undefined
+  picture: string | undefined
+}
 
 export interface BasicProfile {
   getId(): string
@@ -43,8 +54,7 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
   const [pgToDelete, setPgToDelete] = useState<number>()
   const [dbInstance, setDbInstance] = useState<Dexie>()
   const [loading, setLoading] = useState<boolean>(true)
-  //const [user, setUser] = useState<BasicProfile>()
-  const [user, setUser] = useState<IGoogleEndPointResponse>()
+  const [user, setUser] = useState<GoogleUser>()
   const [showLoginDialog, setShowLoginDialog] = useState(false)
   const classes = DashboardStyles()
   const { mode, setMode } = useContext(ThemeContext)
@@ -90,10 +100,18 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
     }
   }, [pgs, dbInstance, pgToDelete])
 
-  const onLogin = useCallback((profile?: BasicProfile) => {
-    //setUser(profile)
-    setShowLoginDialog(false)
-  }, [])
+  const onLogin = useCallback(
+    (profile?: BasicProfile) => {
+      const googleUser = {
+        id: profile?.getId(),
+        picture: profile?.getImageUrl(),
+      }
+      setUser(googleUser)
+      setShowLoginDialog(false)
+      checkUserPgDatabase(googleUser)
+    },
+    [pgs]
+  )
 
   const toggleDarkMode = () => {
     setMode(mode === 'light' ? 'dark' : 'light')
@@ -103,7 +121,10 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
     onError: (error) => console.log('GOOGLE ERR', error),
     onSuccess: (response) => {
       console.log('GOOGLE OK', response)
-      setUser(response)
+      setUser({
+        id: response.aud,
+        picture: response.picture,
+      })
     },
     googleAccountConfigs: {
       client_id:
@@ -114,17 +135,44 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
     },
   })
 
+  const checkUserPgDatabase = useCallback(
+    async (user: GoogleUser) => {
+      console.log('checkUserPgDatabase', pgs)
+      if (user.id) {
+        const db = getFirestore(firebaseApp)
+        const usersDocName = 'users'
+        const response = await getDocs(collection(db, usersDocName))
+        const userDoc = response.docs.find((doc) => doc.id == user?.id)?.data()
+        if (userDoc == undefined) {
+          const ref = doc(db, usersDocName, user?.id)
+          setDoc(ref, {
+            data: pgs.map((pg) => {
+              return JSON.stringify(pg)
+            }),
+          })
+            .then(() => {
+              console.log('saved user pgs', user?.id)
+            })
+            .catch((error) => {
+              console.log('db upload err: ', error)
+            })
+        } else {
+          //check/download pgs
+          setPGIds(
+            (userDoc.data as string[]).map((pg) => {
+              return JSON.parse(pg)
+            })
+          )
+        }
+      }
+    },
+    [pgs]
+  )
+
   return (
     <div className={classes.root}>
       <div className={classes.header}>
         <div className={classes.loginButtonContainer}>
-          {/*<Button
-            onClick={() => setShowLoginDialog(true)}
-            variant="outlined"
-            className={classes.loginButton}
-          >
-            {user ? `Ciao ${user.getGivenName()}` : 'Login'}
-  </Button>*/}
           <IconButton onClick={toggleDarkMode}>
             <BrightnessIcon />
           </IconButton>

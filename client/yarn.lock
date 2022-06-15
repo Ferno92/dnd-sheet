@@ -9539,7 +9539,7 @@
     "strip-ansi" "6.0.0"
     "text-table" "0.2.0"
 
-"react-dom@^16.8.0", "react-dom@^16.8.6", "react-dom@>=16.6.0":
+"react-dom@^16 || ^17", "react-dom@^16.8.0", "react-dom@^16.8.6", "react-dom@>=16.6.0":
   "integrity" "sha512-1nL7PIq9LTL3fthPqwkvr2zY7phIPjYrT0jp4HjyEQrEROnw4dG41VVwi/wfoCneoleqrNX7iAD+pXebJZwrwA=="
   "resolved" "https://registry.npmjs.org/react-dom/-/react-dom-16.8.6.tgz"
   "version" "16.8.6"
@@ -9562,6 +9562,14 @@
     "@babel/runtime" "^7.2.0"
     "prop-types" "^15.6.0"
     "warning" "^4.0.1"
+
+"react-google-login@^5.2.2":
+  "integrity" "sha512-JUngfvaSMcOuV0lFff7+SzJ2qviuNMQdqlsDJkUM145xkGPVIfqWXq9Ui+2Dr6jdJWH5KYdynz9+4CzKjI5u6g=="
+  "resolved" "https://registry.npmjs.org/react-google-login/-/react-google-login-5.2.2.tgz"
+  "version" "5.2.2"
+  dependencies:
+    "@types/react" "*"
+    "prop-types" "^15.6.0"
 
 "react-google-one-tap-login@^0.1.1":
   "integrity" "sha512-RCbOfR3Z7VcRae4AzrLoBfY/aqqdN24pkQeNz9CJ0W65C9SY3vAwF0Yp8mwpeFwsugaZ5b1HZsfhUYWtb3IMrw=="
@@ -9712,7 +9720,7 @@
     "loose-envify" "^1.4.0"
     "prop-types" "^15.6.2"
 
-"react@^0.14.0 || ^15.0.0 || ^16.0.0", "react@^15.3.0 || ^16.0.0", "react@^16.0.0", "react@^16.3.0", "react@^16.8.0", "react@^16.8.6", "react@>= 16.8.0", "react@>=15", "react@>=16.6.0":
+"react@^0.14.0 || ^15.0.0 || ^16.0.0", "react@^15.3.0 || ^16.0.0", "react@^16 || ^17", "react@^16.0.0", "react@^16.3.0", "react@^16.8.0", "react@^16.8.6", "react@>= 16.8.0", "react@>=15", "react@>=16.6.0":
   "integrity" "sha512-pC0uMkhLaHm11ZSJULfOBqV4tIZkx87ZLvbbQYunNixAAvjnC+snJCg0XQXn9VIsttVsbZP/H/ewzgsd5fxKXw=="
   "resolved" "https://registry.npmjs.org/react/-/react-16.8.6.tgz"
   "version" "16.8.6"

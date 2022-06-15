@@ -11,10 +11,10 @@ import {
 import useStyles from './LoginDialog.styles'
 import { Close } from '@material-ui/icons'
 import { BasicProfile } from 'pages/dashboard/Dashboard'
-/*import GoogleLogin, {
+import GoogleLogin, {
   GoogleLoginResponse,
-  GoogleLoginResponseOffline
-} from 'react-google-login'*/
+  GoogleLoginResponseOffline,
+} from 'react-google-login'
 
 interface LoginDialogProps {
   user?: BasicProfile
@@ -30,12 +30,13 @@ const LoginDialog: React.FC<LoginDialogProps> = (props: LoginDialogProps) => {
   const responseGoogle = (
     response: any //GoogleLoginResponse | GoogleLoginResponseOffline
   ) => {
-    /*if (response.googleId) {
+    console.log('google', response)
+    if (response.googleId) {
       const loginResponse = response as GoogleLoginResponse
       onLogin(loginResponse.getBasicProfile())
     } else {
       const offlineResponse = response as GoogleLoginResponseOffline
-    }*/
+    }
   }
 
   return (
@@ -57,7 +58,7 @@ const LoginDialog: React.FC<LoginDialogProps> = (props: LoginDialogProps) => {
         )}
       </DialogContent>
       <DialogActions>
-        {/*user ? (
+        {user ? (
           <Button
             variant="outlined"
             className={styles.dialogActionButton}
@@ -75,7 +76,7 @@ const LoginDialog: React.FC<LoginDialogProps> = (props: LoginDialogProps) => {
             cookiePolicy={'single_host_origin'}
             // isSignedIn={true}
           />
-        )*/}
+        )}
       </DialogActions>
     </Dialog>
   )
