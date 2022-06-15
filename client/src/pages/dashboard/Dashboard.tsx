@@ -23,6 +23,8 @@ import StatsUtils from 'utils/StatsUtils'
 import LoginDialog from 'components/login-dialog/LoginDialog'
 import BrightnessIcon from '@material-ui/icons/Brightness6'
 import { ThemeContext } from 'index'
+import { useGoogleOneTapLogin } from 'react-google-one-tap-login'
+import { IGoogleEndPointResponse } from 'react-google-one-tap-login/dist/types/types'
 
 interface DashboardProps {}
 
@@ -41,7 +43,8 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
   const [pgToDelete, setPgToDelete] = useState<number>()
   const [dbInstance, setDbInstance] = useState<Dexie>()
   const [loading, setLoading] = useState<boolean>(true)
-  const [user, setUser] = useState<BasicProfile>()
+  //const [user, setUser] = useState<BasicProfile>()
+  const [user, setUser] = useState<IGoogleEndPointResponse>()
   const [showLoginDialog, setShowLoginDialog] = useState(false)
   const classes = DashboardStyles()
   const { mode, setMode } = useContext(ThemeContext)
@@ -88,7 +91,7 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
   }, [pgs, dbInstance, pgToDelete])
 
   const onLogin = useCallback((profile?: BasicProfile) => {
-    setUser(profile)
+    //setUser(profile)
     setShowLoginDialog(false)
   }, [])
 
@@ -96,17 +99,32 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
     setMode(mode === 'light' ? 'dark' : 'light')
   }
 
+  useGoogleOneTapLogin({
+    onError: (error) => console.log('GOOGLE ERR', error),
+    onSuccess: (response) => {
+      console.log('GOOGLE OK', response)
+      setUser(response)
+    },
+    googleAccountConfigs: {
+      client_id:
+        '301028242623-nbso2movb7a8iuc4vd1oscanfnfh8m4g.apps.googleusercontent.com',
+      callback: (args) => {
+        console.log('CALLBACK', args)
+      },
+    },
+  })
+
   return (
     <div className={classes.root}>
       <div className={classes.header}>
         <div className={classes.loginButtonContainer}>
-          <Button
+          {/*<Button
             onClick={() => setShowLoginDialog(true)}
             variant="outlined"
             className={classes.loginButton}
           >
             {user ? `Ciao ${user.getGivenName()}` : 'Login'}
-          </Button>
+  </Button>*/}
           <IconButton onClick={toggleDarkMode}>
             <BrightnessIcon />
           </IconButton>
@@ -114,7 +132,11 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
         <Typography variant="h5" className={classes.title}>
           I tuoi personaggi
         </Typography>
-        <div className={classes.rightAction} />
+        <div className={classes.rightAction}>
+          <IconButton onClick={() => setShowLoginDialog(true)}>
+            <Avatar alt="User" src={user?.picture} />
+          </IconButton>
+        </div>
       </div>
 
       <div className={classes.list}>
@@ -208,7 +230,7 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
       />
 
       <LoginDialog
-        user={user}
+        user={undefined}
         open={showLoginDialog}
         onClose={() => setShowLoginDialog(false)}
         onLogin={onLogin}

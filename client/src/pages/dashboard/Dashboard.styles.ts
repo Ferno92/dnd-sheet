@@ -16,7 +16,9 @@ const DashboardStyles = makeStyles((theme: Theme) =>
       margin: 8
     },
     rightAction: {
-      flex: 1
+      flex: 1,
+      display: 'flex',
+      justifyContent: 'end'
     },
     title: {
       textAlign: 'center',
