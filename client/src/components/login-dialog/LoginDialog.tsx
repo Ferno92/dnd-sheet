@@ -10,21 +10,23 @@ import {
 } from '@material-ui/core'
 import useStyles from './LoginDialog.styles'
 import { Close } from '@material-ui/icons'
-import { BasicProfile } from 'pages/dashboard/Dashboard'
+import { BasicProfile, GoogleUser } from 'pages/dashboard/Dashboard'
 import GoogleLogin, {
   GoogleLoginResponse,
   GoogleLoginResponseOffline,
+  GoogleLogout,
 } from 'react-google-login'
 
 interface LoginDialogProps {
-  user?: BasicProfile
+  user?: GoogleUser
   open: boolean
   onClose: () => void
   onLogin: (user?: BasicProfile) => void
+  onLogout: () => void
 }
 
 const LoginDialog: React.FC<LoginDialogProps> = (props: LoginDialogProps) => {
-  const { open, onClose, onLogin, user } = props
+  const { open, onClose, onLogin, onLogout, user } = props
   const styles = useStyles()
 
   const responseGoogle = (
@@ -49,7 +51,7 @@ const LoginDialog: React.FC<LoginDialogProps> = (props: LoginDialogProps) => {
       </DialogTitle>
       <DialogContent className={styles.content}>
         {user ? (
-          <Typography variant="body1">{`Sei loggato come ${user.getName()}, vuoi fare logout?`}</Typography>
+          <Typography variant="body1">{`Sei loggato come ${user.name}, vuoi fare logout?`}</Typography>
         ) : (
           <Typography variant="body1">
             Non hai ancora effettuato il login. Se vuoi usare i tuoi personaggi
@@ -59,14 +61,11 @@ const LoginDialog: React.FC<LoginDialogProps> = (props: LoginDialogProps) => {
       </DialogContent>
       <DialogActions>
         {user ? (
-          <Button
-            variant="outlined"
-            className={styles.dialogActionButton}
-            color="primary"
-            onClick={() => onLogin()}
-          >
-            {'Logout'} //TODO
-          </Button>
+          <GoogleLogout
+            clientId="301028242623-nbso2movb7a8iuc4vd1oscanfnfh8m4g.apps.googleusercontent.com"
+            buttonText="Logout"
+            onLogoutSuccess={onLogout}
+          />
         ) : (
           <GoogleLogin
             clientId="301028242623-nbso2movb7a8iuc4vd1oscanfnfh8m4g.apps.googleusercontent.com"

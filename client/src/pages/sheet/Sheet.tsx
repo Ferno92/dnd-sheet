@@ -146,9 +146,9 @@ class Sheet extends Component<
       proficiency: [],
     }
     this.db = new Dexie('pg01_database')
-    this.db.version(1).stores({
+    /*this.db.version(1).stores({
       pg: 'id,name,race,pgClass,level,stats',
-    })
+    })*/
     this.db.open().then(() => {
       this.pg = this.db.table('pg')
       // this.pg.put({ name: 'Torendal DueLame', race: 'Nano' }).then(() => {

@@ -34,8 +34,9 @@ import {
 
 interface DashboardProps {}
 
-interface GoogleUser {
+export interface GoogleUser {
   id: string | undefined
+  name: string | undefined
   picture: string | undefined
 }
 
@@ -56,6 +57,7 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
   const [loading, setLoading] = useState<boolean>(true)
   const [user, setUser] = useState<GoogleUser>()
   const [showLoginDialog, setShowLoginDialog] = useState(false)
+  const [oneTapLoginDisabled, setOneTapLoginDisabled] = useState(true)
   const classes = DashboardStyles()
   const { mode, setMode } = useContext(ThemeContext)
 
@@ -65,6 +67,40 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
     db.version(1).stores({
       pg: 'id,name,race,pgClass,level,stats',
     })
+    db.version(2).stores({
+      pg: 'id,name,race,pgClass,level,stats',
+      user: 'id,name, picture',
+    })
+    setDbInstance(db)
+    fetchUserDatabase(db)
+  }, [])
+
+  const fetchUserDatabase = useCallback(
+    (db: Dexie) => {
+      db.open().then(() => {
+        const userTable = db.table('user')
+        let user: GoogleUser | undefined = undefined
+        userTable
+          .each((googleUser: GoogleUser) => {
+            user = googleUser
+          })
+          .then(() => {
+            setUser(user)
+
+            if (user) {
+              clearPgDatabase()
+              checkUserPgDatabase(user, false, db)
+            } else {
+              fetchPgDatabase(db)
+            }
+            setOneTapLoginDisabled(false)
+          })
+      })
+    },
+    [dbInstance]
+  )
+
+  const fetchPgDatabase = (db: Dexie) => {
     db.open().then(() => {
       const pgTable = db.table('pg')
       let pgList: PG[] = []
@@ -77,8 +113,7 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
           setLoading(false)
         })
     })
-    setDbInstance(db)
-  }, [])
+  }
 
   const addPG = () => {
     props.history.push(`/sheet/${pgs.length + 1}/0`, { isNew: true })
@@ -102,16 +137,28 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
 
   const onLogin = useCallback(
     (profile?: BasicProfile) => {
+      setOneTapLoginDisabled(true)
+      setShowLoginDialog(false)
       const googleUser = {
         id: profile?.getId(),
+        name: profile?.getName(),
         picture: profile?.getImageUrl(),
       }
       setUser(googleUser)
-      setShowLoginDialog(false)
-      checkUserPgDatabase(googleUser)
+      checkUserPgDatabase(googleUser, true, dbInstance)
+      setOneTapLoginDisabled(false)
     },
-    [pgs]
+    [pgs, dbInstance]
   )
+
+  const onLogout = useCallback(() => {
+    dbInstance?.table('user').delete(user?.id)
+    setShowLoginDialog(false)
+    setUser(undefined)
+    setPGIds([])
+    clearPgDatabase()
+    setOneTapLoginDisabled(true)
+  }, [user])
 
   const toggleDarkMode = () => {
     setMode(mode === 'light' ? 'dark' : 'light')
@@ -121,30 +168,35 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
     onError: (error) => console.log('GOOGLE ERR', error),
     onSuccess: (response) => {
       console.log('GOOGLE OK', response)
-      setUser({
-        id: response.aud,
+      const newUser = {
+        id: response.sub,
+        name: response.name,
         picture: response.picture,
-      })
+      }
+      setUser(newUser)
+      checkUserPgDatabase(newUser, true, dbInstance)
     },
     googleAccountConfigs: {
       client_id:
         '301028242623-nbso2movb7a8iuc4vd1oscanfnfh8m4g.apps.googleusercontent.com',
-      callback: (args) => {
-        console.log('CALLBACK', args)
-      },
     },
+    disabled: oneTapLoginDisabled || user != undefined || showLoginDialog,
   })
 
   const checkUserPgDatabase = useCallback(
-    async (user: GoogleUser) => {
+    async (user: GoogleUser, loggingIn: boolean, db: Dexie | undefined) => {
       console.log('checkUserPgDatabase', pgs)
       if (user.id) {
-        const db = getFirestore(firebaseApp)
+        if (loggingIn) {
+          //save user in db
+          db?.table('user').put(user)
+        }
+        const firebaseDb = getFirestore(firebaseApp)
         const usersDocName = 'users'
-        const response = await getDocs(collection(db, usersDocName))
+        const response = await getDocs(collection(firebaseDb, usersDocName))
         const userDoc = response.docs.find((doc) => doc.id == user?.id)?.data()
         if (userDoc == undefined) {
-          const ref = doc(db, usersDocName, user?.id)
+          const ref = doc(firebaseDb, usersDocName, user?.id)
           setDoc(ref, {
             data: pgs.map((pg) => {
               return JSON.stringify(pg)
@@ -158,16 +210,36 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
             })
         } else {
           //check/download pgs
-          setPGIds(
-            (userDoc.data as string[]).map((pg) => {
-              return JSON.parse(pg)
-            })
-          )
+          const newPgs = (userDoc.data as string[]).map((pg) => {
+            return JSON.parse(pg)
+          })
+          insertPgToDatabase(newPgs, db)
+          setPGIds(newPgs)
         }
       }
+      setLoading(false)
     },
     [pgs]
   )
+
+  const insertPgToDatabase = useCallback(
+    (newPgs: PG[], db: Dexie | undefined) => {
+      console.log('start insertPgToDatabase', newPgs, db)
+      db?.table('pg')
+        .bulkPut(newPgs)
+        .then(() => {
+          console.log('insertPgToDatabase ok')
+        })
+        .catch(Dexie.BulkError, (error) => {
+          console.log('insertPgToDatabase error', error)
+        })
+    },
+    []
+  )
+
+  const clearPgDatabase = useCallback(() => {
+    dbInstance?.table('pg').clear()
+  }, [])
 
   return (
     <div className={classes.root}>
@@ -278,10 +350,11 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
       />
 
       <LoginDialog
-        user={undefined}
+        user={user}
         open={showLoginDialog}
         onClose={() => setShowLoginDialog(false)}
         onLogin={onLogin}
+        onLogout={onLogout}
       />
     </div>
   )
