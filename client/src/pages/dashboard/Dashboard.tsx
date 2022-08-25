@@ -30,6 +30,8 @@ import {
   collection,
   doc,
   setDoc,
+  updateDoc,
+  initializeFirestore,
 } from 'firebase/firestore'
 
 interface DashboardProps {}
@@ -49,10 +51,14 @@ export interface BasicProfile {
   getImageUrl(): string
 }
 
+const DexiePgTable = 'pg'
+export const DexieUserTable = 'user'
+export const UsersDocName = 'users'
+
 function Dashboard(props: DashboardProps & RouteComponentProps) {
   // Declare a new state variable, which we'll call "count"
   const [pgs, setPGIds] = useState<PG[]>([])
-  const [pgToDelete, setPgToDelete] = useState<number>()
+  const [pgToDelete, setPgToDelete] = useState<PG>()
   const [dbInstance, setDbInstance] = useState<Dexie>()
   const [loading, setLoading] = useState<boolean>(true)
   const [user, setUser] = useState<GoogleUser>()
@@ -60,6 +66,10 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
   const [oneTapLoginDisabled, setOneTapLoginDisabled] = useState(true)
   const classes = DashboardStyles()
   const { mode, setMode } = useContext(ThemeContext)
+  initializeFirestore(firebaseApp, {
+    ignoreUndefinedProperties: true,
+  })
+  const firebaseDb = getFirestore(firebaseApp)
 
   useEffect(() => {
     //load only once
@@ -75,10 +85,16 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
     fetchUserDatabase(db)
   }, [])
 
+  useEffect(() => {
+    if (user != undefined) {
+      checkUserPgDatabase(user, true, dbInstance)
+    }
+  }, [user])
+
   const fetchUserDatabase = useCallback(
     (db: Dexie) => {
       db.open().then(() => {
-        const userTable = db.table('user')
+        const userTable = db.table(DexieUserTable)
         let user: GoogleUser | undefined = undefined
         userTable
           .each((googleUser: GoogleUser) => {
@@ -102,7 +118,7 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
 
   const fetchPgDatabase = (db: Dexie) => {
     db.open().then(() => {
-      const pgTable = db.table('pg')
+      const pgTable = db.table(DexiePgTable)
       let pgList: PG[] = []
       pgTable
         .each((pg: PG) => {
@@ -115,9 +131,13 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
     })
   }
 
-  const addPG = () => {
-    props.history.push(`/sheet/${pgs.length + 1}/0`, { isNew: true })
+  const randomInt = (max: number) => {
+    return Math.floor(Math.random() * max)
   }
+
+  const addPG = useCallback(() => {
+    props.history.push(`/sheet/${randomInt(10000)}/0`, { isNew: true })
+  }, [pgs])
 
   const getFirstLetters = (name: string): string => {
     var matches = name.match(/\b(\w)/g) // ['J','S','O','N']
@@ -126,12 +146,13 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
 
   const onDeleteItem = useCallback(() => {
     if (dbInstance && pgToDelete !== undefined) {
-      dbInstance.table('pg').delete(pgToDelete)
+      dbInstance.table(DexiePgTable).delete(pgToDelete.id)
       const temp = [...pgs]
       const pgIndex = pgs.findIndex((pg) => pg.id)
       temp.splice(pgIndex, 1)
       setPGIds(temp)
       setPgToDelete(undefined)
+      deletePgInFirestore(temp)
     }
   }, [pgs, dbInstance, pgToDelete])
 
@@ -152,7 +173,7 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
   )
 
   const onLogout = useCallback(() => {
-    dbInstance?.table('user').delete(user?.id)
+    dbInstance?.table(DexieUserTable).delete(user?.id)
     setShowLoginDialog(false)
     setUser(undefined)
     setPGIds([])
@@ -174,7 +195,6 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
         picture: response.picture,
       }
       setUser(newUser)
-      checkUserPgDatabase(newUser, true, dbInstance)
     },
     googleAccountConfigs: {
       client_id:
@@ -185,34 +205,25 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
 
   const checkUserPgDatabase = useCallback(
     async (user: GoogleUser, loggingIn: boolean, db: Dexie | undefined) => {
-      console.log('checkUserPgDatabase', pgs)
+      console.log('checkUserPgDatabase', pgs, loggingIn)
       if (user.id) {
         if (loggingIn) {
           //save user in db
-          db?.table('user').put(user)
+          db?.table(DexieUserTable).put(user)
         }
-        const firebaseDb = getFirestore(firebaseApp)
-        const usersDocName = 'users'
-        const response = await getDocs(collection(firebaseDb, usersDocName))
+        const response = await getDocs(collection(firebaseDb, UsersDocName))
         const userDoc = response.docs.find((doc) => doc.id == user?.id)?.data()
         if (userDoc == undefined) {
-          const ref = doc(firebaseDb, usersDocName, user?.id)
-          setDoc(ref, {
-            data: pgs.map((pg) => {
-              return JSON.stringify(pg)
-            }),
-          })
-            .then(() => {
-              console.log('saved user pgs', user?.id)
-            })
-            .catch((error) => {
-              console.log('db upload err: ', error)
-            })
+          savePgToFirestore(user, pgs)
         } else {
           //check/download pgs
-          const newPgs = (userDoc.data as string[]).map((pg) => {
-            return JSON.parse(pg)
-          })
+          const remotePgs = userDoc.data as PG[]
+          const remotePgIds = new Set(remotePgs.map((u) => u.id))
+          const newPgs = [
+            ...remotePgs,
+            ...pgs.filter((u) => !remotePgIds.has(u.id)),
+          ]
+          savePgToFirestore(user, newPgs)
           insertPgToDatabase(newPgs, db)
           setPGIds(newPgs)
         }
@@ -222,10 +233,25 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
     [pgs]
   )
 
+  const savePgToFirestore = useCallback((user: GoogleUser, pgsToSave: PG[]) => {
+    if (user.id) {
+      const ref = doc(firebaseDb, UsersDocName, user.id)
+      setDoc(ref, {
+        data: pgsToSave,
+      })
+        .then(() => {
+          console.log('saved user pgs', user?.id)
+        })
+        .catch((error) => {
+          console.log('db upload err: ', error)
+        })
+    }
+  }, [])
+
   const insertPgToDatabase = useCallback(
     (newPgs: PG[], db: Dexie | undefined) => {
       console.log('start insertPgToDatabase', newPgs, db)
-      db?.table('pg')
+      db?.table(DexiePgTable)
         .bulkPut(newPgs)
         .then(() => {
           console.log('insertPgToDatabase ok')
@@ -238,8 +264,26 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
   )
 
   const clearPgDatabase = useCallback(() => {
-    dbInstance?.table('pg').clear()
-  }, [])
+    dbInstance?.table(DexiePgTable).clear()
+  }, [dbInstance])
+
+  const deletePgInFirestore = useCallback(
+    (pgs: PG[]) => {
+      if (user?.id) {
+        const ref = doc(firebaseDb, UsersDocName, user?.id)
+        updateDoc(ref, {
+          data: pgs,
+        })
+          .then(() => {
+            console.log('updateDoc ok')
+          })
+          .catch((error) => {
+            console.log('updateDoc err: ', error)
+          })
+      }
+    },
+    [user]
+  )
 
   return (
     <div className={classes.root}>
@@ -312,7 +356,7 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
                 />
                 <ListItemSecondaryAction>
                   <Tooltip title="Elimina personaggio">
-                    <IconButton onClick={() => setPgToDelete(pg.id)}>
+                    <IconButton onClick={() => setPgToDelete(pg)}>
                       <Delete />
                     </IconButton>
                   </Tooltip>
@@ -323,7 +367,7 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
       {pgs.length === 0 && (
         <div className={classes.emptyDescription}>
           <OrcIcon />
-          <Typography variant="body1">
+          <Typography variant="body1" className={classes.emptyDescriptionText}>
             Non hai ancora dei personaggi, creane subito uno!
           </Typography>
         </div>

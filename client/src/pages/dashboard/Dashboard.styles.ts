@@ -56,6 +56,9 @@ const DashboardStyles = makeStyles((theme: Theme) =>
         marginBottom: 24
       }
     },
+    emptyDescriptionText: {
+      color: theme.palette.text.primary
+    },
     skeletonContainer: {
       display: 'flex',
       alignItems: 'center',

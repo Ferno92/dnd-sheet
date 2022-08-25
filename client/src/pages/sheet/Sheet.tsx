@@ -17,6 +17,7 @@ import { ReactComponent as FightIcon } from 'assets/images/swords.svg'
 import { ReactComponent as ProfileIcon } from 'assets/images/viking.svg'
 import { ReactComponent as BackpackIcon } from 'assets/images/backpack.svg'
 import { ReactComponent as BookIcon } from 'assets/images/spellbook.svg'
+import HomeIcon from '@material-ui/icons/Home'
 import {
   Edit,
   Done,
@@ -56,10 +57,17 @@ import { firebaseApp } from 'App'
 import {
   collection,
   doc,
+  Firestore,
   getDocs,
   getFirestore,
   setDoc,
+  updateDoc,
 } from 'firebase/firestore'
+import {
+  DexieUserTable,
+  GoogleUser,
+  UsersDocName,
+} from 'pages/dashboard/Dashboard'
 
 interface SheetProps {
   id: number
@@ -96,6 +104,9 @@ class Sheet extends Component<
 
   pg: Dexie.Table<PG, number> | undefined
   db: Dexie
+  firebaseDb: Firestore
+  user: GoogleUser | undefined
+
   constructor(
     props: SheetProps &
       RouteComponentProps<{ id: string; page?: string }> &
@@ -106,6 +117,7 @@ class Sheet extends Component<
 
     const { id, page } = props.match.params
     const sheetId = parseInt(id)
+    this.firebaseDb = getFirestore(firebaseApp)
     this.state = {
       pageIndex: page ? parseInt(page) : 0,
       onEdit: false,
@@ -241,7 +253,7 @@ class Sheet extends Component<
     }
   }
 
-  updateDB = () => {
+  updateDB = async () => {
     const { exist, sheetId } = this.state
     const id = sheetId
     const {
@@ -272,6 +284,7 @@ class Sheet extends Component<
       levelFirstClass,
     } = this.state.pg
 
+    console.log('exist', exist)
     if (this.pg) {
       if (exist) {
         this.pg
@@ -343,6 +356,34 @@ class Sheet extends Component<
           })
           .catch((err) => console.log('err: ', err))
       }
+    }
+    if (this.user?.id) {
+      const response = await getDocs(collection(this.firebaseDb, UsersDocName))
+      const firestorePgs = response.docs
+        .find((doc) => doc.id == this.user?.id)
+        ?.data().data as PG[]
+      const index = firestorePgs.map(user => user.id).indexOf(this.state.pg?.id)
+      if (index >= 0) {
+        firestorePgs[index] = this.state.pg
+      } else {
+        firestorePgs.push(this.state.pg)
+      }
+      console.log(
+        'Update firestore',
+        UsersDocName,
+        this.firebaseDb,
+        this.user?.id
+      )
+      const ref = doc(this.firebaseDb, UsersDocName, this.user?.id)
+      updateDoc(ref, {
+        data: firestorePgs,
+      })
+        .then(() => {
+          console.log('updateDoc ok')
+        })
+        .catch((error) => {
+          console.log('updateDoc err: ', error)
+        })
     }
   }
 
@@ -1064,8 +1105,24 @@ class Sheet extends Component<
     }
   }
 
+  fetchUserDatabase = (db: Dexie) => {
+    db.open().then(() => {
+      const userTable = db.table(DexieUserTable)
+      let user: GoogleUser | undefined = undefined
+      userTable
+        .each((googleUser: GoogleUser) => {
+          user = googleUser
+        })
+        .then(() => {
+          this.user = user
+        })
+    })
+  }
+
   componentDidMount() {
     this.getProficiency()
+    const db = new Dexie('pg01_database')
+    this.fetchUserDatabase(db)
   }
 
   render() {
