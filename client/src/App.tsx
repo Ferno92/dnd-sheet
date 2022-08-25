@@ -8,6 +8,7 @@ import useStyles from 'App.styles'
 import DownloadPG from 'pages/download/DownloadPG'
 import PrivacyPolicy from 'pages/privacy/PrivacyPolicy'
 import { initializeApp } from 'firebase/app'
+import { initializeFirestore } from 'firebase/firestore'
 
 export const firebaseConfig = {
   apiKey: 'AIzaSyB1kmz-zbEFRX72gkvxWTHg8CW0I6Qk9As',
@@ -20,6 +21,10 @@ export const firebaseConfig = {
   measurementId: 'G-L2099R8SDB',
 }
 export const firebaseApp = initializeApp(firebaseConfig)
+
+initializeFirestore(firebaseApp, {
+  ignoreUndefinedProperties: true,
+})
 
 const App: React.FC = () => {
   const [showNewVersionBanner, setShowNewVersionBanner] = useState(false)

@@ -68,6 +68,7 @@ import {
   GoogleUser,
   UsersDocName,
 } from 'pages/dashboard/Dashboard'
+import BackupPG from 'pages/stats/models/BackupPG'
 
 interface SheetProps {
   id: number
@@ -362,7 +363,9 @@ class Sheet extends Component<
       const firestorePgs = response.docs
         .find((doc) => doc.id == this.user?.id)
         ?.data().data as PG[]
-      const index = firestorePgs.map(user => user.id).indexOf(this.state.pg?.id)
+      const index = firestorePgs
+        .map((user) => user.id)
+        .indexOf(this.state.pg?.id)
       if (index >= 0) {
         firestorePgs[index] = this.state.pg
       } else {
@@ -383,6 +386,31 @@ class Sheet extends Component<
         })
         .catch((error) => {
           console.log('updateDoc err: ', error)
+        })
+
+      const backupPath = `${UsersDocName}/${this.user?.id}/backup`
+      const pgId = this.state.pg?.id.toString()
+      const refBackup = doc(this.firebaseDb, backupPath, pgId)
+
+      const backupResponse = await getDocs(
+        collection(this.firebaseDb, backupPath)
+      )
+      const backupPgs = backupResponse.docs
+        .find((doc) => doc.id == pgId)
+        ?.data().data as BackupPG[]
+
+      const backupPG: BackupPG = {
+        pg: this.state.pg,
+        date: new Date().toUTCString(),
+      }
+      setDoc(refBackup, {
+        data: [...(backupPgs || []), ...[backupPG]],
+      })
+        .then(() => {
+          console.log('updateBackup ok')
+        })
+        .catch((error) => {
+          console.log('updateBackup err: ', error)
         })
     }
   }
