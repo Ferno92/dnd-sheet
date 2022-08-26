@@ -20,6 +20,9 @@ const useStyles = makeStyles((theme: Theme) => ({
   content: {
     paddingTop: 8
   },
+  dialogActions: {
+    justifyContent: 'space-between'
+  },
   dialogActionButton: {
     '& .MuiButton-label': {
       fontSize: 16,

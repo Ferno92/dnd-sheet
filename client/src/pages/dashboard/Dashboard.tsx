@@ -33,6 +33,7 @@ import {
   updateDoc,
   initializeFirestore,
 } from 'firebase/firestore'
+import BackupDialog from 'components/backup-dialog/BackupDialog'
 
 interface DashboardProps {}
 
@@ -63,12 +64,10 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
   const [loading, setLoading] = useState<boolean>(true)
   const [user, setUser] = useState<GoogleUser>()
   const [showLoginDialog, setShowLoginDialog] = useState(false)
+  const [showBackupDialog, setShowBackupDialog] = useState(false)
   const [oneTapLoginDisabled, setOneTapLoginDisabled] = useState(true)
   const classes = DashboardStyles()
   const { mode, setMode } = useContext(ThemeContext)
-  initializeFirestore(firebaseApp, {
-    ignoreUndefinedProperties: true,
-  })
   const firebaseDb = getFirestore(firebaseApp)
 
   useEffect(() => {
@@ -396,9 +395,19 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
       <LoginDialog
         user={user}
         open={showLoginDialog}
-        onClose={() => setShowLoginDialog(false)}
+        onClose={(showBackup: boolean) => {
+          setShowLoginDialog(false)
+          setShowBackupDialog(showBackup)
+        }}
         onLogin={onLogin}
         onLogout={onLogout}
+      />
+
+      <BackupDialog
+        user={user}
+        open={showBackupDialog}
+        onClose={() => setShowBackupDialog(false)}
+        firebaseDb={firebaseDb}
       />
     </div>
   )

@@ -20,7 +20,7 @@ import GoogleLogin, {
 interface LoginDialogProps {
   user?: GoogleUser
   open: boolean
-  onClose: () => void
+  onClose: (showBackup: boolean) => void
   onLogin: (user?: BasicProfile) => void
   onLogout: () => void
 }
@@ -44,14 +44,17 @@ const LoginDialog: React.FC<LoginDialogProps> = (props: LoginDialogProps) => {
   return (
     <Dialog open={open} onClose={onClose} className={styles.dialogRoot}>
       <DialogTitle className={styles.dialogTitle}>
-        <Typography>Login</Typography>
-        <IconButton className={styles.closeDialog} onClick={onClose}>
+        <Typography>{user ? `Ciao ${user.name}` : 'Login'}</Typography>
+        <IconButton
+          className={styles.closeDialog}
+          onClick={() => onClose(false)}
+        >
           <Close />
         </IconButton>
       </DialogTitle>
       <DialogContent className={styles.content}>
         {user ? (
-          <Typography variant="body1">{`Sei loggato come ${user.name}, vuoi fare logout?`}</Typography>
+          <Typography variant="body1">{`Vuoi fare logout o controllare i backup dei tuoi personaggi?`}</Typography>
         ) : (
           <Typography variant="body1">
             Non hai ancora effettuato il login. Se vuoi usare i tuoi personaggi
@@ -59,13 +62,18 @@ const LoginDialog: React.FC<LoginDialogProps> = (props: LoginDialogProps) => {
           </Typography>
         )}
       </DialogContent>
-      <DialogActions>
+      <DialogActions className={styles.dialogActions}>
         {user ? (
-          <GoogleLogout
-            clientId="301028242623-nbso2movb7a8iuc4vd1oscanfnfh8m4g.apps.googleusercontent.com"
-            buttonText="Logout"
-            onLogoutSuccess={onLogout}
-          />
+          [
+            <GoogleLogout
+              clientId="301028242623-nbso2movb7a8iuc4vd1oscanfnfh8m4g.apps.googleusercontent.com"
+              buttonText="Logout"
+              onLogoutSuccess={onLogout}
+            />,
+            <Button variant="contained" onClick={() => onClose(true)}>
+              Backup
+            </Button>,
+          ]
         ) : (
           <GoogleLogin
             clientId="301028242623-nbso2movb7a8iuc4vd1oscanfnfh8m4g.apps.googleusercontent.com"

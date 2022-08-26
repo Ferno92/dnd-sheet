@@ -48,7 +48,7 @@ import ArmorInfo from 'data/types/ArmorInfo'
 import SpellsView from 'pages/spells/SpellsView'
 import Spell from 'data/types/Spell'
 import SpellsByLevel from 'data/types/SpellsByLevel'
-import _ from 'lodash'
+import _, { has } from 'lodash'
 import PgGeneralInfo from 'data/types/PgGeneralInfo'
 import RestType from 'data/types/RestType'
 import MuiAlert from '@material-ui/lab/Alert'
@@ -254,8 +254,88 @@ class Sheet extends Component<
     }
   }
 
+  checkPgJsonChanges = (initialPgJson: string, newPgJson: string) => {
+    var initial = JSON.parse(initialPgJson) as PG
+    initial.currentPF = 0
+    initial.tsMorte = []
+    var current = JSON.parse(newPgJson) as PG
+    current.currentPF = 0
+    current.tsMorte = []
+    return JSON.stringify(initial) != JSON.stringify(current)
+  }
+
+  saveRemote = async (initialPgJson: string, newPgJson: string) => {
+    const hasChanges = this.checkPgJsonChanges(initialPgJson, newPgJson)
+    if (this.user?.id && hasChanges) {
+      const response = await getDocs(collection(this.firebaseDb, UsersDocName))
+      const firestorePgs = response.docs
+        .find((doc) => doc.id == this.user?.id)
+        ?.data().data as PG[]
+      const index = firestorePgs
+        .map((user) => user.id)
+        .indexOf(this.state.pg?.id)
+      if (index >= 0) {
+        firestorePgs[index] = this.state.pg
+      } else {
+        firestorePgs.push(this.state.pg)
+      }
+      const ref = doc(this.firebaseDb, UsersDocName, this.user?.id)
+      updateDoc(ref, {
+        data: firestorePgs,
+      })
+        .then(() => {
+          console.log('updateDoc ok')
+        })
+        .catch((error) => {
+          console.log('updateDoc err: ', error)
+        })
+
+      const backupPath = `${UsersDocName}/${this.user?.id}/backup`
+      const pgId = this.state.pg?.id.toString()
+      const refBackup = doc(this.firebaseDb, backupPath, pgId)
+
+      const backupResponse = await getDocs(
+        collection(this.firebaseDb, backupPath)
+      )
+      const backupPgs = backupResponse.docs
+        .find((doc) => doc.id == pgId)
+        ?.data().data as BackupPG[]
+
+      const reducedMap = backupPgs.reduce((acc, item) => {
+        const date = new Date(item.date).toLocaleDateString()
+        const oldValue = acc.get(date) || []
+        acc.set(date, [...oldValue, item])
+        return acc
+      }, new Map<string, BackupPG[]>())
+      const reducedPgs = Array.from(reducedMap.keys())
+        .map((key) => {
+          const pgs = reducedMap.get(key)
+          if (key != new Date().toLocaleDateString()) {
+            return [pgs?.at((pgs?.length || 0) - 1)]
+          } else {
+            return pgs || []
+          }
+        })
+        .reduce((old, current) => [...old, ...current])
+
+      const backupPG: BackupPG = {
+        pg: this.state.pg,
+        date: new Date().toUTCString(),
+      }
+      setDoc(refBackup, {
+        data: [...(reducedPgs || []), ...[backupPG]],
+      })
+        .then(() => {
+          console.log('updateBackup ok')
+        })
+        .catch((error) => {
+          console.log('updateBackup err: ', error)
+        })
+    }
+  }
+
   updateDB = async () => {
-    const { exist, sheetId } = this.state
+    const { exist, sheetId, initialPgJson } = this.state
     const id = sheetId
     const {
       name,
@@ -285,7 +365,7 @@ class Sheet extends Component<
       levelFirstClass,
     } = this.state.pg
 
-    console.log('exist', exist)
+    var newPgJson: string | undefined
     if (this.pg) {
       if (exist) {
         this.pg
@@ -318,7 +398,9 @@ class Sheet extends Component<
           })
           .then(() => {
             console.log('update done')
-            this.setState({ initialPgJson: JSON.stringify(this.state.pg) })
+            newPgJson = JSON.stringify(this.state.pg)
+            this.saveRemote(initialPgJson, newPgJson)
+            this.setState({ initialPgJson: newPgJson })
           })
           .catch((err) => console.log('err: ', err))
       } else {
@@ -357,61 +439,6 @@ class Sheet extends Component<
           })
           .catch((err) => console.log('err: ', err))
       }
-    }
-    if (this.user?.id) {
-      const response = await getDocs(collection(this.firebaseDb, UsersDocName))
-      const firestorePgs = response.docs
-        .find((doc) => doc.id == this.user?.id)
-        ?.data().data as PG[]
-      const index = firestorePgs
-        .map((user) => user.id)
-        .indexOf(this.state.pg?.id)
-      if (index >= 0) {
-        firestorePgs[index] = this.state.pg
-      } else {
-        firestorePgs.push(this.state.pg)
-      }
-      console.log(
-        'Update firestore',
-        UsersDocName,
-        this.firebaseDb,
-        this.user?.id
-      )
-      const ref = doc(this.firebaseDb, UsersDocName, this.user?.id)
-      updateDoc(ref, {
-        data: firestorePgs,
-      })
-        .then(() => {
-          console.log('updateDoc ok')
-        })
-        .catch((error) => {
-          console.log('updateDoc err: ', error)
-        })
-
-      const backupPath = `${UsersDocName}/${this.user?.id}/backup`
-      const pgId = this.state.pg?.id.toString()
-      const refBackup = doc(this.firebaseDb, backupPath, pgId)
-
-      const backupResponse = await getDocs(
-        collection(this.firebaseDb, backupPath)
-      )
-      const backupPgs = backupResponse.docs
-        .find((doc) => doc.id == pgId)
-        ?.data().data as BackupPG[]
-
-      const backupPG: BackupPG = {
-        pg: this.state.pg,
-        date: new Date().toUTCString(),
-      }
-      setDoc(refBackup, {
-        data: [...(backupPgs || []), ...[backupPG]],
-      })
-        .then(() => {
-          console.log('updateBackup ok')
-        })
-        .catch((error) => {
-          console.log('updateBackup err: ', error)
-        })
     }
   }
 
