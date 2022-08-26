@@ -42,7 +42,11 @@ const LoginDialog: React.FC<LoginDialogProps> = (props: LoginDialogProps) => {
   }
 
   return (
-    <Dialog open={open} onClose={onClose} className={styles.dialogRoot}>
+    <Dialog
+      open={open}
+      onClose={() => onClose(false)}
+      className={styles.dialogRoot}
+    >
       <DialogTitle className={styles.dialogTitle}>
         <Typography>{user ? `Ciao ${user.name}` : 'Login'}</Typography>
         <IconButton
