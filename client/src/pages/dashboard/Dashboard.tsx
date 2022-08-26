@@ -147,11 +147,11 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
     if (dbInstance && pgToDelete !== undefined) {
       dbInstance.table(DexiePgTable).delete(pgToDelete.id)
       const temp = [...pgs]
-      const pgIndex = pgs.findIndex((pg) => pg.id)
+      const pgIndex = pgs.findIndex((pg) => pg.id == pgToDelete.id)
       temp.splice(pgIndex, 1)
       setPGIds(temp)
       setPgToDelete(undefined)
-      deletePgInFirestore(temp)
+      deletePgInFirestore([...temp, { ...pgToDelete, deleted: true }])
     }
   }, [pgs, dbInstance, pgToDelete])
 
@@ -223,8 +223,9 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
             ...pgs.filter((u) => !remotePgIds.has(u.id)),
           ]
           savePgToFirestore(user, newPgs)
-          insertPgToDatabase(newPgs, db)
-          setPGIds(newPgs)
+          const currentPgs = newPgs.filter((pg) => pg.deleted != true)
+          insertPgToDatabase(currentPgs, db)
+          setPGIds(currentPgs)
         }
       }
       setLoading(false)

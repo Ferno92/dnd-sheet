@@ -35,6 +35,7 @@ interface PG {
   temp?: any
   multiclass?: boolean
   levelFirstClass?: number
+  deleted?: boolean
 }
 
 export default PG

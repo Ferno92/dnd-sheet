@@ -270,13 +270,17 @@ class Sheet extends Component<
 
   checkPgJsonChanges = (initialPgJson: string, newPgJson: string) => {
     //ignore pf and tsmorte, too many changes
-    var initial = JSON.parse(initialPgJson) as PG
-    initial.currentPF = 0
-    initial.tsMorte = []
-    var current = JSON.parse(newPgJson) as PG
-    current.currentPF = 0
-    current.tsMorte = []
-    return JSON.stringify(initial) != JSON.stringify(current)
+    if (initialPgJson.length == 0) {
+      return true
+    } else {
+      var initial = JSON.parse(initialPgJson) as PG
+      initial.currentPF = 0
+      initial.tsMorte = []
+      var current = JSON.parse(newPgJson) as PG
+      current.currentPF = 0
+      current.tsMorte = []
+      return JSON.stringify(initial) != JSON.stringify(current)
+    }
   }
 
   saveRemote = async (initialPgJson: string, newPgJson: string) => {
@@ -313,9 +317,9 @@ class Sheet extends Component<
       const backupResponse = await getDocs(
         collection(this.firebaseDb, backupPath)
       )
-      const backupPgs = backupResponse.docs
-        .find((doc) => doc.id == pgId)
-        ?.data().data as BackupPG[]
+      const backupPgs =
+        (backupResponse.docs.find((doc) => doc.id == pgId)?.data()
+          .data as BackupPG[]) || []
 
       const reducedMap = backupPgs.reduce((acc, item) => {
         const date = new Date(item.date).toLocaleDateString()
@@ -323,16 +327,18 @@ class Sheet extends Component<
         acc.set(date, [...oldValue, item])
         return acc
       }, new Map<string, BackupPG[]>())
-      const reducedPgs = Array.from(reducedMap.keys())
-        .map((key) => {
-          const pgs = reducedMap.get(key)
-          if (key != new Date().toLocaleDateString()) {
-            return [pgs?.at((pgs?.length || 0) - 1)]
-          } else {
-            return pgs || []
-          }
-        })
-        .reduce((old, current) => [...old, ...current])
+      const mappedPgs = Array.from(reducedMap.keys()).map((key) => {
+        const pgs = reducedMap.get(key)
+        if (key != new Date().toLocaleDateString()) {
+          return [pgs?.at((pgs?.length || 0) - 1)]
+        } else {
+          return pgs || []
+        }
+      })
+      const reducedPgs =
+        mappedPgs.length == 0
+          ? []
+          : mappedPgs.reduce((old, current) => [...old, ...current])
 
       const backupPG: BackupPG = {
         pg: this.state.pg,
@@ -381,7 +387,8 @@ class Sheet extends Component<
       levelFirstClass,
     } = this.state.pg
 
-    var newPgJson: string | undefined
+    var newPgJson = JSON.stringify(this.state.pg)
+    this.saveRemote(initialPgJson, newPgJson)
     if (this.pg) {
       if (exist) {
         this.pg
@@ -414,8 +421,6 @@ class Sheet extends Component<
           })
           .then(() => {
             console.log('update done')
-            newPgJson = JSON.stringify(this.state.pg)
-            this.saveRemote(initialPgJson, newPgJson)
             this.setState({ initialPgJson: newPgJson })
           })
           .catch((err) => console.log('err: ', err))
@@ -451,7 +456,7 @@ class Sheet extends Component<
           })
           .then(() => {
             console.log('create done')
-            this.setState({ initialPgJson: JSON.stringify(this.state.pg) })
+            this.setState({ initialPgJson: newPgJson })
           })
           .catch((err) => console.log('err: ', err))
       }
@@ -1453,13 +1458,14 @@ class Sheet extends Component<
         </Snackbar>
         <ConfirmDialog
           title="Ripristino"
-          description="Sei sicuro di voler ripristinare questo personaggio?"
+          description="Vuoi ripristinare questo personaggio?"
           open={showRestoreDialog}
           yesCallback={() => {
             this.restoreBackup()
           }}
           noCallback={() => {
             this.setState({ showRestoreDialog: false })
+            this.props.history.push(`/`)
           }}
         />
       </React.Fragment>
