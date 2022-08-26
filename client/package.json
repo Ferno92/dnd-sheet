@@ -13,7 +13,7 @@
     "@types/react-router": "^5.0.2",
     "@types/shortid": "0.0.29",
     "clsx": "^1.0.4",
-    "dexie": "^2.0.4",
+    "dexie": "^3.2.2",
     "firebase": "^9.8.2",
     "image-compressor.js": "^1.1.4",
     "lodash": "^4.17.20",
