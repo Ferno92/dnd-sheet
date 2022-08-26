@@ -63,7 +63,7 @@ const BackupDialog: React.FC<BackupDialogProps & RouteComponentProps> = (
           const backupPgs = response.docs.find((doc) => doc.id == id)?.data()
             .data as BackupPG[]
           const copy = new Map(backup)
-          copy.set(id, backupPgs)
+          copy.set(id, backupPgs || [])
           setBackup(copy)
         })
       }
@@ -120,24 +120,30 @@ const BackupDialog: React.FC<BackupDialogProps & RouteComponentProps> = (
           </ExpansionPanelSummary>
           <ExpansionPanelDetails className={styles.panelDetails}>
             <List className={styles.list}>
-              {backup.get(pg.id.toString())?.map((b) => (
-                <ListItem
-                  key={b.date}
-                  button
-                  onClick={() => goToPreview(pg.id.toString(), b.date)}
-                >
-                  <ListItemText
-                    primary={`${b.pg.pgClass} LV.${StatsUtils.getPgLevel(
-                      b.pg.pe
-                    )} (${b.pg.pe} PE)`}
-                    secondary={`${new Date(
-                      b.date
-                    ).toLocaleDateString()} ${new Date(
-                      b.date
-                    ).toLocaleTimeString()}`}
-                  />
-                </ListItem>
-              )) || <CircularProgress />}
+              {backup.get(pg.id.toString())?.length == 0 ? (
+                <Typography variant="body1">
+                  Non ci sono ancora backup di questo personaggio
+                </Typography>
+              ) : (
+                backup.get(pg.id.toString())?.map((b) => (
+                  <ListItem
+                    key={b.date}
+                    button
+                    onClick={() => goToPreview(pg.id.toString(), b.date)}
+                  >
+                    <ListItemText
+                      primary={`${b.pg.pgClass} LV.${StatsUtils.getPgLevel(
+                        b.pg.pe
+                      )} (${b.pg.pe} PE)`}
+                      secondary={`${new Date(
+                        b.date
+                      ).toLocaleDateString()} ${new Date(
+                        b.date
+                      ).toLocaleTimeString()}`}
+                    />
+                  </ListItem>
+                )) || <CircularProgress />
+              )}
             </List>
           </ExpansionPanelDetails>
         </ExpansionPanel>

@@ -91,11 +91,6 @@ const DashboardStyles = makeStyles((theme: Theme) =>
           marginRight: 8
         }
       },
-      fab: {
-        bottom: undefined,
-        top: 40,
-        right: 20
-      },
       title: {
         marginBottom: 24
       }
