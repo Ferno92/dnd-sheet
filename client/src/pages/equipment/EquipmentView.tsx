@@ -7,7 +7,7 @@ import {
   Button,
   IconButton,
   useMediaQuery,
-  Divider
+  Divider,
 } from '@material-ui/core'
 import { useTheme } from '@material-ui/core/styles'
 import PG from 'pages/stats/models/PG'
@@ -22,6 +22,7 @@ import SizeEnum from 'data/types/SizeEnum'
 interface EquipmentViewProps {
   onEdit: boolean
   pg: PG
+  readOnly: boolean
   onChangeMoney: (index: number, value: number) => void
   onRemoveEquipment: (index: number) => void
   onAddEquipment: (equipments: EquipmentObject[]) => void
@@ -30,7 +31,14 @@ interface EquipmentViewProps {
 const EquipmentView: React.FC<EquipmentViewProps> = (
   props: EquipmentViewProps
 ) => {
-  const { onEdit, pg, onChangeMoney, onRemoveEquipment, onAddEquipment } = props
+  const {
+    onEdit,
+    pg,
+    onChangeMoney,
+    onRemoveEquipment,
+    onAddEquipment,
+    readOnly,
+  } = props
   const styles = useEquipmentViewStyles()
   const [equipmentItemDialogOpen, setEquipmentItemDialogOpen] = useState(false)
   const theme = useTheme()
@@ -56,13 +64,13 @@ const EquipmentView: React.FC<EquipmentViewProps> = (
 
   const getCurrentCapacity = useCallback(() => {
     let value = 0
-    pg.equipment.backpack.forEach(item => {
+    pg.equipment.backpack.forEach((item) => {
       value += item.weight * item.quantity
     })
-    pg.armors.forEach(armorInfo => {
+    pg.armors.forEach((armorInfo) => {
       value += armorInfo.armor.weight
     })
-    pg.weapons.forEach(weaponInfo => {
+    pg.weapons.forEach((weaponInfo) => {
       if (weaponInfo.weapon.weight) {
         value += weaponInfo.weapon.weight
       }
@@ -74,7 +82,9 @@ const EquipmentView: React.FC<EquipmentViewProps> = (
   return (
     <div className={styles.root}>
       <div className={styles.inputContainer}>
-        <Typography variant="h5"color='textPrimary'>Equipaggiamento</Typography>
+        <Typography variant="h5" color="textPrimary">
+          Equipaggiamento
+        </Typography>
         <div className={styles.moneys}>
           <TextFieldNumber
             label="MR"
@@ -128,7 +138,7 @@ const EquipmentView: React.FC<EquipmentViewProps> = (
           />
         </div>
         <Divider className={styles.divider} />
-        <Typography variant="subtitle2" color='textPrimary'>
+        <Typography variant="subtitle2" color="textPrimary">
           Peso trasportato / Peso massimo{' '}
         </Typography>
         <div className={styles.capacity}>
@@ -138,29 +148,37 @@ const EquipmentView: React.FC<EquipmentViewProps> = (
               styles.currentCapacity,
               getCurrentCapacity() > getMaxCapacity() ? 'red' : undefined
             )}
-            color='textPrimary'
+            color="textPrimary"
           >
             {getCurrentCapacity()}
           </Typography>
           <Typography
             variant="body2"
             className={styles.capacityTot}
-            color='textPrimary'
+            color="textPrimary"
           >{`/${getMaxCapacity()}kg`}</Typography>
         </div>
 
         <Divider className={styles.divider} />
-        <Typography variant="subtitle2"color='textPrimary'>Oggetti:</Typography>
+        <Typography variant="subtitle2" color="textPrimary">
+          Oggetti:
+        </Typography>
         {pg.equipment.backpack.length > 0 && (
           <Grid container className={styles.equipmentHeader}>
             <Grid item xs={3}>
-              <Typography variant="subtitle2"color='textPrimary'>Quantità</Typography>
+              <Typography variant="subtitle2" color="textPrimary">
+                Quantità
+              </Typography>
             </Grid>
             <Grid item xs={5}>
-              <Typography variant="subtitle2"color='textPrimary'>Nome</Typography>
+              <Typography variant="subtitle2" color="textPrimary">
+                Nome
+              </Typography>
             </Grid>
             <Grid item xs={2}>
-              <Typography variant="subtitle2"color='textPrimary'>Peso(kg)</Typography>
+              <Typography variant="subtitle2" color="textPrimary">
+                Peso(kg)
+              </Typography>
             </Grid>
             <Grid item xs={2}></Grid>
           </Grid>
@@ -190,13 +208,15 @@ const EquipmentView: React.FC<EquipmentViewProps> = (
                   xs={5}
                   className={clsx(styles.gridItem, styles.equipmentName)}
                 >
-                  <Typography variant="caption" color='textPrimary'>{item.name}</Typography>
+                  <Typography variant="caption" color="textPrimary">
+                    {item.name}
+                  </Typography>
                 </Grid>
                 <Grid item xs={2} className={styles.gridItem}>
                   <Typography
                     variant="caption"
                     className={styles.centerGridValue}
-                    color='textPrimary'
+                    color="textPrimary"
                   >
                     {item.weight * item.quantity}
                   </Typography>
@@ -207,7 +227,10 @@ const EquipmentView: React.FC<EquipmentViewProps> = (
                     color="secondary"
                     onClick={() => onRemoveEquipment(index)}
                   >
-                    <CloseOutlined className={styles.itemInfoButton} color='primary'/>
+                    <CloseOutlined
+                      className={styles.itemInfoButton}
+                      color="primary"
+                    />
                   </IconButton>
                 </Grid>
                 <Grid
@@ -215,7 +238,9 @@ const EquipmentView: React.FC<EquipmentViewProps> = (
                   xs={12}
                   className={clsx(styles.gridItem, styles.equipmentInfo)}
                 >
-                  <Typography variant="caption" color='textPrimary'>{item.info}</Typography>
+                  <Typography variant="caption" color="textPrimary">
+                    {item.info}
+                  </Typography>
                 </Grid>
               </React.Fragment>
             )
@@ -229,6 +254,7 @@ const EquipmentView: React.FC<EquipmentViewProps> = (
         </Button>
 
         <Divider className={styles.divider} />
+        {readOnly && <div className={styles.readOnly}></div>}
 
         {/* ________________ Equipment dialog _____________ */}
 

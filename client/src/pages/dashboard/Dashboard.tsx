@@ -408,6 +408,9 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
         open={showBackupDialog}
         onClose={() => setShowBackupDialog(false)}
         firebaseDb={firebaseDb}
+        history={props.history}
+        location={props.location}
+        match={props.match}
       />
     </div>
   )

@@ -29,6 +29,7 @@ interface SpellsViewProps {
   onEdit: boolean
   pg: PG
   proficiency: Proficiency[]
+  readOnly: boolean
   onAddSpell: (spell: Spell) => void
   onRemoveSpell: (spell: Spell) => void
   onUpdateSpell: (spell: Spell) => void
@@ -44,6 +45,7 @@ const SpellsView: React.FC<SpellsViewProps> = (props: SpellsViewProps) => {
     onRemoveSpell,
     onUseSlot,
     onUpdateSpell,
+    readOnly,
   } = props
   const [spellByJobLevel, setSpellByJobLevel] = useState<SpellsByJobLevel>()
   const [spellExpanded, setSpellExpanded] = useState<string>()
@@ -433,6 +435,7 @@ const SpellsView: React.FC<SpellsViewProps> = (props: SpellsViewProps) => {
           })}
 
         <Divider className={styles.divider} />
+        {readOnly && <div className={styles.readOnly}></div>}
         {/* ________________ Spell dialog _____________ */}
 
         <SpellDialog

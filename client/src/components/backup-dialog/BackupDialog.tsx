@@ -27,6 +27,7 @@ import PG from 'pages/stats/models/PG'
 import useStyles from './BackupDialog.styles'
 import StatsUtils from 'utils/StatsUtils'
 import BackupPG from 'pages/stats/models/BackupPG'
+import { RouteComponentProps } from 'react-router-dom'
 
 interface BackupDialogProps {
   user?: GoogleUser
@@ -35,8 +36,8 @@ interface BackupDialogProps {
   onClose: () => void
 }
 
-const BackupDialog: React.FC<BackupDialogProps> = (
-  props: BackupDialogProps
+const BackupDialog: React.FC<BackupDialogProps & RouteComponentProps> = (
+  props: BackupDialogProps & RouteComponentProps
 ) => {
   const { open, user, onClose, firebaseDb } = props
   const [remotePgs, setRemotePgs] = useState<PG[]>([])
@@ -69,6 +70,11 @@ const BackupDialog: React.FC<BackupDialogProps> = (
     },
     [backup, user]
   )
+
+  const goToPreview = useCallback((id: string, date: string) => {
+    const backupDate = btoa(encodeURIComponent(date))
+    props.history.push(`/sheet/${id}/${0}/${backupDate}`)
+  }, [])
 
   useEffect(() => {
     if (user && open) {
@@ -112,12 +118,19 @@ const BackupDialog: React.FC<BackupDialogProps> = (
               )})`}
             </Typography>
           </ExpansionPanelSummary>
-          <ExpansionPanelDetails>
+          <ExpansionPanelDetails className={styles.panelDetails}>
             <List className={styles.list}>
               {backup.get(pg.id.toString())?.map((b) => (
-                <ListItem key={b.date} button>
+                <ListItem
+                  key={b.date}
+                  button
+                  onClick={() => goToPreview(pg.id.toString(), b.date)}
+                >
                   <ListItemText
-                    primary={`${new Date(
+                    primary={`${b.pg.pgClass} LV.${StatsUtils.getPgLevel(
+                      b.pg.pe
+                    )} (${b.pg.pe} PE)`}
+                    secondary={`${new Date(
                       b.date
                     ).toLocaleDateString()} ${new Date(
                       b.date

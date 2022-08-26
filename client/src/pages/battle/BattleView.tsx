@@ -54,6 +54,7 @@ interface BattleViewProps {
   id: number
   pg: PG
   proficiency: Proficiency[]
+  readOnly: boolean
   onChangeSpeed: (event: React.ChangeEvent<HTMLInputElement>) => void
   onChangePF: (event: React.ChangeEvent<HTMLInputElement>) => void
   onChangeTsMorte: (index: number) => void
@@ -86,6 +87,7 @@ function BattleView(props: BattleViewProps) {
     onRemoveArmor,
     onSelectArmor,
     onChangeTemp,
+    readOnly,
   } = props
   const classes = BattleViewStyles()
   const [caModifiersOpen, setCaModifiersOpen] = useState(false)
@@ -1155,6 +1157,8 @@ function BattleView(props: BattleViewProps) {
             </Grid>
           </DialogContent>
         </Dialog>
+
+        {readOnly && <div className={classes.readOnly}></div>}
       </div>
     </div>
   )

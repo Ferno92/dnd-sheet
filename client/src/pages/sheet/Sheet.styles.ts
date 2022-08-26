@@ -6,6 +6,8 @@ const SheetStyles = (theme: Theme) =>
     container: {
       background: theme.palette.backgroundSecondary.default
     },
+    swipeableViews: {
+    },
     bottomNavigation: {
       position: 'fixed',
       bottom: 0,

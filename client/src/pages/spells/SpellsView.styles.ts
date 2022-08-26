@@ -7,7 +7,15 @@ const useStyles = makeStyles((theme: Theme) => ({
     height: 'calc(100vh - 75px)'
   },
   inputContainer: {
-    paddingBottom: 86
+    paddingBottom: 86,
+    position: 'relative'
+  },
+  readOnly: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%'
   },
   spellInfoContainer: {
     marginBottom: 16

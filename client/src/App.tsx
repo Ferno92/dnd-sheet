@@ -92,6 +92,7 @@ const App: React.FC = () => {
         <Switch>
           <Route exact path="/" component={Dashboard} />
           <Route exact path="/sheet/:id/:page" component={Sheet} />
+          <Route exact path="/sheet/:id/:page/:backup" component={Sheet} />
           <Route exact path="/download/:id" component={DownloadPG} />
           <Route exact path="/privacy" component={PrivacyPolicy} />
         </Switch>

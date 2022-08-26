@@ -17,7 +17,6 @@ import { ReactComponent as FightIcon } from 'assets/images/swords.svg'
 import { ReactComponent as ProfileIcon } from 'assets/images/viking.svg'
 import { ReactComponent as BackpackIcon } from 'assets/images/backpack.svg'
 import { ReactComponent as BookIcon } from 'assets/images/spellbook.svg'
-import HomeIcon from '@material-ui/icons/Home'
 import {
   Edit,
   Done,
@@ -26,6 +25,7 @@ import {
   Share,
   Hotel,
   Restaurant,
+  Restore,
 } from '@material-ui/icons'
 import SwipeableViews from 'react-swipeable-views'
 import StatsView from 'pages/stats/StatsView'
@@ -69,10 +69,12 @@ import {
   UsersDocName,
 } from 'pages/dashboard/Dashboard'
 import BackupPG from 'pages/stats/models/BackupPG'
+import ConfirmDialog from 'components/confirm-dialog/ConfirmDialog'
 
 interface SheetProps {
   id: number
   page?: number
+  backup?: string
 }
 
 interface SheetState {
@@ -86,6 +88,7 @@ interface SheetState {
   initialPgJson: string
   snackMessage?: string
   proficiency: Proficiency[]
+  showRestoreDialog: boolean
 }
 
 interface LastPageAction {
@@ -96,7 +99,7 @@ interface LastPageAction {
 
 class Sheet extends Component<
   SheetProps &
-    RouteComponentProps<{ id: string }> &
+    RouteComponentProps<{ id: string; page?: string; backup?: string }> &
     WithStyles<typeof SheetStyles> &
     WithTheme,
   SheetState
@@ -110,13 +113,13 @@ class Sheet extends Component<
 
   constructor(
     props: SheetProps &
-      RouteComponentProps<{ id: string; page?: string }> &
+      RouteComponentProps<{ id: string; page?: string; backup?: string }> &
       WithStyles<typeof SheetStyles> &
       WithTheme
   ) {
     super(props)
 
-    const { id, page } = props.match.params
+    const { id, page, backup } = props.match.params
     const sheetId = parseInt(id)
     this.firebaseDb = getFirestore(firebaseApp)
     this.state = {
@@ -157,6 +160,7 @@ class Sheet extends Component<
       exist: false,
       initialPgJson: '',
       proficiency: [],
+      showRestoreDialog: false,
     }
     this.db = new Dexie('pg01_database')
     /*this.db.version(1).stores({
@@ -167,16 +171,18 @@ class Sheet extends Component<
       // this.pg.put({ name: 'Torendal DueLame', race: 'Nano' }).then(() => {
       //   return db.table('pg').get('Torendal DueLame')
       // })
-      this.db.table('pg').each((pg: PG) => {
-        if (pg.id === sheetId) {
-          const mergedPG = Object.assign(this.state.pg, pg)
-          this.setState({
-            pg: mergedPG,
-            exist: true,
-            initialPgJson: JSON.stringify(mergedPG),
-          })
-        }
-      })
+      if (backup == undefined) {
+        this.db.table('pg').each((pg: PG) => {
+          if (pg.id === sheetId) {
+            const mergedPG = Object.assign(this.state.pg, pg)
+            this.setState({
+              pg: mergedPG,
+              exist: true,
+              initialPgJson: JSON.stringify(mergedPG),
+            })
+          }
+        })
+      }
       //   .then((pg: any) => {
       //     console.log(pg.name);
 
@@ -200,7 +206,7 @@ class Sheet extends Component<
         name: 'Torna a selezione personaggi',
         onClick: () => {
           //go back
-          this.props.history.goBack()
+          this.props.history.push('/')
         },
       },
       {
@@ -248,13 +254,22 @@ class Sheet extends Component<
   }
 
   componentDidUpdate(prevProps: SheetProps, prevState: SheetState) {
-    const { onEdit } = this.state
+    const { onEdit, snackMessage } = this.state
+    const { backup } = this.props.match.params
     if (!onEdit && onEdit !== prevState.onEdit) {
       this.updateDB()
+    }
+    if (
+      snackMessage == undefined &&
+      prevState.snackMessage != snackMessage &&
+      backup
+    ) {
+      this.props.history.push(`/`)
     }
   }
 
   checkPgJsonChanges = (initialPgJson: string, newPgJson: string) => {
+    //ignore pf and tsmorte, too many changes
     var initial = JSON.parse(initialPgJson) as PG
     initial.currentPF = 0
     initial.tsMorte = []
@@ -265,8 +280,9 @@ class Sheet extends Component<
   }
 
   saveRemote = async (initialPgJson: string, newPgJson: string) => {
+    const { backup } = this.props.match.params
     const hasChanges = this.checkPgJsonChanges(initialPgJson, newPgJson)
-    if (this.user?.id && hasChanges) {
+    if (this.user?.id && (hasChanges || backup != undefined)) {
       const response = await getDocs(collection(this.firebaseDb, UsersDocName))
       const firestorePgs = response.docs
         .find((doc) => doc.id == this.user?.id)
@@ -458,7 +474,13 @@ class Sheet extends Component<
 
   onChangeEditMode = () => {
     const { onEdit } = this.state
-    this.setState({ onEdit: !onEdit })
+    const { backup } = this.props.match.params
+    if (backup) {
+      //ask dialog
+      this.setState({ showRestoreDialog: true })
+    } else {
+      this.setState({ onEdit: !onEdit })
+    }
   }
 
   handleClick = () => {
@@ -1160,6 +1182,24 @@ class Sheet extends Component<
     }
   }
 
+  fetchBackupPg = async (date: string) => {
+    const backupPath = `${UsersDocName}/${this.user?.id}/backup`
+    const backupResponse = await getDocs(
+      collection(this.firebaseDb, backupPath)
+    )
+    const backupPgs = backupResponse.docs
+      .find((doc) => doc.id == this.props.match.params.id)
+      ?.data().data as BackupPG[]
+    const pg = backupPgs.find((b) => b.date == date)?.pg
+    if (pg) {
+      this.setState({
+        pg: pg,
+        exist: true,
+        initialPgJson: JSON.stringify(pg),
+      })
+    }
+  }
+
   fetchUserDatabase = (db: Dexie) => {
     db.open().then(() => {
       const userTable = db.table(DexieUserTable)
@@ -1170,7 +1210,21 @@ class Sheet extends Component<
         })
         .then(() => {
           this.user = user
+          const { backup } = this.props.match.params
+          if (backup) {
+            console.log('backup', backup, decodeURIComponent(atob(backup)))
+            const date = decodeURIComponent(atob(backup))
+            this.fetchBackupPg(date)
+          }
         })
+    })
+  }
+
+  restoreBackup = () => {
+    this.updateDB()
+    this.setState({
+      snackMessage: 'Personaggio ripristinato con successo!',
+      showRestoreDialog: false,
     })
   }
 
@@ -1182,8 +1236,17 @@ class Sheet extends Component<
 
   render() {
     const { classes, theme } = this.props
-    const { pageIndex, onEdit, sheetId, pg, exist, snackMessage, proficiency } =
-      this.state
+    const { backup } = this.props.match.params
+    const {
+      pageIndex,
+      onEdit,
+      sheetId,
+      pg,
+      exist,
+      snackMessage,
+      proficiency,
+      showRestoreDialog,
+    } = this.state
 
     let swipeableViews = [
       <div key={'slide1'}>
@@ -1193,6 +1256,7 @@ class Sheet extends Component<
           id={sheetId}
           pg={pg}
           exist={exist}
+          readOnly={backup != undefined}
           onChangeAbilityCheck={this.onChangeAbilityCheck}
           onChangeAbilityPoints={this.onChangeAbilityPoints}
           onChangeIspiration={this.onChangeIspiration}
@@ -1219,6 +1283,7 @@ class Sheet extends Component<
           onEdit={onEdit}
           id={sheetId}
           pg={pg}
+          readOnly={backup != undefined}
           onChangeSpeed={this.onChangeSpeed}
           onChangePF={this.onChangePF}
           onChangeTsMorte={this.onChangeTsMorte}
@@ -1237,6 +1302,7 @@ class Sheet extends Component<
         <EquipmentView
           onEdit={onEdit}
           pg={pg}
+          readOnly={backup != undefined}
           onChangeMoney={this.onChangeMoney}
           onAddEquipment={this.onAddEquipment}
           onRemoveEquipment={this.onRemoveEquipment}
@@ -1251,6 +1317,7 @@ class Sheet extends Component<
             onEdit={onEdit}
             pg={pg}
             proficiency={proficiency}
+            readOnly={backup != undefined}
             onAddSpell={this.onAddSpell}
             onRemoveSpell={this.onRemoveSpell}
             onUpdateSpell={this.onUpdateSpell}
@@ -1299,12 +1366,15 @@ class Sheet extends Component<
         />
       )
     }
-    bottomNavigations.push(
-      <BottomNavigationAction
-        key={'altro'}
-        icon={<MoreHoriz className={classes.navigationIcon} />}
-      />
-    )
+    console.log('render', backup)
+    if (backup == undefined) {
+      bottomNavigations.push(
+        <BottomNavigationAction
+          key={'altro'}
+          icon={<MoreHoriz className={classes.navigationIcon} />}
+        />
+      )
+    }
     return (
       <React.Fragment>
         <Prompt
@@ -1327,29 +1397,34 @@ class Sheet extends Component<
             return shouldPrompt
           }}
         />
-        <Tooltip
-          title={onEdit ? 'Salva' : 'Modifica'}
-          aria-label={onEdit ? 'Save' : 'Edit'}
-        >
-          <Fab
-            color="primary"
-            aria-label="Done"
-            size="small"
-            onClick={this.onChangeEditMode}
-            className={classes.fab}
+        {
+          <Tooltip
+            title={onEdit ? 'Salva' : 'Modifica'}
+            aria-label={onEdit ? 'Save' : 'Edit'}
           >
-            {onEdit ? (
-              <Done className={classes.fabIcon} />
-            ) : (
-              <Edit className={classes.fabIcon} />
-            )}
-          </Fab>
-        </Tooltip>
+            <Fab
+              color="primary"
+              aria-label="Done"
+              size="small"
+              onClick={this.onChangeEditMode}
+              className={classes.fab}
+            >
+              {onEdit ? (
+                <Done className={classes.fabIcon} />
+              ) : backup == undefined ? (
+                <Edit className={classes.fabIcon} />
+              ) : (
+                <Restore className={classes.fabIcon} />
+              )}
+            </Fab>
+          </Tooltip>
+        }
         <SwipeableViews
           axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
           index={pageIndex}
           onChangeIndex={this.onSwipePage}
-          className="tab-container"
+          disabled={backup != undefined}
+          className={classes.swipeableViews}
         >
           {swipeableViews.map((item) => item)}
         </SwipeableViews>
@@ -1376,6 +1451,17 @@ class Sheet extends Component<
             {snackMessage}
           </MuiAlert>
         </Snackbar>
+        <ConfirmDialog
+          title="Ripristino"
+          description="Sei sicuro di voler ripristinare questo personaggio?"
+          open={showRestoreDialog}
+          yesCallback={() => {
+            this.restoreBackup()
+          }}
+          noCallback={() => {
+            this.setState({ showRestoreDialog: false })
+          }}
+        />
       </React.Fragment>
     )
   }

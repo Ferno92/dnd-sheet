@@ -7,6 +7,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
     list: {
         width: '100%'
+    },
+    panelDetails: {
+        padding: 8
     }
 }))
 

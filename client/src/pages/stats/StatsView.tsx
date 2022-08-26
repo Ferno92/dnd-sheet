@@ -72,6 +72,7 @@ interface StatsViewProps {
   pg: PG
   proficiency: Proficiency[]
   exist: boolean
+  readOnly: boolean
   onEditName: (value: string) => void
   onEditLevel: (lv: number) => void
   onEditStats: (
@@ -615,6 +616,7 @@ class StatsView extends Component<
       onChangeMulticlass,
       width,
       proficiency,
+      readOnly,
     } = this.props
     const {
       dialogInfoAbilitiesOpen,
@@ -1346,6 +1348,7 @@ class StatsView extends Component<
             })}
           </div>
           <Divider className={classes.divider} />
+          {readOnly && <div className={classes.readOnly}></div>}
         </div>
         {pgClass && (
           <InfoDialog

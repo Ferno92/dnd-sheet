@@ -36,7 +36,8 @@ const StatsViewStyles = (theme: Theme) =>
     },
     inputContainer: {
       padding: 10,
-      paddingBottom: 86
+      paddingBottom: 86,
+      position: 'relative'
     },
     gridContainer: {
       width: 'calc(100% - 4px)',
@@ -259,6 +260,13 @@ const StatsViewStyles = (theme: Theme) =>
       secondClassLevel: {
         marginBottom: 10
       }
+    },
+    readOnly: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: '100%'
     },
     [theme.breakpoints.up('md')]: {
       infoSummary: {
