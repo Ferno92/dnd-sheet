@@ -32,7 +32,6 @@ import StatsType from 'data/types/StatsEnum'
 import TextUtils from 'utils/TextUtils'
 import { default as racesJSON } from 'data/json/RacesJSON'
 import { default as subRacesJSON } from 'data/json/SubRacesJSON'
-import { default as jobsJSON } from 'data/json/JobsJSON'
 import { default as subJobsJSON } from 'data/json/SubJobsJSON'
 import { default as abilitiesJSON } from 'data/json/AbilitiesJSON'
 import { default as backgroundJSON } from 'data/json/BackgroundJSON'
@@ -65,6 +64,7 @@ import PgGeneralInfo from 'data/types/PgGeneralInfo'
 import ConfirmDialog from 'components/confirm-dialog/ConfirmDialog'
 import Job from 'data/types/Job'
 import ClassLevel from './components/ClassLevel'
+import { firebaseApp } from 'App'
 
 interface StatsViewProps {
   onEdit: boolean
@@ -124,6 +124,7 @@ interface StatsViewState {
   generalInfoDialogOpen: boolean
   tempStatMode: boolean
   askDeleteTempStat: boolean
+  jobs: Job[]
 }
 
 class StatsView extends Component<
@@ -133,7 +134,6 @@ class StatsView extends Component<
   inputLabel = createRef<any>()
   racesData = DataUtils.RaceMapper(racesJSON as any)
   subRacesData = DataUtils.RaceMapper(subRacesJSON as any)
-  jobsData = DataUtils.JobMapper(jobsJSON as any)
   backgroundData = DataUtils.BackgroundMapper(backgroundJSON as any)
   abilitiesData = DataUtils.AbilityMapper(abilitiesJSON as any)
   subJobsData = DataUtils.JobMapper(subJobsJSON as any)
@@ -153,6 +153,7 @@ class StatsView extends Component<
       tempStatMode:
         props.pg.stats.find((stat) => stat.temp !== undefined) !== undefined,
       askDeleteTempStat: false,
+      jobs: [],
     }
   }
 
@@ -173,17 +174,24 @@ class StatsView extends Component<
     }
   }
 
+  async componentDidMount() {
+    const jobs = await DataUtils.getJobs(firebaseApp)
+    this.setState({ jobs })
+  }
+
   getTSProficiency = (type: StatsType) => {
     const { pgClass } = this.props.pg
     const { proficiency } = this.props
+    const { jobs } = this.state
     let hasProficiency = false
     if (pgClass) {
-      this.jobsData.forEach((job) => {
+      jobs.forEach((job) => {
         if (job.type === pgClass) {
           hasProficiency = job.ts.filter((ts) => ts === type).length > 0
         }
       })
     }
+    console.log('getTSProficiency', type, hasProficiency, pgClass, jobs)
     return hasProficiency
       ? StatsUtils.getProficiency(
           StatsUtils.getPgLevel(this.props.pg.pe),
@@ -232,9 +240,10 @@ class StatsView extends Component<
 
   getAbilitiesListFromClass = (): AbilitiesEnum[] => {
     const { pgClass } = this.props.pg
+    const { jobs } = this.state
     let abilitiesList: AbilitiesEnum[] = []
     if (pgClass) {
-      this.jobsData.forEach((job) => {
+      jobs.forEach((job) => {
         if (job.type === pgClass) {
           abilitiesList = job.abilities
         }
@@ -279,9 +288,10 @@ class StatsView extends Component<
 
   getAbilitiesCountFromClass = (): number => {
     const { pgClass, race, pgClass2, multiclass } = this.props.pg
+    const { jobs } = this.state
     let count = 0
     if (pgClass) {
-      this.jobsData.forEach((job) => {
+      jobs.forEach((job) => {
         if (job.type === pgClass) {
           count = job.abilitiesCount
         } else if (job.type === pgClass2 && multiclass && job.multiclass) {
@@ -551,7 +561,8 @@ class StatsView extends Component<
 
   getSecondaryJobsData = (): Job[] => {
     const { pgClass } = this.props.pg
-    const filtered: Job[] = this.jobsData.filter((job) => job.type !== pgClass)
+    const { jobs } = this.state
+    const filtered: Job[] = jobs.filter((job) => job.type !== pgClass)
     const mapped: Job[] = filtered.map((x) => {
       const req = this.getJobRequirement(x.type as JobsEnum)
       return {
@@ -630,6 +641,7 @@ class StatsView extends Component<
       tempStatMode,
       askDeleteTempStat,
       tempPE,
+      jobs,
     } = this.state
     const currentRaceObj = StatsUtils.getCurrentRace(race)
     const isMobile =
@@ -656,7 +668,7 @@ class StatsView extends Component<
         )}`}</Typography>
         {multiclass && pgClass && pgClass2 ? (
           <Typography variant="body2" color="textPrimary">
-            {StatsUtils.getInfoName(`${pgClass}`, this.jobsData)
+            {StatsUtils.getInfoName(`${pgClass}`, jobs)
               ? `${pgClass} Lv. ${
                   levelFirstClass || StatsUtils.getPgLevel(this.props.pg.pe) - 1
                 } - ${pgClass2} Lv. ${
@@ -668,10 +680,10 @@ class StatsView extends Component<
           </Typography>
         ) : (
           <Typography variant="body2" color="textPrimary">
-            {StatsUtils.getInfoName(`${pgClass}`, this.jobsData)
+            {StatsUtils.getInfoName(`${pgClass}`, jobs)
               ? `${StatsUtils.getInfoName(
                   `${pgClass}`,
-                  this.jobsData
+                  jobs
                 )} Lv. ${StatsUtils.getPgLevel(this.props.pg.pe)}`
               : ''}
           </Typography>
@@ -758,7 +770,7 @@ class StatsView extends Component<
           <SimpleSelect<JobsEnum>
             label={multiclass ? 'Classe Primaria' : 'Classe'}
             item={pgClass}
-            data={this.jobsData}
+            data={jobs}
             onEdit={onEdit}
             onChange={(e) => onChangeJob(e.target.value as JobsEnum)}
             root={multiclass ? classes.infoDetailsItem : undefined}

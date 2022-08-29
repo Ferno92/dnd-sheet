@@ -7,8 +7,13 @@ import Weapon from './types/Weapon'
 import Armor from './types/Armor'
 import Background from './types/Background'
 import Level from './types/Level'
+import { FirebaseApp } from 'firebase/app'
+import { getFirestore, getDocs, collection } from 'firebase/firestore'
 
 class DataUtils {
+
+  static jobs = new Array<Job>()
+
   static RaceMapper(json: any): Race[] {
     let races: Race[] = []
     json.forEach((child: any) => {
@@ -32,6 +37,26 @@ class DataUtils {
       })
     })
     return races
+  }
+
+  static async getJobs(firebaseApp: FirebaseApp) {
+    if(DataUtils.jobs.length === 0) {
+      const db = getFirestore(firebaseApp)
+      const response = await getDocs(collection(db, 'data'))
+      const jobs = response.docs.find((doc) => doc.id == 'jobs')?.data()
+      if(jobs){
+        const data = (JSON.parse(jobs.data) as any[]).map(j => {
+          j.value = j.name
+          return j
+        }) as Job[]
+        DataUtils.jobs = data
+        return data
+      } else {
+        return []
+      }
+    } else {
+      return DataUtils.jobs
+    }
   }
 
   static JobMapper(json: any): Job[] {

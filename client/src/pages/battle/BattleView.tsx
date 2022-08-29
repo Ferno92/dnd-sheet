@@ -35,13 +35,14 @@ import ArmorDialog from 'components/armor-dialog/ArmorDialog'
 import Armor from 'data/types/Armor'
 import { RacesEnum, SubRacesEnum } from 'data/types/RacesEnum'
 import { default as racesJSON } from 'data/json/RacesJSON'
-import { default as jobsJSON } from 'data/json/JobsJSON'
 import DataUtils from 'data/DataUtils'
 import RaceAbility from 'data/types/RaceAbility'
 import Privileges from 'data/types/Privileges'
 import ExpansionPanelItem from 'components/expansion-panel-item/ExpansionPanelItem'
 import ConfirmDialog from 'components/confirm-dialog/ConfirmDialog'
 import RestType from 'data/types/RestType'
+import Job from 'data/types/Job'
+import { JobsEnum, SubJobsEnum } from 'data/types/JobsEnum'
 
 export interface Modifier {
   type: string
@@ -102,6 +103,7 @@ function BattleView(props: BattleViewProps) {
   const [armorSelected, setArmorSelected] = useState<ArmorInfo>()
   const [weaponSelected, setWeaponSelected] = useState<WeaponInfo>()
   const [askDeleteArmorOrWeapon, setAskDeleteArmorOrWeapon] = useState(false)
+  const [jobs, setJobs] = useState<Job[]>([])
   const theme = useTheme()
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
   let defaultModifiers = [
@@ -181,8 +183,7 @@ function BattleView(props: BattleViewProps) {
       const { pgClass, pgClass2 } = pg
       let hasProficiency = false
 
-      const jobsData = DataUtils.JobMapper(jobsJSON as any)
-      jobsData.forEach((job) => {
+      jobs.forEach((job) => {
         if (job.type === pgClass) {
           job.privileges.forEach((item) => {
             if (item.extra) {
@@ -219,7 +220,7 @@ function BattleView(props: BattleViewProps) {
       })
       return hasProficiency
     },
-    [pg]
+    [pg, jobs]
   )
 
   const hasWeaponProficiency = useCallback(
@@ -227,8 +228,7 @@ function BattleView(props: BattleViewProps) {
       const { pgClass, pgClass2 } = pg
       let hasProficiency = false
 
-      const jobsData = DataUtils.JobMapper(jobsJSON as any)
-      jobsData.forEach((job) => {
+      jobs.forEach((job) => {
         if (job.type === pgClass) {
           job.privileges.forEach((item) => {
             if (item.extra) {
@@ -266,7 +266,7 @@ function BattleView(props: BattleViewProps) {
       })
       return hasProficiency
     },
-    [pg]
+    [pg, jobs]
   )
 
   const getWeaponTPC = useCallback(
@@ -372,31 +372,42 @@ function BattleView(props: BattleViewProps) {
     pg.weapons,
   ])
 
-  useEffect(() => {
-    const primary = BattleUtils.getDV(pg.pgClass)
+  const fetchDV = useCallback(async (pg: PG) => {
+    const primary = await BattleUtils.getDV(pg.pgClass)
     let secondary = ''
     if (pg.pgClass2) {
-      secondary = BattleUtils.getDV(pg.pgClass2)
+      secondary = await BattleUtils.getDV(pg.pgClass2)
     }
     setDV(
       `${primary}${
         secondary !== '' && primary !== secondary ? `/${secondary}` : ''
       }`
     )
-  }, [pg.race, pg.pgClass, pg.pgClass2])
+  }, [])
 
   useEffect(() => {
-    if (pg.pgClass && pg.subClass) {
+    fetchDV(pg)
+  }, [pg.race, pg.pgClass, pg.pgClass2])
+
+  const fetchPrivileges = useCallback(
+    async (pg: PG, pgClass: JobsEnum, subClass: SubJobsEnum) => {
       setPrivileges(
-        BattleUtils.getPrivileges(
+        await BattleUtils.getPrivileges(
           StatsUtils.getPgLevel(pg.pe),
-          pg.pgClass,
-          pg.subClass,
+          pgClass,
+          subClass,
           pg.background,
           pg.pgClass2,
           pg.multiclass
         )
       )
+    },
+    []
+  )
+
+  useEffect(() => {
+    if (pg.pgClass && pg.subClass) {
+      fetchPrivileges(pg, pg.pgClass, pg.subClass)
     }
   }, [pg, pg.pgClass, pg.subClass, pg.background])
 

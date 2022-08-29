@@ -1101,7 +1101,7 @@ class Sheet extends Component<
     )
   }
 
-  rest = (long: boolean) => {
+  rest = async (long: boolean) => {
     const { pg } = this.state
     let newTemp = pg.temp
     if (pg.temp) {
@@ -1123,13 +1123,16 @@ class Sheet extends Component<
       const level = StatsUtils.getPgLevel(pg.pe)
       if (pg.levelFirstClass) {
         const pf1 =
-          (BattleUtils.getDVvalue(pg.pgClass) / 2 + 1) * pg.levelFirstClass
+          ((await BattleUtils.getDVvalue(pg.pgClass)) / 2 + 1) *
+          pg.levelFirstClass
         const pf2 =
-          (BattleUtils.getDVvalue(pg.pgClass2) / 2 + 1) *
+          ((await BattleUtils.getDVvalue(pg.pgClass2)) / 2 + 1) *
           (level - pg.levelFirstClass)
         pf = pg.currentPF + pf1 + pf2
       } else {
-        pf = pg.currentPF + (BattleUtils.getDVvalue(pg.pgClass) / 2 + 1) * level
+        pf =
+          pg.currentPF +
+          ((await BattleUtils.getDVvalue(pg.pgClass)) / 2 + 1) * level
       }
     }
     this.setState(
