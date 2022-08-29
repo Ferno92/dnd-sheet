@@ -14,7 +14,6 @@ const DownloadPG: React.FC<
   DownloadPGProps & RouteComponentProps<{ id: string }>
 > = (props: DownloadPGProps & RouteComponentProps<{ id: string }>) => {
   const { id } = props.match.params
-  console.log('pg to download: ', id)
 
   useEffect(() => {
     let didCancel = false
@@ -23,7 +22,6 @@ const DownloadPG: React.FC<
       const db = getFirestore(firebaseApp)
       const response = await getDocs(collection(db, 'sharing'))
       const data = response.docs.find((doc) => doc.id == id)?.data()
-      console.log('Response', data)
       if (!didCancel && data) {
         const pgData = JSON.parse(data.data)
         let pgTable: Dexie.Table<PG, number> | undefined

@@ -224,7 +224,6 @@ class Sheet extends Component<
           const ref = doc(db, 'sharing', id)
           setDoc(ref, { data: pgEncoded })
             .then(() => {
-              console.log('url', url)
               if (nav.share) {
                 nav.share({
                   title: 'Condividi il personaggio',
@@ -304,7 +303,7 @@ class Sheet extends Component<
         data: firestorePgs,
       })
         .then(() => {
-          console.log('updateDoc ok')
+          //console.log('updateDoc ok')
         })
         .catch((error) => {
           console.log('updateDoc err: ', error)
@@ -348,7 +347,7 @@ class Sheet extends Component<
         data: [...(reducedPgs || []), ...[backupPG]],
       })
         .then(() => {
-          console.log('updateBackup ok')
+          //console.log('updateBackup ok')
         })
         .catch((error) => {
           console.log('updateBackup err: ', error)
@@ -420,7 +419,7 @@ class Sheet extends Component<
             levelFirstClass,
           })
           .then(() => {
-            console.log('update done')
+            //console.log('update done')
             this.setState({ initialPgJson: newPgJson })
           })
           .catch((err) => console.log('err: ', err))
@@ -455,7 +454,7 @@ class Sheet extends Component<
             levelFirstClass,
           })
           .then(() => {
-            console.log('create done')
+            //console.log('create done')
             this.setState({ initialPgJson: newPgJson })
           })
           .catch((err) => console.log('err: ', err))
@@ -1220,7 +1219,6 @@ class Sheet extends Component<
           this.user = user
           const { backup } = this.props.match.params
           if (backup) {
-            console.log('backup', backup, decodeURIComponent(atob(backup)))
             const date = decodeURIComponent(atob(backup))
             this.fetchBackupPg(date)
           }
@@ -1374,7 +1372,6 @@ class Sheet extends Component<
         />
       )
     }
-    console.log('render', backup)
     if (backup == undefined) {
       bottomNavigations.push(
         <BottomNavigationAction

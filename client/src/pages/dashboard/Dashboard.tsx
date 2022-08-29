@@ -206,7 +206,6 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
 
   const checkUserPgDatabase = useCallback(
     async (user: GoogleUser, loggingIn: boolean, db: Dexie | undefined) => {
-      console.log('checkUserPgDatabase', pgs, loggingIn)
       if (user.id) {
         if (loggingIn) {
           //save user in db
@@ -242,7 +241,7 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
         data: pgsToSave,
       })
         .then(() => {
-          console.log('saved user pgs', user?.id)
+          //console.log('saved user pgs', user?.id)
         })
         .catch((error) => {
           console.log('db upload err: ', error)
@@ -252,11 +251,10 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
 
   const insertPgToDatabase = useCallback(
     (newPgs: PG[], db: Dexie | undefined) => {
-      console.log('start insertPgToDatabase', newPgs, db)
       db?.table(DexiePgTable)
         .bulkPut(newPgs)
         .then(() => {
-          console.log('insertPgToDatabase ok')
+          //console.log('insertPgToDatabase ok')
         })
         .catch(Dexie.BulkError, (error) => {
           console.log('insertPgToDatabase error', error)
@@ -277,7 +275,7 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
           data: pgs,
         })
           .then(() => {
-            console.log('updateDoc ok')
+            //console.log('updateDoc ok')
           })
           .catch((error) => {
             console.log('updateDoc err: ', error)

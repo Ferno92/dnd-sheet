@@ -191,7 +191,6 @@ class StatsView extends Component<
         }
       })
     }
-    console.log('getTSProficiency', type, hasProficiency, pgClass, jobs)
     return hasProficiency
       ? StatsUtils.getProficiency(
           StatsUtils.getPgLevel(this.props.pg.pe),
@@ -853,7 +852,7 @@ class StatsView extends Component<
         />{' '}
       </React.Fragment>
     )
-    console.log('width', width)
+
     return (
       <div className={classes.container}>
         <div className={classes.inputContainer}>
