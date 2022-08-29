@@ -54,7 +54,9 @@ export interface BasicProfile {
 
 const DexiePgTable = 'pg'
 export const DexieUserTable = 'user'
-export const UsersDocName = 'users'
+export const UsersDocName = window.location.hostname.includes('schedadnd-test')
+  ? 'users-dev'
+  : 'users'
 
 function Dashboard(props: DashboardProps & RouteComponentProps) {
   // Declare a new state variable, which we'll call "count"
