@@ -13,6 +13,7 @@ import { getFirestore, getDocs, collection } from 'firebase/firestore'
 class DataUtils {
 
   static jobs = new Array<Job>()
+  static subjobs = new Array<Job>()
 
   static RaceMapper(json: any): Race[] {
     let races: Race[] = []
@@ -56,6 +57,26 @@ class DataUtils {
       }
     } else {
       return DataUtils.jobs
+    }
+  }
+
+  static async getSubJobs(firebaseApp: FirebaseApp) {
+    if(DataUtils.subjobs.length === 0) {
+      const db = getFirestore(firebaseApp)
+      const response = await getDocs(collection(db, 'data'))
+      const jobs = response.docs.find((doc) => doc.id == 'subjobs')?.data()
+      if(jobs){
+        const data = (JSON.parse(jobs.data) as any[]).map(j => {
+          j.value = j.name
+          return j
+        }) as Job[]
+        DataUtils.subjobs = data
+        return data
+      } else {
+        return []
+      }
+    } else {
+      return DataUtils.subjobs
     }
   }
 

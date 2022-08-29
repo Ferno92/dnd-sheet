@@ -32,7 +32,6 @@ import StatsType from 'data/types/StatsEnum'
 import TextUtils from 'utils/TextUtils'
 import { default as racesJSON } from 'data/json/RacesJSON'
 import { default as subRacesJSON } from 'data/json/SubRacesJSON'
-import { default as subJobsJSON } from 'data/json/SubJobsJSON'
 import { default as abilitiesJSON } from 'data/json/AbilitiesJSON'
 import { default as backgroundJSON } from 'data/json/BackgroundJSON'
 import { RacesEnum, SubRacesEnum } from 'data/types/RacesEnum'
@@ -125,6 +124,7 @@ interface StatsViewState {
   tempStatMode: boolean
   askDeleteTempStat: boolean
   jobs: Job[]
+  subjobs: Job[]
 }
 
 class StatsView extends Component<
@@ -136,7 +136,6 @@ class StatsView extends Component<
   subRacesData = DataUtils.RaceMapper(subRacesJSON as any)
   backgroundData = DataUtils.BackgroundMapper(backgroundJSON as any)
   abilitiesData = DataUtils.AbilityMapper(abilitiesJSON as any)
-  subJobsData = DataUtils.JobMapper(subJobsJSON as any)
 
   constructor(
     props: StatsViewProps & WithWidth & WithStyles<typeof StatsViewStyles>
@@ -154,6 +153,7 @@ class StatsView extends Component<
         props.pg.stats.find((stat) => stat.temp !== undefined) !== undefined,
       askDeleteTempStat: false,
       jobs: [],
+      subjobs: [],
     }
   }
 
@@ -176,7 +176,9 @@ class StatsView extends Component<
 
   async componentDidMount() {
     const jobs = await DataUtils.getJobs(firebaseApp)
-    this.setState({ jobs })
+    const subjobs = await DataUtils.getSubJobs(firebaseApp)
+    console.log('componentDidMount', subjobs)
+    this.setState({ jobs, subjobs })
   }
 
   getTSProficiency = (type: StatsType) => {
@@ -360,8 +362,9 @@ class StatsView extends Component<
 
   getSubJobsData = () => {
     const { pgClass } = this.props.pg
+    const { subjobs } = this.state
     if (pgClass) {
-      const filtered = this.subJobsData.filter(
+      const filtered = subjobs.filter(
         (subJob) =>
           subJob.type.toLowerCase().indexOf(pgClass.toString().toLowerCase()) >=
           0
@@ -374,8 +377,9 @@ class StatsView extends Component<
 
   getSecondarySubJobsData = () => {
     const { pgClass2 } = this.props.pg
+    const { subjobs } = this.state
     if (pgClass2) {
-      const filtered = this.subJobsData.filter(
+      const filtered = subjobs.filter(
         (subJob) =>
           subJob.type
             .toLowerCase()

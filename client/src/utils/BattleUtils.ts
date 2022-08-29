@@ -1,5 +1,4 @@
 import DataUtils from 'data/DataUtils'
-import { default as SubJobsJSON } from 'data/json/SubJobsJSON'
 import { default as backgroundJSON } from 'data/json/BackgroundJSON'
 import { JobsEnum, SubJobsEnum } from 'data/types/JobsEnum'
 import Privileges from 'data/types/Privileges'
@@ -42,7 +41,7 @@ class BattleUtils {
     multiclass?: boolean
   ): Promise<Privileges[]> {
     const jobsData = await DataUtils.getJobs(firebaseApp)
-    const subJobsData = DataUtils.JobMapper(SubJobsJSON as any)
+    const subJobsData = await DataUtils.getSubJobs(firebaseApp)
     const backgroundData = DataUtils.BackgroundMapper(backgroundJSON as any)
     const privileges: Privileges[] = []
     if (background) {
