@@ -30,7 +30,6 @@ import PG from './models/PG'
 import MixedInput, { InputPosition } from 'components/mixed-input/MixedInput'
 import StatsType from 'data/types/StatsEnum'
 import TextUtils from 'utils/TextUtils'
-import { default as subRacesJSON } from 'data/json/SubRacesJSON'
 import { default as abilitiesJSON } from 'data/json/AbilitiesJSON'
 import { default as backgroundJSON } from 'data/json/BackgroundJSON'
 import { RacesEnum, SubRacesEnum } from 'data/types/RacesEnum'
@@ -126,6 +125,7 @@ interface StatsViewState {
   jobs: Job[]
   subjobs: Job[]
   races: Race[]
+  subraces: Race[]
 }
 
 class StatsView extends Component<
@@ -133,7 +133,6 @@ class StatsView extends Component<
   StatsViewState
 > {
   inputLabel = createRef<any>()
-  subRacesData = DataUtils.RaceMapper(subRacesJSON as any)
   backgroundData = DataUtils.BackgroundMapper(backgroundJSON as any)
   abilitiesData = DataUtils.AbilityMapper(abilitiesJSON as any)
 
@@ -155,6 +154,7 @@ class StatsView extends Component<
       jobs: [],
       subjobs: [],
       races: [],
+      subraces: [],
     }
   }
 
@@ -179,7 +179,8 @@ class StatsView extends Component<
     const jobs = await DataUtils.getJobs(firebaseApp)
     const subjobs = await DataUtils.getSubJobs(firebaseApp)
     const races = await DataUtils.getRaces(firebaseApp)
-    this.setState({ jobs, subjobs, races })
+    const subraces = await DataUtils.getSubRaces(firebaseApp)
+    this.setState({ jobs, subjobs, races, subraces })
   }
 
   getTSProficiency = (type: StatsType) => {
@@ -355,7 +356,8 @@ class StatsView extends Component<
 
   getSubRacesData = () => {
     const { race } = this.props.pg
-    const filtered = this.subRacesData.filter(
+    const { subraces } = this.state
+    const filtered = subraces.filter(
       (subRace) => subRace.type.indexOf(race.toString().toLowerCase()) >= 0
     )
     return filtered || ''
@@ -478,92 +480,96 @@ class StatsView extends Component<
   }
 
   getJobRequirement = (job: JobsEnum) => {
-    const { races } = this.state
+    const { races, subraces } = this.state
     const { pg } = this.props
     const race = races.find((r) => r.type === pg.race.toString())
+    const minStatValue = 13
     if (race) {
       let requirement: string | undefined = ''
+      const statValue = StatsUtils.getStatValue(
+        StatsType.Forza,
+        pg,
+        race,
+        subraces
+      )
       switch (job) {
         case JobsEnum.Barbaro:
           requirement =
-            StatsUtils.getStatValue(StatsType.Forza, pg, race) < 13
-              ? 'Forza 13'
-              : undefined
+            statValue < minStatValue ? `Forza ${minStatValue}` : undefined
           break
         case JobsEnum.Bardo:
           requirement =
-            StatsUtils.getStatValue(StatsType.Carisma, pg, race) < 13
-              ? 'Carisma 13'
-              : undefined
+            statValue < minStatValue ? `Carisma ${minStatValue}` : undefined
           break
         case JobsEnum.Chierico:
           requirement =
-            StatsUtils.getStatValue(StatsType.Saggezza, pg, race) < 13
-              ? 'Saggezza 13'
-              : undefined
+            statValue < minStatValue ? `Saggezza ${minStatValue}` : undefined
           break
         case JobsEnum.Druido:
           requirement =
-            StatsUtils.getStatValue(StatsType.Saggezza, pg, race) < 13
-              ? 'Saggezza 13'
-              : undefined
+            statValue < minStatValue ? `Saggezza ${minStatValue}` : undefined
           break
         case JobsEnum.Guerriero:
-          if (StatsUtils.getStatValue(StatsType.Forza, pg, race) < 13) {
-            requirement = 'Forza 13'
+          if (statValue < minStatValue) {
+            requirement = `Forza ${minStatValue}`
           }
-          if (StatsUtils.getStatValue(StatsType.Destrezza, pg, race) < 13) {
+          if (statValue < minStatValue) {
             requirement +=
-              requirement === '' ? 'Destrezza 13' : ', Destrezza 13'
+              requirement === ''
+                ? `Destrezza ${minStatValue}`
+                : `, Destrezza ${minStatValue}`
           }
           break
         case JobsEnum.Ladro:
           requirement =
-            StatsUtils.getStatValue(StatsType.Destrezza, pg, race) < 13
-              ? 'Destrezza 13'
-              : undefined
+            statValue < minStatValue ? `Destrezza ${minStatValue}` : undefined
           break
         case JobsEnum.Mago:
           requirement =
-            StatsUtils.getStatValue(StatsType.Intelligenza, pg, race) < 13
-              ? 'Intelligenza 13'
+            statValue < minStatValue
+              ? `Intelligenza ${minStatValue}`
               : undefined
           break
         case JobsEnum.Monaco:
-          if (StatsUtils.getStatValue(StatsType.Destrezza, pg, race) < 13) {
-            requirement = 'Destrezza 13'
+          if (statValue < minStatValue) {
+            requirement = `Destrezza ${minStatValue}`
           }
-          if (StatsUtils.getStatValue(StatsType.Saggezza, pg, race) < 13) {
-            requirement += requirement === '' ? 'Saggezza 13' : ', Saggezza 13'
+          if (statValue < minStatValue) {
+            requirement +=
+              requirement === ''
+                ? `Saggezza ${minStatValue}`
+                : `, Saggezza ${minStatValue}`
           }
           break
         case JobsEnum.Paladino:
-          if (StatsUtils.getStatValue(StatsType.Forza, pg, race) < 13) {
-            requirement = 'Forza 13'
+          if (statValue < minStatValue) {
+            requirement = `Forza ${minStatValue}`
           }
-          if (StatsUtils.getStatValue(StatsType.Carisma, pg, race) < 13) {
-            requirement += requirement === '' ? 'Carisma 13' : ', Carisma 13'
+          if (statValue < minStatValue) {
+            requirement +=
+              requirement === ''
+                ? `Carisma ${minStatValue}`
+                : `, Carisma ${minStatValue}`
           }
           break
         case JobsEnum.Ranger:
-          if (StatsUtils.getStatValue(StatsType.Destrezza, pg, race) < 13) {
-            requirement = 'Destrezza 13'
+          if (statValue < minStatValue) {
+            requirement = `Destrezza ${minStatValue}`
           }
-          if (StatsUtils.getStatValue(StatsType.Saggezza, pg, race) < 13) {
-            requirement += requirement === '' ? 'Saggezza 13' : ', Saggezza 13'
+          if (statValue < minStatValue) {
+            requirement +=
+              requirement === ''
+                ? `Saggezza ${minStatValue}`
+                : `, Saggezza ${minStatValue}`
           }
           break
         case JobsEnum.Stregone:
           requirement =
-            StatsUtils.getStatValue(StatsType.Carisma, pg, race) < 13
-              ? 'Carisma 13'
-              : undefined
+            statValue < minStatValue ? `Carisma ${minStatValue}` : undefined
           break
         case JobsEnum.Warlock:
           requirement =
-            StatsUtils.getStatValue(StatsType.Carisma, pg, race) < 13
-              ? 'Carisma 13'
-              : undefined
+            statValue < minStatValue ? `Carisma ${minStatValue}` : undefined
           break
       }
 
@@ -751,16 +757,18 @@ class StatsView extends Component<
           onChange={onChangeRace}
           root={classes.infoDetailsItem}
         />
-        {race && (
-          <SimpleSelect<SubRacesEnum>
-            label={'Sotto-razza'}
-            item={subRace}
-            data={this.getSubRacesData()}
-            onEdit={onEdit}
-            onChange={onChangeSubRace}
-            root={classes.infoDetailsItem}
-          />
-        )}
+        {race &&
+          (StatsUtils.getCurrentRace(race, races)?.subraces || []).length >
+            0 && (
+            <SimpleSelect<SubRacesEnum>
+              label={'Sotto-razza'}
+              item={subRace}
+              data={this.getSubRacesData()}
+              onEdit={onEdit}
+              onChange={onChangeSubRace}
+              root={classes.infoDetailsItem}
+            />
+          )}
         {onEdit && StatsUtils.getPgLevel(this.props.pg.pe) !== 1 && (
           <FormControlLabel
             className={clsx(classes.multiclass, classes.infoDetailsItem)}

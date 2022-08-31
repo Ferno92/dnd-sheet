@@ -44,7 +44,8 @@ const EquipmentView: React.FC<EquipmentViewProps> = (
   } = props
   const styles = useEquipmentViewStyles()
   const [equipmentItemDialogOpen, setEquipmentItemDialogOpen] = useState(false)
-  const [races, setRaces] = useState<Race[]>()
+  const [races, setRaces] = useState<Race[]>([])
+  const [subRaces, setSubRaces] = useState<Race[]>([])
   const theme = useTheme()
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
 
@@ -56,7 +57,8 @@ const EquipmentView: React.FC<EquipmentViewProps> = (
   const getMaxCapacity = useCallback(() => {
     const race = races?.find((r) => r.type === pg.race.toString())
     if (race) {
-      let value = StatsUtils.getStatValue(StatsType.Forza, pg, race) * 7.5
+      let value =
+        StatsUtils.getStatValue(StatsType.Forza, pg, race, subRaces) * 7.5
       switch (StatsUtils.getRaceSize(pg, race)) {
         case SizeEnum.Grande:
           value = value * 2
@@ -90,6 +92,7 @@ const EquipmentView: React.FC<EquipmentViewProps> = (
 
   const fetchRaces = useCallback(async () => {
     setRaces(await DataUtils.getRaces(firebaseApp))
+    setSubRaces(await DataUtils.getSubRaces(firebaseApp))
   }, [])
 
   useEffect(() => {

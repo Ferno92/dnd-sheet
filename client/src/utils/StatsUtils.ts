@@ -1,13 +1,11 @@
 import PG from 'pages/stats/models/PG'
 import { RacesEnum } from 'data/types/RacesEnum'
 import StatsType from 'data/types/StatsEnum'
-import { default as subRacesJSON } from 'data/json/SubRacesJSON'
 import DataUtils from 'data/DataUtils'
 import SizeEnum from 'data/types/SizeEnum'
 import Stats from 'pages/stats/models/Stats'
 import { JobsEnum } from 'data/types/JobsEnum'
 import SimpleSelectItem from 'data/types/SimpleSelectItem'
-import { firebaseApp } from 'App'
 import Race from 'data/types/Race'
 
 export interface Proficiency { id: number; proficiency: number }
@@ -52,9 +50,8 @@ class StatsUtils {
     return modifier
   }
 
-  static getStatValue = (stat: StatsType, pg: PG, race: Race): number => {
+  static getStatValue = (stat: StatsType, pg: PG, race: Race, subRaces: Race[]): number => {
     const { subRace } = pg
-    const subRacesData = DataUtils.RaceMapper(subRacesJSON as any)
     let add = 0
     let subRaceAdd = 0
     if (race) {
@@ -64,7 +61,7 @@ class StatsUtils {
         }
       })
       if (subRace) {
-        subRacesData.forEach(subRaceData => {
+        subRaces.forEach(subRaceData => {
           if (subRaceData.type === subRace) {
             subRaceData.stats.forEach(subRaceStat => {
               if (subRaceStat.type === stat) {
@@ -80,8 +77,7 @@ class StatsUtils {
     return (obj ? obj.value : 0) + add + subRaceAdd
   }
 
-  static getCurrentRace = async (race: RacesEnum) => {
-    const races = await DataUtils.getRaces(firebaseApp)
+  static getCurrentRace = (race: RacesEnum, races: Race[]) => {
     const data = races.filter(raceJson => raceJson.type === race.toString())
     if (data.length > 0) {
       return data[0]
@@ -100,21 +96,20 @@ class StatsUtils {
     return size
   }
 
-  static getStatsFromRace = (pg: PG, race: Race) => {
+  static getStatsFromRace = (pg: PG, race: Race, subRaces: Race[]) => {
     let stats: Stats[] = []
     pg.stats.forEach(async stat => {
       stats.push({
         type: stat.type,
-        value: await StatsUtils.getStatValue(stat.type, pg, race)
+        value: await StatsUtils.getStatValue(stat.type, pg, race, subRaces)
       })
     })
 
     return stats
   }
 
-  static removeRaceStatModifiers = (pg: PG, race: Race) => {
+  static removeRaceStatModifiers = (pg: PG, race: Race, subRaces: Race[]) => {
     const { subRace } = pg
-    const subRacesData = DataUtils.RaceMapper(subRacesJSON as any)
     if (race) {
       pg.stats.forEach(stat => {
         race.stats.forEach(raceStat => {
@@ -123,7 +118,7 @@ class StatsUtils {
           }
         })
         if (subRace) {
-          subRacesData.forEach(subRaceData => {
+          subRaces.forEach(subRaceData => {
             if (subRaceData.type === subRace) {
               subRaceData.stats.forEach(subRaceStat => {
                 if (subRaceStat.type === stat.type) {

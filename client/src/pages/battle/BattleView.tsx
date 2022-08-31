@@ -106,6 +106,7 @@ function BattleView(props: BattleViewProps) {
   const [askDeleteArmorOrWeapon, setAskDeleteArmorOrWeapon] = useState(false)
   const [jobs, setJobs] = useState<Job[]>([])
   const [races, setRaces] = useState<Race[]>([])
+  const [subRaces, setSubRaces] = useState<Race[]>([])
   const theme = useTheme()
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
 
@@ -328,7 +329,12 @@ function BattleView(props: BattleViewProps) {
     (armorInfo: ArmorInfo): boolean => {
       const race = races.find((r) => r.type === pg.race.toString())
       if (race) {
-        const des = StatsUtils.getStatValue(StatsType.Destrezza, pg, race)
+        const des = StatsUtils.getStatValue(
+          StatsType.Destrezza,
+          pg,
+          race,
+          subRaces
+        )
         return (
           armorInfo.armor.minFor !== undefined && armorInfo.armor.minFor > des
         )
@@ -382,6 +388,9 @@ function BattleView(props: BattleViewProps) {
 
     const jobs = await DataUtils.getJobs(firebaseApp)
     setJobs(jobs)
+
+    const subRaces = await DataUtils.getSubRaces(firebaseApp)
+    setSubRaces(subRaces)
   }, [])
 
   useEffect(() => {

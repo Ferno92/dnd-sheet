@@ -93,6 +93,7 @@ interface SheetState {
   proficiency: Proficiency[]
   showRestoreDialog: boolean
   races: Race[]
+  subRaces: Race[]
   speedDialOpen: boolean
 }
 
@@ -167,6 +168,7 @@ class Sheet extends Component<
       proficiency: [],
       showRestoreDialog: false,
       races: [],
+      subRaces: [],
       speedDialOpen: false,
     }
     this.db = new Dexie('pg01_database')
@@ -543,11 +545,12 @@ class Sheet extends Component<
       value: unknown
     }>
   ) => {
-    let { pg, races } = this.state
+    let { pg, races, subRaces } = this.state
     const value = event.target.value as RacesEnum
-    const race = races.find((r) => r.type === pg.race.toString())
+    const race = races.find((r) => r.type === value.toString())
+    console.log('race', race)
     if (race) {
-      pg = StatsUtils.removeRaceStatModifiers(pg, race)
+      pg = StatsUtils.removeRaceStatModifiers(pg, race, subRaces)
       this.setState({ pg: { ...pg, race: value, subRace: undefined } })
     }
   }
@@ -558,15 +561,15 @@ class Sheet extends Component<
       value: unknown
     }>
   ) => {
-    let { pg, races } = this.state
+    let { pg, races, subRaces } = this.state
     const value = event.target.value as SubRacesEnum
     const race = races.find((r) => r.type === pg.race.toString())
     if (race) {
       if (pg.subRace) {
-        pg = StatsUtils.removeRaceStatModifiers(pg, race)
+        pg = StatsUtils.removeRaceStatModifiers(pg, race, subRaces)
       }
       pg = { ...pg, subRace: value }
-      const stats = StatsUtils.getStatsFromRace(pg, race)
+      const stats = StatsUtils.getStatsFromRace(pg, race, subRaces)
       pg = { ...pg, stats: stats }
       this.setState({ pg })
     }
@@ -1250,7 +1253,8 @@ class Sheet extends Component<
 
   async componentDidMount() {
     const races = await DataUtils.getRaces(firebaseApp)
-    this.setState({ races })
+    const subRaces = await DataUtils.getSubRaces(firebaseApp)
+    this.setState({ races, subRaces })
     this.getProficiency()
     const db = new Dexie('pg01_database')
     this.fetchUserDatabase(db)
