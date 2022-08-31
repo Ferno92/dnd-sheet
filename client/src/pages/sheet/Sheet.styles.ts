@@ -1,5 +1,6 @@
 import { createStyles } from '@material-ui/core'
 import Theme from 'assets/styles/Theme'
+import ColorUtils from 'utils/ColorUtils'
 
 const SheetStyles = (theme: Theme) =>
   createStyles({
@@ -32,7 +33,13 @@ const SheetStyles = (theme: Theme) =>
       bottom: 45,
       right: 0,
       margin: 10,
-      zIndex: 10
+      zIndex: 10,
+      '& .MuiSpeedDialAction-staticTooltipLabel': {
+        color: ColorUtils.hexToNegative(theme.palette.text.primary),
+        backgroundColor: ColorUtils.hexToNegative(theme.palette.background.paper),
+        width: '40vw',
+        textAlign: 'end'
+      }
     },
     fabIcon: {
       height: 24,
@@ -46,6 +53,10 @@ const SheetStyles = (theme: Theme) =>
     },
     speedDialIcon: {
       height: 28.8
+    },
+    speedDialAction: {
+      color: ColorUtils.hexToNegative(theme.palette.text.primary),
+      backgroundColor: ColorUtils.hexToNegative(theme.palette.background.paper)
     }
   })
 

@@ -16,6 +16,15 @@ class ColorUtils {
       : undefined
   }
 
+  static hexToNegative(hex: string): string {
+    const rgb = this.hexToRgb(hex)
+    if(rgb) {
+      return `rgb(${255 - rgb.r}, ${255 - rgb.g}, ${255 - rgb.b})`
+    } else {
+      return ''
+    }
+  }
+
   static rgbStringToObject(rgb: string): RgbColor | undefined {
     const match = rgb.match(
       /rgba?\((\d{1,3}), ?(\d{1,3}), ?(\d{1,3})\)?(?:, ?(\d(?:\.\d?))\))?/

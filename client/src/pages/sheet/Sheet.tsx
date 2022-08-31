@@ -1446,6 +1446,8 @@ class Sheet extends Component<
                     key="edit"
                     icon={<Edit />}
                     tooltipTitle="Modifica"
+                    tooltipOpen
+                    className={classes.speedDialAction}
                     onClick={() => {
                       this.onChangeEditMode()
                       this.setState({ speedDialOpen: !speedDialOpen })
@@ -1457,6 +1459,8 @@ class Sheet extends Component<
                     key={a.name}
                     icon={a.icon}
                     tooltipTitle={a.name}
+                    tooltipOpen
+                    className={classes.speedDialAction}
                     onClick={() => {
                       a.onClick()
                       this.setState({ speedDialOpen: !speedDialOpen })
