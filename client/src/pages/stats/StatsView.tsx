@@ -30,7 +30,6 @@ import PG from './models/PG'
 import MixedInput, { InputPosition } from 'components/mixed-input/MixedInput'
 import StatsType from 'data/types/StatsEnum'
 import TextUtils from 'utils/TextUtils'
-import { default as racesJSON } from 'data/json/RacesJSON'
 import { default as subRacesJSON } from 'data/json/SubRacesJSON'
 import { default as abilitiesJSON } from 'data/json/AbilitiesJSON'
 import { default as backgroundJSON } from 'data/json/BackgroundJSON'
@@ -64,6 +63,7 @@ import ConfirmDialog from 'components/confirm-dialog/ConfirmDialog'
 import Job from 'data/types/Job'
 import ClassLevel from './components/ClassLevel'
 import { firebaseApp } from 'App'
+import Race from 'data/types/Race'
 
 interface StatsViewProps {
   onEdit: boolean
@@ -125,6 +125,7 @@ interface StatsViewState {
   askDeleteTempStat: boolean
   jobs: Job[]
   subjobs: Job[]
+  races: Race[]
 }
 
 class StatsView extends Component<
@@ -132,7 +133,6 @@ class StatsView extends Component<
   StatsViewState
 > {
   inputLabel = createRef<any>()
-  racesData = DataUtils.RaceMapper(racesJSON as any)
   subRacesData = DataUtils.RaceMapper(subRacesJSON as any)
   backgroundData = DataUtils.BackgroundMapper(backgroundJSON as any)
   abilitiesData = DataUtils.AbilityMapper(abilitiesJSON as any)
@@ -154,6 +154,7 @@ class StatsView extends Component<
       askDeleteTempStat: false,
       jobs: [],
       subjobs: [],
+      races: [],
     }
   }
 
@@ -177,8 +178,8 @@ class StatsView extends Component<
   async componentDidMount() {
     const jobs = await DataUtils.getJobs(firebaseApp)
     const subjobs = await DataUtils.getSubJobs(firebaseApp)
-    console.log('componentDidMount', subjobs)
-    this.setState({ jobs, subjobs })
+    const races = await DataUtils.getRaces(firebaseApp)
+    this.setState({ jobs, subjobs, races })
   }
 
   getTSProficiency = (type: StatsType) => {
@@ -289,7 +290,7 @@ class StatsView extends Component<
 
   getAbilitiesCountFromClass = (): number => {
     const { pgClass, race, pgClass2, multiclass } = this.props.pg
-    const { jobs } = this.state
+    const { jobs, races } = this.state
     let count = 0
     if (pgClass) {
       jobs.forEach((job) => {
@@ -310,7 +311,7 @@ class StatsView extends Component<
         }
       })
     }
-    this.racesData.forEach((data) => {
+    races.forEach((data) => {
       if (data.type === race.toString()) {
         data.abilities.forEach((item) => {
           if (item.extra) {
@@ -451,12 +452,14 @@ class StatsView extends Component<
 
   getLanguages = () => {
     const { generalInfo, race } = this.props.pg
+    const { races } = this.state
     let languages: string[] = []
-    this.racesData.forEach((data) => {
+    races.forEach((data) => {
       if (data.type === race.toString()) {
         data.abilities.forEach((item) => {
           if (item.extra) {
             const splitted = item.extra.split('|')
+            console.log('getLanguages', races, race)
             if (splitted[0] === 'languages') {
               const obj = JSON.parse(splitted[1])
               if (obj.list) {
@@ -475,91 +478,99 @@ class StatsView extends Component<
   }
 
   getJobRequirement = (job: JobsEnum) => {
-    let requirement: string | undefined = ''
-    switch (job) {
-      case JobsEnum.Barbaro:
-        requirement =
-          StatsUtils.getStatValue(StatsType.Forza, this.props.pg) < 13
-            ? 'Forza 13'
-            : undefined
-        break
-      case JobsEnum.Bardo:
-        requirement =
-          StatsUtils.getStatValue(StatsType.Carisma, this.props.pg) < 13
-            ? 'Carisma 13'
-            : undefined
-        break
-      case JobsEnum.Chierico:
-        requirement =
-          StatsUtils.getStatValue(StatsType.Saggezza, this.props.pg) < 13
-            ? 'Saggezza 13'
-            : undefined
-        break
-      case JobsEnum.Druido:
-        requirement =
-          StatsUtils.getStatValue(StatsType.Saggezza, this.props.pg) < 13
-            ? 'Saggezza 13'
-            : undefined
-        break
-      case JobsEnum.Guerriero:
-        if (StatsUtils.getStatValue(StatsType.Forza, this.props.pg) < 13) {
-          requirement = 'Forza 13'
-        }
-        if (StatsUtils.getStatValue(StatsType.Destrezza, this.props.pg) < 13) {
-          requirement += requirement === '' ? 'Destrezza 13' : ', Destrezza 13'
-        }
-        break
-      case JobsEnum.Ladro:
-        requirement =
-          StatsUtils.getStatValue(StatsType.Destrezza, this.props.pg) < 13
-            ? 'Destrezza 13'
-            : undefined
-        break
-      case JobsEnum.Mago:
-        requirement =
-          StatsUtils.getStatValue(StatsType.Intelligenza, this.props.pg) < 13
-            ? 'Intelligenza 13'
-            : undefined
-        break
-      case JobsEnum.Monaco:
-        if (StatsUtils.getStatValue(StatsType.Destrezza, this.props.pg) < 13) {
-          requirement = 'Destrezza 13'
-        }
-        if (StatsUtils.getStatValue(StatsType.Saggezza, this.props.pg) < 13) {
-          requirement += requirement === '' ? 'Saggezza 13' : ', Saggezza 13'
-        }
-        break
-      case JobsEnum.Paladino:
-        if (StatsUtils.getStatValue(StatsType.Forza, this.props.pg) < 13) {
-          requirement = 'Forza 13'
-        }
-        if (StatsUtils.getStatValue(StatsType.Carisma, this.props.pg) < 13) {
-          requirement += requirement === '' ? 'Carisma 13' : ', Carisma 13'
-        }
-        break
-      case JobsEnum.Ranger:
-        if (StatsUtils.getStatValue(StatsType.Destrezza, this.props.pg) < 13) {
-          requirement = 'Destrezza 13'
-        }
-        if (StatsUtils.getStatValue(StatsType.Saggezza, this.props.pg) < 13) {
-          requirement += requirement === '' ? 'Saggezza 13' : ', Saggezza 13'
-        }
-        break
-      case JobsEnum.Stregone:
-        requirement =
-          StatsUtils.getStatValue(StatsType.Carisma, this.props.pg) < 13
-            ? 'Carisma 13'
-            : undefined
-        break
-      case JobsEnum.Warlock:
-        requirement =
-          StatsUtils.getStatValue(StatsType.Carisma, this.props.pg) < 13
-            ? 'Carisma 13'
-            : undefined
-        break
-    }
+    const { races } = this.state
+    const { pg } = this.props
+    const race = races.find((r) => r.type === pg.race.toString())
+    if (race) {
+      let requirement: string | undefined = ''
+      switch (job) {
+        case JobsEnum.Barbaro:
+          requirement =
+            StatsUtils.getStatValue(StatsType.Forza, pg, race) < 13
+              ? 'Forza 13'
+              : undefined
+          break
+        case JobsEnum.Bardo:
+          requirement =
+            StatsUtils.getStatValue(StatsType.Carisma, pg, race) < 13
+              ? 'Carisma 13'
+              : undefined
+          break
+        case JobsEnum.Chierico:
+          requirement =
+            StatsUtils.getStatValue(StatsType.Saggezza, pg, race) < 13
+              ? 'Saggezza 13'
+              : undefined
+          break
+        case JobsEnum.Druido:
+          requirement =
+            StatsUtils.getStatValue(StatsType.Saggezza, pg, race) < 13
+              ? 'Saggezza 13'
+              : undefined
+          break
+        case JobsEnum.Guerriero:
+          if (StatsUtils.getStatValue(StatsType.Forza, pg, race) < 13) {
+            requirement = 'Forza 13'
+          }
+          if (StatsUtils.getStatValue(StatsType.Destrezza, pg, race) < 13) {
+            requirement +=
+              requirement === '' ? 'Destrezza 13' : ', Destrezza 13'
+          }
+          break
+        case JobsEnum.Ladro:
+          requirement =
+            StatsUtils.getStatValue(StatsType.Destrezza, pg, race) < 13
+              ? 'Destrezza 13'
+              : undefined
+          break
+        case JobsEnum.Mago:
+          requirement =
+            StatsUtils.getStatValue(StatsType.Intelligenza, pg, race) < 13
+              ? 'Intelligenza 13'
+              : undefined
+          break
+        case JobsEnum.Monaco:
+          if (StatsUtils.getStatValue(StatsType.Destrezza, pg, race) < 13) {
+            requirement = 'Destrezza 13'
+          }
+          if (StatsUtils.getStatValue(StatsType.Saggezza, pg, race) < 13) {
+            requirement += requirement === '' ? 'Saggezza 13' : ', Saggezza 13'
+          }
+          break
+        case JobsEnum.Paladino:
+          if (StatsUtils.getStatValue(StatsType.Forza, pg, race) < 13) {
+            requirement = 'Forza 13'
+          }
+          if (StatsUtils.getStatValue(StatsType.Carisma, pg, race) < 13) {
+            requirement += requirement === '' ? 'Carisma 13' : ', Carisma 13'
+          }
+          break
+        case JobsEnum.Ranger:
+          if (StatsUtils.getStatValue(StatsType.Destrezza, pg, race) < 13) {
+            requirement = 'Destrezza 13'
+          }
+          if (StatsUtils.getStatValue(StatsType.Saggezza, pg, race) < 13) {
+            requirement += requirement === '' ? 'Saggezza 13' : ', Saggezza 13'
+          }
+          break
+        case JobsEnum.Stregone:
+          requirement =
+            StatsUtils.getStatValue(StatsType.Carisma, pg, race) < 13
+              ? 'Carisma 13'
+              : undefined
+          break
+        case JobsEnum.Warlock:
+          requirement =
+            StatsUtils.getStatValue(StatsType.Carisma, pg, race) < 13
+              ? 'Carisma 13'
+              : undefined
+          break
+      }
 
-    return requirement
+      return requirement
+    } else {
+      return undefined
+    }
   }
 
   getSecondaryJobsData = (): Job[] => {
@@ -645,8 +656,9 @@ class StatsView extends Component<
       askDeleteTempStat,
       tempPE,
       jobs,
+      races,
     } = this.state
-    const currentRaceObj = StatsUtils.getCurrentRace(race)
+
     const isMobile =
       /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
         navigator.userAgent
@@ -662,10 +674,7 @@ class StatsView extends Component<
         <Typography
           variant="body2"
           color="textPrimary"
-        >{`${StatsUtils.getInfoName(
-          `${race}`,
-          this.racesData
-        )} ${StatsUtils.getInfoName(
+        >{`${StatsUtils.getInfoName(`${race}`, races)} ${StatsUtils.getInfoName(
           `${subRace}`,
           this.getSubRacesData()
         )}`}</Typography>
@@ -737,12 +746,12 @@ class StatsView extends Component<
         <SimpleSelect<RacesEnum>
           label={'Razza'}
           item={race}
-          data={this.racesData}
+          data={races}
           onEdit={onEdit}
           onChange={onChangeRace}
           root={classes.infoDetailsItem}
         />
-        {currentRaceObj && currentRaceObj.subraces.length > 0 && (
+        {race && (
           <SimpleSelect<SubRacesEnum>
             label={'Sotto-razza'}
             item={subRace}
@@ -857,6 +866,7 @@ class StatsView extends Component<
       </React.Fragment>
     )
 
+    const currentRace = races.find((r) => r.type === race.toString())
     return (
       <div className={classes.container}>
         <div className={classes.inputContainer}>
@@ -967,12 +977,11 @@ class StatsView extends Component<
               </Grid>
               <Grid item xs={4} className={classes.gridItem}>
                 <div className={classes.taglia}>
-                  <Typography
-                    variant="body1"
-                    color="textPrimary"
-                  >{`Taglia: ${StatsUtils.getRaceSize(
-                    this.props.pg
-                  )}`}</Typography>
+                  <Typography variant="body1" color="textPrimary">{`Taglia: ${
+                    currentRace
+                      ? StatsUtils.getRaceSize(this.props.pg, currentRace)
+                      : ''
+                  }`}</Typography>
                 </div>
               </Grid>
               <Grid item xs={6} className={classes.gridItem}>

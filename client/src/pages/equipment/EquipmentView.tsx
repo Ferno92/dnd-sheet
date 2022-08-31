@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import useEquipmentViewStyles from './EquipmentView.styles'
 import TextFieldNumber from 'components/text-field-number/TextFieldNumber'
 import {
@@ -18,6 +18,9 @@ import EquipmentDialog from 'components/equipment-dialog/EquipmentDialog'
 import StatsUtils from 'utils/StatsUtils'
 import StatsType from 'data/types/StatsEnum'
 import SizeEnum from 'data/types/SizeEnum'
+import Race from 'data/types/Race'
+import DataUtils from 'data/DataUtils'
+import { firebaseApp } from 'App'
 
 interface EquipmentViewProps {
   onEdit: boolean
@@ -41,6 +44,7 @@ const EquipmentView: React.FC<EquipmentViewProps> = (
   } = props
   const styles = useEquipmentViewStyles()
   const [equipmentItemDialogOpen, setEquipmentItemDialogOpen] = useState(false)
+  const [races, setRaces] = useState<Race[]>()
   const theme = useTheme()
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
 
@@ -50,17 +54,22 @@ const EquipmentView: React.FC<EquipmentViewProps> = (
   }
 
   const getMaxCapacity = useCallback(() => {
-    let value = StatsUtils.getStatValue(StatsType.Forza, pg) * 7.5
-    switch (StatsUtils.getRaceSize(pg)) {
-      case SizeEnum.Grande:
-        value = value * 2
-        break
-      case SizeEnum.Piccola:
-        value = value / 2
-        break
+    const race = races?.find((r) => r.type === pg.race.toString())
+    if (race) {
+      let value = StatsUtils.getStatValue(StatsType.Forza, pg, race) * 7.5
+      switch (StatsUtils.getRaceSize(pg, race)) {
+        case SizeEnum.Grande:
+          value = value * 2
+          break
+        case SizeEnum.Piccola:
+          value = value / 2
+          break
+      }
+      return value
+    } else {
+      return 0
     }
-    return value
-  }, [pg])
+  }, [pg, races])
 
   const getCurrentCapacity = useCallback(() => {
     let value = 0
@@ -78,6 +87,14 @@ const EquipmentView: React.FC<EquipmentViewProps> = (
 
     return value
   }, [pg])
+
+  const fetchRaces = useCallback(async () => {
+    setRaces(await DataUtils.getRaces(firebaseApp))
+  }, [])
+
+  useEffect(() => {
+    fetchRaces()
+  }, [])
 
   return (
     <div className={styles.root}>

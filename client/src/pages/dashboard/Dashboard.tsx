@@ -31,7 +31,6 @@ import {
   doc,
   setDoc,
   updateDoc,
-  initializeFirestore,
 } from 'firebase/firestore'
 import BackupDialog from 'components/backup-dialog/BackupDialog'
 
@@ -54,9 +53,11 @@ export interface BasicProfile {
 
 const DexiePgTable = 'pg'
 export const DexieUserTable = 'user'
-export const UsersDocName = window.location.hostname.includes('schedadnd-test')
-  ? 'users-dev'
-  : 'users'
+export const UsersDocName =
+  window.location.hostname.includes('schedadnd-test') ||
+  window.location.hostname.includes('localhost')
+    ? 'users-dev'
+    : 'users'
 
 function Dashboard(props: DashboardProps & RouteComponentProps) {
   // Declare a new state variable, which we'll call "count"

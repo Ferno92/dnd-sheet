@@ -1,13 +1,14 @@
 import PG from 'pages/stats/models/PG'
 import { RacesEnum } from 'data/types/RacesEnum'
 import StatsType from 'data/types/StatsEnum'
-import { default as racesJSON } from 'data/json/RacesJSON'
 import { default as subRacesJSON } from 'data/json/SubRacesJSON'
 import DataUtils from 'data/DataUtils'
 import SizeEnum from 'data/types/SizeEnum'
 import Stats from 'pages/stats/models/Stats'
 import { JobsEnum } from 'data/types/JobsEnum'
 import SimpleSelectItem from 'data/types/SimpleSelectItem'
+import { firebaseApp } from 'App'
+import Race from 'data/types/Race'
 
 export interface Proficiency { id: number; proficiency: number }
 
@@ -51,14 +52,13 @@ class StatsUtils {
     return modifier
   }
 
-  static getStatValue = (stat: StatsType, pg: PG): number => {
-    const { race, subRace } = pg
+  static getStatValue = (stat: StatsType, pg: PG, race: Race): number => {
+    const { subRace } = pg
     const subRacesData = DataUtils.RaceMapper(subRacesJSON as any)
-    const currentRaceObj = StatsUtils.getCurrentRace(race)
     let add = 0
     let subRaceAdd = 0
-    if (currentRaceObj) {
-      currentRaceObj.stats.forEach(raceStat => {
+    if (race) {
+      race.stats.forEach(raceStat => {
         if (raceStat.type === stat) {
           add = raceStat.value
         }
@@ -80,9 +80,9 @@ class StatsUtils {
     return (obj ? obj.value : 0) + add + subRaceAdd
   }
 
-  static getCurrentRace = (race: RacesEnum) => {
-    const racesData = DataUtils.RaceMapper(racesJSON as any)
-    const data = racesData.filter(raceJson => raceJson.type === race.toString())
+  static getCurrentRace = async (race: RacesEnum) => {
+    const races = await DataUtils.getRaces(firebaseApp)
+    const data = races.filter(raceJson => raceJson.type === race.toString())
     if (data.length > 0) {
       return data[0]
     } else {
@@ -90,39 +90,34 @@ class StatsUtils {
     }
   }
 
-  static getRaceSize = (pg: PG): SizeEnum => {
-    const { race } = pg
+  static getRaceSize = (pg: PG, race: Race): SizeEnum => {
     let size = SizeEnum.Media
-    if (race) {
-      const racesData = DataUtils.RaceMapper(racesJSON as any)
-      racesData.forEach(raceData => {
-        if (race.toString() === raceData.type) {
-          size = raceData.size
+    if (pg.race) {
+        if (pg.race.toString() === race.type) {
+          size = race.size
         }
-      })
     }
     return size
   }
 
-  static getStatsFromRace = (pg: PG) => {
+  static getStatsFromRace = (pg: PG, race: Race) => {
     let stats: Stats[] = []
-    pg.stats.forEach(stat => {
+    pg.stats.forEach(async stat => {
       stats.push({
         type: stat.type,
-        value: StatsUtils.getStatValue(stat.type, pg)
+        value: await StatsUtils.getStatValue(stat.type, pg, race)
       })
     })
 
     return stats
   }
 
-  static removeRaceStatModifiers = (pg: PG) => {
-    const { race, subRace } = pg
+  static removeRaceStatModifiers = (pg: PG, race: Race) => {
+    const { subRace } = pg
     const subRacesData = DataUtils.RaceMapper(subRacesJSON as any)
-    const currentRaceObj = StatsUtils.getCurrentRace(race)
-    if (currentRaceObj) {
+    if (race) {
       pg.stats.forEach(stat => {
-        currentRaceObj.stats.forEach(raceStat => {
+        race.stats.forEach(raceStat => {
           if (raceStat.type === stat.type) {
             stat.value -= raceStat.value
           }

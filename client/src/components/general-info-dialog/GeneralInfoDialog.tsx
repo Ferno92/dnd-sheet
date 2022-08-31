@@ -10,7 +10,7 @@ import {
   Typography,
   IconButton,
   TextField,
-  Snackbar
+  Snackbar,
 } from '@material-ui/core'
 import PG from 'pages/stats/models/PG'
 import TextFieldNumber from 'components/text-field-number/TextFieldNumber'
@@ -19,11 +19,11 @@ import useStyles from './GeneralInfoDialog.styles'
 import PgGeneralInfo from 'data/types/PgGeneralInfo'
 import MuiAlert from '@material-ui/lab/Alert'
 import { RacesEnum } from 'data/types/RacesEnum'
-import { default as racesJSON } from 'data/json/RacesJSON'
 import DataUtils from 'data/DataUtils'
 import Race from 'data/types/Race'
 import TextFieldUpdateOnBlur from 'components/text-field-updateOnBlur/TextFieldUpdateOnBlur'
 import { default as backgroundJSON } from 'data/json/BackgroundJSON'
+import { firebaseApp } from 'App'
 
 interface GeneralInfoDialogProps {
   pg: PG
@@ -42,13 +42,12 @@ enum Alignment {
   NeutralePuro = 'Neutrale Puro',
   CaoticoMalvagio = 'Caotico Malvagio',
   LegaleMalvagio = 'Legale Malvagio',
-  NeutraleMalvagio = 'Neutrale Malvagio'
+  NeutraleMalvagio = 'Neutrale Malvagio',
 }
 
 const GeneralInfoDialog: React.FC<GeneralInfoDialogProps> = (
   props: GeneralInfoDialogProps
 ) => {
-  const racesData = DataUtils.RaceMapper(racesJSON as any)
   const backgroundData = DataUtils.BackgroundMapper(backgroundJSON as any)
   const { pg, open, onClose, fullscreen, onSave } = props
   const [weight, setWeight] = useState<number>()
@@ -100,8 +99,8 @@ const GeneralInfoDialog: React.FC<GeneralInfoDialogProps> = (
         alignment,
         height,
         weight,
-        languages: languages.filter(item => item.trim() !== ''),
-        age
+        languages: languages.filter((item) => item.trim() !== ''),
+        age,
       })
       onClose()
     } else {
@@ -112,7 +111,7 @@ const GeneralInfoDialog: React.FC<GeneralInfoDialogProps> = (
   const missingLanguagesLabel = useCallback(() => {
     let count = otherLanguages.length
     if (pg.background) {
-      backgroundData.forEach(data => {
+      backgroundData.forEach((data) => {
         if (data.type === pg.background) {
           count += data.languages ? data.languages : 0
         }
@@ -130,11 +129,12 @@ const GeneralInfoDialog: React.FC<GeneralInfoDialogProps> = (
         }`
   }, [languages, otherLanguages, backgroundData, pg.background])
 
-  const getLanguages = (race: RacesEnum, racesData: Race[]) => {
+  const getLanguages = async (race: RacesEnum) => {
     let languages: string[] = []
-    racesData.forEach(data => {
+    const races = await DataUtils.getRaces(firebaseApp)
+    races.forEach((data) => {
       if (data.type === race.toString()) {
-        data.abilities.forEach(item => {
+        data.abilities.forEach((item) => {
           if (item.extra) {
             const splitted = item.extra.split('|')
             if (splitted[0] === 'languages') {
@@ -150,6 +150,10 @@ const GeneralInfoDialog: React.FC<GeneralInfoDialogProps> = (
     return languages
   }
 
+  const fetchOtherLanguages = useCallback(async () => {
+    setOtherLanguages(await getLanguages(pg.race))
+  }, [pg.race])
+
   useEffect(() => {
     if (pg.generalInfo && !initialized) {
       setInitialized(true)
@@ -159,11 +163,11 @@ const GeneralInfoDialog: React.FC<GeneralInfoDialogProps> = (
       setLanguages(pg.generalInfo.languages)
       setAge(pg.generalInfo.age)
     }
-  }, [pg.generalInfo, racesData, initialized])
+  }, [pg.generalInfo, initialized])
 
   useEffect(() => {
-    setOtherLanguages(getLanguages(pg.race, racesData))
-  }, [pg.race, racesData])
+    fetchOtherLanguages()
+  }, [fetchOtherLanguages])
 
   return (
     <Dialog
@@ -187,7 +191,7 @@ const GeneralInfoDialog: React.FC<GeneralInfoDialogProps> = (
               value={weight}
               min={0}
               max={1000}
-              onChange={e => setWeight(parseFloat(e.currentTarget.value))}
+              onChange={(e) => setWeight(parseFloat(e.currentTarget.value))}
               step={'1'}
             />
             <Typography variant="body1" className={styles.label}>
@@ -201,7 +205,7 @@ const GeneralInfoDialog: React.FC<GeneralInfoDialogProps> = (
               value={height}
               min={0}
               max={10}
-              onChange={e => setHeight(parseFloat(e.currentTarget.value))}
+              onChange={(e) => setHeight(parseFloat(e.currentTarget.value))}
               step={'1'}
             />
             <Typography variant="body1" className={styles.label}>
@@ -215,7 +219,7 @@ const GeneralInfoDialog: React.FC<GeneralInfoDialogProps> = (
               value={age}
               min={0}
               max={10000}
-              onChange={e => setAge(parseFloat(e.currentTarget.value))}
+              onChange={(e) => setAge(parseFloat(e.currentTarget.value))}
               step={'1'}
             />
             <Typography variant="body1" className={styles.label}>
@@ -227,13 +231,13 @@ const GeneralInfoDialog: React.FC<GeneralInfoDialogProps> = (
           <Select
             variant={'outlined'}
             title={'Allineamento'}
-            onChange={e => {
+            onChange={(e) => {
               setAlignment(e.target.value as string)
             }}
             value={alignment}
             className={styles.alignment}
           >
-            {Object.keys(alignmentTypes).map(i => (
+            {Object.keys(alignmentTypes).map((i) => (
               <MenuItem key={i} value={alignmentTypes[i]}>
                 {alignmentTypes[i]}
               </MenuItem>
@@ -249,7 +253,7 @@ const GeneralInfoDialog: React.FC<GeneralInfoDialogProps> = (
         <Typography variant="caption" className={styles.errorCaption}>
           {missingLanguagesLabel()}
         </Typography>
-        {otherLanguages.map(item => (
+        {otherLanguages.map((item) => (
           <TextField value={item} key={'other_' + item} disabled />
         ))}
         {languages &&
@@ -259,7 +263,7 @@ const GeneralInfoDialog: React.FC<GeneralInfoDialogProps> = (
                 key={index}
                 value={languages[index]}
                 autoFocus={languages[index] === ''}
-                onBlur={text => onChangeLanguage(text, index)}
+                onBlur={(text) => onChangeLanguage(text, index)}
               />
               <IconButton onClick={() => removeLanguage(index)}>
                 <Delete />

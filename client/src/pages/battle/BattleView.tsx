@@ -34,7 +34,6 @@ import ArmorInfo from 'data/types/ArmorInfo'
 import ArmorDialog from 'components/armor-dialog/ArmorDialog'
 import Armor from 'data/types/Armor'
 import { RacesEnum, SubRacesEnum } from 'data/types/RacesEnum'
-import { default as racesJSON } from 'data/json/RacesJSON'
 import DataUtils from 'data/DataUtils'
 import RaceAbility from 'data/types/RaceAbility'
 import Privileges from 'data/types/Privileges'
@@ -43,6 +42,8 @@ import ConfirmDialog from 'components/confirm-dialog/ConfirmDialog'
 import RestType from 'data/types/RestType'
 import Job from 'data/types/Job'
 import { JobsEnum, SubJobsEnum } from 'data/types/JobsEnum'
+import { firebaseApp } from 'App'
+import Race from 'data/types/Race'
 
 export interface Modifier {
   type: string
@@ -104,21 +105,9 @@ function BattleView(props: BattleViewProps) {
   const [weaponSelected, setWeaponSelected] = useState<WeaponInfo>()
   const [askDeleteArmorOrWeapon, setAskDeleteArmorOrWeapon] = useState(false)
   const [jobs, setJobs] = useState<Job[]>([])
+  const [races, setRaces] = useState<Race[]>([])
   const theme = useTheme()
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
-  let defaultModifiers = [
-    {
-      type: StatsType.Destrezza as string,
-      value: StatsUtils.getStatModifier(
-        pg.stats.find((stat) => stat.type === StatsType.Destrezza)!
-      ),
-      canDelete: false,
-    },
-  ]
-
-  if (StatsUtils.getRaceSize(pg) === SizeEnum.Piccola) {
-    defaultModifiers.push({ type: 'Taglia', value: 1, canDelete: false })
-  }
 
   const getCA = useCallback(() => {
     let count = 0
@@ -325,23 +314,27 @@ function BattleView(props: BattleViewProps) {
   const getRaceAbilities = useCallback(
     (race: RacesEnum, subRace?: SubRacesEnum) => {
       let raceAbilities: RaceAbility[] = []
-      const racesData = DataUtils.RaceMapper(racesJSON as any)
-      racesData.forEach((raceData) => {
+      races.forEach((raceData) => {
         if (raceData.type === race.toString()) {
           raceAbilities.push.apply(raceAbilities, raceData.abilities)
         }
       })
       return raceAbilities
     },
-    []
+    [races]
   )
 
   const isArmorDisabled = useCallback(
     (armorInfo: ArmorInfo): boolean => {
-      const des = StatsUtils.getStatValue(StatsType.Destrezza, pg)
-      return (
-        armorInfo.armor.minFor !== undefined && armorInfo.armor.minFor > des
-      )
+      const race = races.find((r) => r.type === pg.race.toString())
+      if (race) {
+        const des = StatsUtils.getStatValue(StatsType.Destrezza, pg, race)
+        return (
+          armorInfo.armor.minFor !== undefined && armorInfo.armor.minFor > des
+        )
+      } else {
+        return true
+      }
     },
     [pg]
   )
@@ -372,7 +365,7 @@ function BattleView(props: BattleViewProps) {
     pg.weapons,
   ])
 
-  const fetchDV = useCallback(async (pg: PG) => {
+  const fetchData = useCallback(async (pg: PG) => {
     const primary = await BattleUtils.getDV(pg.pgClass)
     let secondary = ''
     if (pg.pgClass2) {
@@ -383,10 +376,16 @@ function BattleView(props: BattleViewProps) {
         secondary !== '' && primary !== secondary ? `/${secondary}` : ''
       }`
     )
+
+    const races = await DataUtils.getRaces(firebaseApp)
+    setRaces(races)
+
+    const jobs = await DataUtils.getJobs(firebaseApp)
+    setJobs(jobs)
   }, [])
 
   useEffect(() => {
-    fetchDV(pg)
+    fetchData(pg)
   }, [pg.race, pg.pgClass, pg.pgClass2])
 
   const fetchPrivileges = useCallback(
@@ -995,6 +994,7 @@ function BattleView(props: BattleViewProps) {
             </Typography>
 
             {privileges.map((privilege) => {
+              console.log('privilege', privilege.counterType, privilege)
               return (
                 <ExpansionPanel
                   key={privilege.type}

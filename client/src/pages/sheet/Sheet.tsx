@@ -70,6 +70,8 @@ import {
 } from 'pages/dashboard/Dashboard'
 import BackupPG from 'pages/stats/models/BackupPG'
 import ConfirmDialog from 'components/confirm-dialog/ConfirmDialog'
+import DataUtils from 'data/DataUtils'
+import Race from 'data/types/Race'
 
 interface SheetProps {
   id: number
@@ -89,6 +91,7 @@ interface SheetState {
   snackMessage?: string
   proficiency: Proficiency[]
   showRestoreDialog: boolean
+  races: Race[]
 }
 
 interface LastPageAction {
@@ -161,6 +164,7 @@ class Sheet extends Component<
       initialPgJson: '',
       proficiency: [],
       showRestoreDialog: false,
+      races: [],
     }
     this.db = new Dexie('pg01_database')
     /*this.db.version(1).stores({
@@ -221,6 +225,7 @@ class Sheet extends Component<
           const url = `https://${window.location.hostname}/download/${id}`
 
           const db = getFirestore(firebaseApp)
+          console.log('share ', id, pgEncoded)
           const ref = doc(db, 'sharing', id)
           setDoc(ref, { data: pgEncoded })
             .then(() => {
@@ -535,10 +540,13 @@ class Sheet extends Component<
       value: unknown
     }>
   ) => {
-    let { pg } = this.state
+    let { pg, races } = this.state
     const value = event.target.value as RacesEnum
-    pg = StatsUtils.removeRaceStatModifiers(pg)
-    this.setState({ pg: { ...pg, race: value, subRace: undefined } })
+    const race = races.find((r) => r.type === pg.race.toString())
+    if (race) {
+      pg = StatsUtils.removeRaceStatModifiers(pg, race)
+      this.setState({ pg: { ...pg, race: value, subRace: undefined } })
+    }
   }
 
   onChangeSubRace = (
@@ -547,15 +555,18 @@ class Sheet extends Component<
       value: unknown
     }>
   ) => {
-    let { pg } = this.state
+    let { pg, races } = this.state
     const value = event.target.value as SubRacesEnum
-    if (pg.subRace) {
-      pg = StatsUtils.removeRaceStatModifiers(pg)
+    const race = races.find((r) => r.type === pg.race.toString())
+    if (race) {
+      if (pg.subRace) {
+        pg = StatsUtils.removeRaceStatModifiers(pg, race)
+      }
+      pg = { ...pg, subRace: value }
+      const stats = StatsUtils.getStatsFromRace(pg, race)
+      pg = { ...pg, stats: stats }
+      this.setState({ pg })
     }
-    pg = { ...pg, subRace: value }
-    const stats = StatsUtils.getStatsFromRace(pg)
-    pg = { ...pg, stats: stats }
-    this.setState({ pg })
   }
 
   onChangeJob = (job: JobsEnum, secondary?: boolean) => {
@@ -1234,7 +1245,9 @@ class Sheet extends Component<
     })
   }
 
-  componentDidMount() {
+  async componentDidMount() {
+    const races = await DataUtils.getRaces(firebaseApp)
+    this.setState({ races })
     this.getProficiency()
     const db = new Dexie('pg01_database')
     this.fetchUserDatabase(db)

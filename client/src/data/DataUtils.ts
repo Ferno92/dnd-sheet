@@ -14,6 +14,7 @@ class DataUtils {
 
   static jobs = new Array<Job>()
   static subjobs = new Array<Job>()
+  static races = new Array<Race>()
 
   static RaceMapper(json: any): Race[] {
     let races: Race[] = []
@@ -77,6 +78,26 @@ class DataUtils {
       }
     } else {
       return DataUtils.subjobs
+    }
+  }
+
+  static async getRaces(firebaseApp: FirebaseApp) {
+    if(DataUtils.races.length === 0) {
+      const db = getFirestore(firebaseApp)
+      const response = await getDocs(collection(db, 'data'))
+      const races = response.docs.find((doc) => doc.id == 'races')?.data()
+      if(races){
+        const data = (JSON.parse(races.data) as any[]).map(j => {
+          j.value = j.name
+          return j
+        }) as Race[]
+        DataUtils.races = data
+        return data
+      } else {
+        return []
+      }
+    } else {
+      return DataUtils.races
     }
   }
 
