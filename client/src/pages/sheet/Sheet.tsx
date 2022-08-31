@@ -72,6 +72,7 @@ import BackupPG from 'pages/stats/models/BackupPG'
 import ConfirmDialog from 'components/confirm-dialog/ConfirmDialog'
 import DataUtils from 'data/DataUtils'
 import Race from 'data/types/Race'
+import { SpeedDial, SpeedDialAction, SpeedDialIcon } from '@material-ui/lab'
 
 interface SheetProps {
   id: number
@@ -92,6 +93,7 @@ interface SheetState {
   proficiency: Proficiency[]
   showRestoreDialog: boolean
   races: Race[]
+  speedDialOpen: boolean
 }
 
 interface LastPageAction {
@@ -165,6 +167,7 @@ class Sheet extends Component<
       proficiency: [],
       showRestoreDialog: false,
       races: [],
+      speedDialOpen: false,
     }
     this.db = new Dexie('pg01_database')
     /*this.db.version(1).stores({
@@ -206,6 +209,16 @@ class Sheet extends Component<
 
     this.actions = [
       {
+        icon: <Restaurant />,
+        name: 'Riposo Breve',
+        onClick: () => this.rest(false),
+      },
+      {
+        icon: <Hotel />,
+        name: 'Riposo Lungo',
+        onClick: () => this.rest(true),
+      },
+      {
         icon: <People />,
         name: 'Torna a selezione personaggi',
         onClick: () => {
@@ -243,16 +256,6 @@ class Sheet extends Component<
               console.log('db upload err: ', error)
             })
         },
-      },
-      {
-        icon: <Restaurant />,
-        name: 'Riposo Breve',
-        onClick: () => this.rest(false),
-      },
-      {
-        icon: <Hotel />,
-        name: 'Riposo Lungo',
-        onClick: () => this.rest(true),
       },
     ]
   }
@@ -1265,6 +1268,7 @@ class Sheet extends Component<
       snackMessage,
       proficiency,
       showRestoreDialog,
+      speedDialOpen,
     } = this.state
 
     let swipeableViews = [
@@ -1385,14 +1389,6 @@ class Sheet extends Component<
         />
       )
     }
-    if (backup == undefined) {
-      bottomNavigations.push(
-        <BottomNavigationAction
-          key={'altro'}
-          icon={<MoreHoriz className={classes.navigationIcon} />}
-        />
-      )
-    }
     return (
       <React.Fragment>
         <Prompt
@@ -1415,28 +1411,61 @@ class Sheet extends Component<
             return shouldPrompt
           }}
         />
-        {
-          <Tooltip
-            title={onEdit ? 'Salva' : 'Modifica'}
-            aria-label={onEdit ? 'Save' : 'Edit'}
-          >
-            <Fab
-              color="primary"
-              aria-label="Done"
-              size="small"
-              onClick={this.onChangeEditMode}
+        {backup == undefined &&
+          (onEdit ? (
+            <Tooltip
+              title={onEdit ? 'Salva' : 'Modifica'}
+              aria-label={onEdit ? 'Save' : 'Edit'}
+            >
+              <Fab
+                color="primary"
+                aria-label="Done"
+                onClick={this.onChangeEditMode}
+                className={classes.fab}
+              >
+                {onEdit ? (
+                  <Done className={classes.fabIcon} />
+                ) : backup == undefined ? (
+                  <Edit className={classes.fabIcon} />
+                ) : (
+                  <Restore className={classes.fabIcon} />
+                )}
+              </Fab>
+            </Tooltip>
+          ) : (
+            <SpeedDial
+              ariaLabel="Opzioni"
+              open={speedDialOpen}
+              icon={<SpeedDialIcon className={classes.speedDialIcon} />}
+              onClick={() => this.setState({ speedDialOpen: !speedDialOpen })}
               className={classes.fab}
             >
-              {onEdit ? (
-                <Done className={classes.fabIcon} />
-              ) : backup == undefined ? (
-                <Edit className={classes.fabIcon} />
-              ) : (
-                <Restore className={classes.fabIcon} />
-              )}
-            </Fab>
-          </Tooltip>
-        }
+              {[
+                ...[
+                  <SpeedDialAction
+                    key="edit"
+                    icon={<Edit />}
+                    tooltipTitle="Modifica"
+                    onClick={() => {
+                      this.onChangeEditMode()
+                      this.setState({ speedDialOpen: !speedDialOpen })
+                    }}
+                  />,
+                ],
+                ...this.actions.map((a) => (
+                  <SpeedDialAction
+                    key={a.name}
+                    icon={a.icon}
+                    tooltipTitle={a.name}
+                    onClick={() => {
+                      a.onClick()
+                      this.setState({ speedDialOpen: !speedDialOpen })
+                    }}
+                  />
+                )),
+              ]}
+            </SpeedDial>
+          ))}
         <SwipeableViews
           axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
           index={pageIndex}

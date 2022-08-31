@@ -43,6 +43,9 @@ const SheetStyles = (theme: Theme) =>
     },
     otherText: {
       color: theme.palette.text.primary
+    },
+    speedDialIcon: {
+      height: 28.8
     }
   })
 
