@@ -1,29 +1,59 @@
 {
-  "name": "schedadnd",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "dnd-sheet",
+  "version": "0.1.0",
+  "private": true,
   "dependencies": {
-    "express": "^4.16.4",
-    "ssl-express-www": "^3.0.3"
+    "@material-ui/core": "^4.9.3",
+    "@material-ui/icons": "^4.9.1",
+    "@material-ui/lab": "^4.0.0-alpha.42",
+    "@material-ui/styles": "^4.9.0",
+    "@types/lodash": "^4.14.149",
+    "@types/node": "^12.0.8",
+    "@types/react-dom": "16.8.4",
+    "@types/react-router": "^5.0.2",
+    "@types/shortid": "0.0.29",
+    "clsx": "^1.0.4",
+    "dexie": "^2.0.4",
+    "firebase": "^9.8.2",
+    "image-compressor.js": "^1.1.4",
+    "lodash": "^4.17.20",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "react-google-login": "^5.2.2",
+    "react-google-one-tap-login": "^0.1.1",
+    "react-router-dom": "^5.0.1",
+    "react-scripts": "^3.4.3",
+    "react-swipeable-views": "^0.13.3",
+    "shortid": "^2.2.15",
+    "typescript": "^4.7.2"
   },
-  "devDependencies": {},
   "scripts": {
-    "start": "node index.js",
-    "heroku-postbuild": "cd client/ && npm install && npm install --only=dev --no-shrinkwrap && npm run build"
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Ferno92/dnd-sheet.git"
+  "eslintConfig": {
+    "extends": "react-app"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/Ferno92/dnd-sheet/issues"
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   },
-  "homepage": "https://schedadnd.herokuapp.com",
+  "devDependencies": {
+    "@types/react": "^16.8.22",
+    "@types/react-router-dom": "^4.3.4",
+    "@types/react-swipeable-views": "^0.13.0"
+  },
   "engines": {
-    "node": "10.x"
+    "node": "16.x"
   }
 }

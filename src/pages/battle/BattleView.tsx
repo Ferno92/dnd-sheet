@@ -1046,7 +1046,7 @@ function BattleView(props: BattleViewProps) {
                             variant="text"
                             onClick={(e) => {
                               e.stopPropagation()
-                              console.log('TODO')
+                              console.log('TODO ')
                             }}
                             className={classes.counterButton}
                           >
