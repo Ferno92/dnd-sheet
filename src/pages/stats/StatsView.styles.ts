@@ -6,34 +6,6 @@ const StatsViewStyles = (theme: Theme) =>
     container: {
       height: 'calc(100vh - 75px)'
     },
-    infoAvatar: {
-      height: 60,
-      width: 60,
-      marginRight: 16,
-      position: 'relative'
-    },
-    avatar: {
-      height: '100%',
-      width: '100%',
-      position: 'absolute',
-      top: 0,
-      left: 0
-    },
-    editAvatar: {
-      height: '100%',
-      width: '100%',
-      position: 'absolute',
-      top: 0,
-      left: 0
-    },
-    infoSummary: {
-      display: 'flex',
-      alignItems: 'center'
-    },
-    infoDetails: {
-      display: 'flex',
-      flexDirection: 'column'
-    },
     inputContainer: {
       padding: 10,
       paddingBottom: 86,
@@ -128,10 +100,6 @@ const StatsViewStyles = (theme: Theme) =>
     abilityPanel: {
       marginBottom: 1
     },
-    emptyImage: {
-      height: 70,
-      width: 70
-    },
     peContainer: {
       display: 'flex',
       alignItems: 'center'
@@ -215,52 +183,6 @@ const StatsViewStyles = (theme: Theme) =>
     tsNegative: {
       color: theme.palette.warning.main
     },
-    multiclass: {
-      marginBottom: 10,
-      marginLeft: 0
-    },
-    multiLevelContainer: {
-      display: 'flex',
-      alignItems: 'center',
-      width: '100%'
-    },
-    secondClassLevel: {
-      flexShrink: 0,
-      margin: '0 52px'
-    },
-    infoBigScreen: {
-      display: 'flex',
-      width: '100%',
-      marginTop: 16,
-      alignItems: 'center'
-    },
-    infoBigPanelDetail: {
-      flex: 1,
-      display: 'flex',
-      flexWrap: 'wrap'
-    },
-    [theme.breakpoints.up('sm')]: {
-      infoDetails: {
-        flexDirection: 'row',
-        flexWrap: 'wrap'
-      },
-      infoDetailsItem: {
-        width: 'calc(50% - 8px)',
-        marginTop: 0,
-        marginRight: 8
-      },
-      multiLevelContainer: {
-        width: 'calc(50% - 8px)',
-        marginRight: 8
-      },
-      multiLevelContainerOnEdit: {
-        width: '100%',
-        marginRight: 0
-      },
-      secondClassLevel: {
-        marginBottom: 10
-      }
-    },
     readOnly: {
       position: 'absolute',
       top: 0,
@@ -269,28 +191,8 @@ const StatsViewStyles = (theme: Theme) =>
       height: '100%'
     },
     [theme.breakpoints.up('md')]: {
-      infoSummary: {
-        flexDirection: 'column',
-        marginRight: 16
-      },
-      infoAvatar: {
-        height: 180,
-        width: 180,
-        marginRight: 0
-      },
       inputContainer: {
         padding: 16
-      },
-      infoReadOnly: {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center'
-      }
-    },
-    [theme.breakpoints.up('lg')]: {
-      infoAvatar: {
-        height: 320,
-        width: 320
       }
     }
   })

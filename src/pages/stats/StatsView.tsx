@@ -52,7 +52,6 @@ import {
 import InfoDialog from 'components/info-dialog/InfoDialog'
 import StatsUtils, { Proficiency } from 'utils/StatsUtils'
 import Ability from 'data/types/Ability'
-import ImageCompressor from 'image-compressor.js'
 import ExpansionPanelItem from 'components/expansion-panel-item/ExpansionPanelItem'
 import EquipmentObject from 'pages/equipment/EquipmentObject'
 import clsx from 'clsx'
@@ -63,6 +62,7 @@ import Job from 'data/types/Job'
 import ClassLevel from './components/ClassLevel'
 import { firebaseApp } from 'App'
 import Race from 'data/types/Race'
+import ResumeComponent from 'components/blocks/stats/resume'
 
 interface StatsViewProps {
   onEdit: boolean
@@ -354,80 +354,6 @@ class StatsView extends Component<
     return found
   }
 
-  getSubRacesData = () => {
-    const { race } = this.props.pg
-    const { subraces } = this.state
-    const filtered = subraces.filter(
-      (subRace) => subRace.type.indexOf(race.toString().toLowerCase()) >= 0
-    )
-    return filtered || ''
-  }
-
-  getSubJobsData = () => {
-    const { pgClass } = this.props.pg
-    const { subjobs } = this.state
-    if (pgClass) {
-      const filtered = subjobs.filter(
-        (subJob) =>
-          subJob.type.toLowerCase().indexOf(pgClass.toString().toLowerCase()) >=
-          0
-      )
-      return filtered
-    } else {
-      return []
-    }
-  }
-
-  getSecondarySubJobsData = () => {
-    const { pgClass2 } = this.props.pg
-    const { subjobs } = this.state
-    if (pgClass2) {
-      const filtered = subjobs.filter(
-        (subJob) =>
-          subJob.type
-            .toLowerCase()
-            .indexOf(pgClass2.toString().toLowerCase()) >= 0
-      )
-      return filtered
-    } else {
-      return []
-    }
-  }
-
-  onEditAvatar = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    event.stopPropagation()
-
-    const editFabs = document.getElementsByClassName('hidden-input')
-    const editFab = editFabs[0] as HTMLInputElement
-    editFab.click()
-  }
-
-  inputImageCallback = (evt: React.ChangeEvent<HTMLInputElement>) => {
-    if (evt && evt.target && evt.target.files) {
-      const imageFile = evt.target.files[0]
-      if (imageFile && imageFile.type.indexOf('image/') !== -1) {
-        new ImageCompressor(imageFile, {
-          quality: 0.5,
-          success: this.imageCompressCallback,
-        })
-      } else {
-        //TODO error
-        // store.dispatch(showMessageAction("error", "Seleziona un immagine."));
-      }
-    }
-  }
-
-  imageCompressCallback = (file: File) => {
-    var reader = new FileReader()
-    reader.onload = (e: any) => {
-      if (e.target) {
-        const { onChangeImage } = this.props
-        onChangeImage(e.target.result)
-      }
-    }
-    reader.readAsDataURL(file)
-  }
-
   getPePerc = () => {
     const { pe } = this.props.pg
     return StatsUtils.getPercLevelFromPE(pe)
@@ -479,141 +405,6 @@ class StatsView extends Component<
     return languages
   }
 
-  getJobRequirement = (job: JobsEnum) => {
-    const { races, subraces } = this.state
-    const { pg } = this.props
-    const race = races.find((r) => r.type === pg.race.toString())
-    const minStatValue = 13
-    if (race) {
-      let requirement: string | undefined = ''
-      const statValue = StatsUtils.getStatValue(
-        StatsType.Forza,
-        pg,
-        race,
-        subraces
-      )
-      switch (job) {
-        case JobsEnum.Barbaro:
-          requirement =
-            statValue < minStatValue ? `Forza ${minStatValue}` : undefined
-          break
-        case JobsEnum.Bardo:
-          requirement =
-            statValue < minStatValue ? `Carisma ${minStatValue}` : undefined
-          break
-        case JobsEnum.Chierico:
-          requirement =
-            statValue < minStatValue ? `Saggezza ${minStatValue}` : undefined
-          break
-        case JobsEnum.Druido:
-          requirement =
-            statValue < minStatValue ? `Saggezza ${minStatValue}` : undefined
-          break
-        case JobsEnum.Guerriero:
-          if (statValue < minStatValue) {
-            requirement = `Forza ${minStatValue}`
-          }
-          if (statValue < minStatValue) {
-            requirement +=
-              requirement === ''
-                ? `Destrezza ${minStatValue}`
-                : `, Destrezza ${minStatValue}`
-          }
-          break
-        case JobsEnum.Ladro:
-          requirement =
-            statValue < minStatValue ? `Destrezza ${minStatValue}` : undefined
-          break
-        case JobsEnum.Mago:
-          requirement =
-            statValue < minStatValue
-              ? `Intelligenza ${minStatValue}`
-              : undefined
-          break
-        case JobsEnum.Monaco:
-          if (statValue < minStatValue) {
-            requirement = `Destrezza ${minStatValue}`
-          }
-          if (statValue < minStatValue) {
-            requirement +=
-              requirement === ''
-                ? `Saggezza ${minStatValue}`
-                : `, Saggezza ${minStatValue}`
-          }
-          break
-        case JobsEnum.Paladino:
-          if (statValue < minStatValue) {
-            requirement = `Forza ${minStatValue}`
-          }
-          if (statValue < minStatValue) {
-            requirement +=
-              requirement === ''
-                ? `Carisma ${minStatValue}`
-                : `, Carisma ${minStatValue}`
-          }
-          break
-        case JobsEnum.Ranger:
-          if (statValue < minStatValue) {
-            requirement = `Destrezza ${minStatValue}`
-          }
-          if (statValue < minStatValue) {
-            requirement +=
-              requirement === ''
-                ? `Saggezza ${minStatValue}`
-                : `, Saggezza ${minStatValue}`
-          }
-          break
-        case JobsEnum.Stregone:
-          requirement =
-            statValue < minStatValue ? `Carisma ${minStatValue}` : undefined
-          break
-        case JobsEnum.Warlock:
-          requirement =
-            statValue < minStatValue ? `Carisma ${minStatValue}` : undefined
-          break
-      }
-
-      return requirement
-    } else {
-      return undefined
-    }
-  }
-
-  getSecondaryJobsData = (): Job[] => {
-    const { pgClass } = this.props.pg
-    const { jobs } = this.state
-    const filtered: Job[] = jobs.filter((job) => job.type !== pgClass)
-    const mapped: Job[] = filtered.map((x) => {
-      const req = this.getJobRequirement(x.type as JobsEnum)
-      return {
-        ...x,
-        disabled: req !== undefined,
-        extra: req ? req : undefined,
-      } as Job
-    })
-    return mapped || []
-  }
-
-  onAddLevel = (first: boolean) => {
-    const { levelFirstClass } = this.props.pg
-    const { onUpdateFirstClassLevel } = this.props
-    let level = StatsUtils.getPgLevel(this.props.pg.pe) - 1
-    if (levelFirstClass) {
-      level = levelFirstClass + 1
-    }
-    onUpdateFirstClassLevel(level)
-  }
-
-  onRemoveLevel = (first: boolean) => {
-    const { levelFirstClass } = this.props.pg
-    const { onUpdateFirstClassLevel } = this.props
-    let level = StatsUtils.getPgLevel(this.props.pg.pe) - 2
-    if (levelFirstClass && levelFirstClass > 1) {
-      level = levelFirstClass - 1
-    }
-    onUpdateFirstClassLevel(level)
-  }
-
   render() {
     const {
       name,
@@ -645,6 +436,8 @@ class StatsView extends Component<
       onEditStats,
       onChangePE,
       onChangeMulticlass,
+      onChangeImage,
+      onUpdateFirstClassLevel,
       width,
       proficiency,
       readOnly,
@@ -669,238 +462,34 @@ class StatsView extends Component<
       /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
         navigator.userAgent
       )
-    const infoReadOnly = (
-      <div className={classes.infoReadOnly}>
-        <Typography
-          variant={width === 'xs' || width === 'sm' ? 'body1' : 'h2'}
-          color="textPrimary"
-        >
-          {name || ''}
-        </Typography>
-        <Typography
-          variant="body2"
-          color="textPrimary"
-        >{`${StatsUtils.getInfoName(`${race}`, races)} ${StatsUtils.getInfoName(
-          `${subRace}`,
-          this.getSubRacesData()
-        )}`}</Typography>
-        {multiclass && pgClass && pgClass2 ? (
-          <Typography variant="body2" color="textPrimary">
-            {StatsUtils.getInfoName(`${pgClass}`, jobs)
-              ? `${pgClass} Lv. ${
-                  levelFirstClass || StatsUtils.getPgLevel(this.props.pg.pe) - 1
-                } - ${pgClass2} Lv. ${
-                  levelFirstClass
-                    ? StatsUtils.getPgLevel(this.props.pg.pe) - levelFirstClass
-                    : 1
-                }`
-              : ''}
-          </Typography>
-        ) : (
-          <Typography variant="body2" color="textPrimary">
-            {StatsUtils.getInfoName(`${pgClass}`, jobs)
-              ? `${StatsUtils.getInfoName(
-                  `${pgClass}`,
-                  jobs
-                )} Lv. ${StatsUtils.getPgLevel(this.props.pg.pe)}`
-              : ''}
-          </Typography>
-        )}
-      </div>
-    )
-    const summary = (
-      <div className={classes.infoSummary}>
-        <div className={classes.infoAvatar}>
-          <Avatar
-            className={classes.avatar}
-            src={image}
-            style={{ opacity: onEdit ? 0.5 : 1 }}
-          >
-            {!image && (
-              <AccountCircle className={classes.emptyImage} color="secondary" />
-            )}
-          </Avatar>
-          <input
-            className="hidden-input"
-            accept="image/*"
-            type="file"
-            style={{ display: 'none' }}
-            onChange={this.inputImageCallback}
-          />
-          {onEdit && (
-            <IconButton
-              className={classes.editAvatar}
-              onClick={this.onEditAvatar}
-            >
-              <Edit />
-            </IconButton>
-          )}
-        </div>
-        {width === 'xs' || width === 'sm' ? infoReadOnly : undefined}
-      </div>
-    )
-    const panelDetail = (
-      <React.Fragment>
-        <TextFieldString
-          label="Nome Personaggio"
-          value={name}
-          onChange={onEditName}
-          disabled={!onEdit}
-          name={'name'}
-          root={classes.infoDetailsItem}
-        />
-        <SimpleSelect<RacesEnum>
-          label={'Razza'}
-          item={race}
-          data={races}
-          onEdit={onEdit}
-          onChange={onChangeRace}
-          root={classes.infoDetailsItem}
-        />
-        {race &&
-          (StatsUtils.getCurrentRace(race, races)?.subraces || []).length >
-            0 && (
-            <SimpleSelect<SubRacesEnum>
-              label={'Sotto-razza'}
-              item={subRace}
-              data={this.getSubRacesData()}
-              onEdit={onEdit}
-              onChange={onChangeSubRace}
-              root={classes.infoDetailsItem}
-            />
-          )}
-        {onEdit && StatsUtils.getPgLevel(this.props.pg.pe) !== 1 && (
-          <FormControlLabel
-            className={clsx(classes.multiclass, classes.infoDetailsItem)}
-            control={
-              <Checkbox
-                checked={multiclass || false}
-                onChange={() => onChangeMulticlass(!multiclass)}
-              />
-            }
-            label={'Multiclasse'}
-          />
-        )}
-        <div
-          className={clsx(
-            classes.multiLevelContainer,
-            multiclass ? classes.multiLevelContainerOnEdit : undefined
-          )}
-        >
-          <SimpleSelect<JobsEnum>
-            label={multiclass ? 'Classe Primaria' : 'Classe'}
-            item={pgClass}
-            data={jobs}
-            onEdit={onEdit}
-            onChange={(e) => onChangeJob(e.target.value as JobsEnum)}
-            root={multiclass ? classes.infoDetailsItem : undefined}
-          />
-          {multiclass && pgClass && (
-            <ClassLevel
-              level={
-                levelFirstClass || StatsUtils.getPgLevel(this.props.pg.pe) - 1
-              }
-              max={StatsUtils.getPgLevel(this.props.pg.pe)}
-              onAdd={() => this.onAddLevel(true)}
-              onRemove={() => this.onRemoveLevel(true)}
-              readOnly={!onEdit}
-            />
-          )}
-        </div>
-        {pgClass && (
-          <SimpleSelect<SubJobsEnum>
-            label={
-              multiclass ? 'Specializzazione Primaria' : 'Specializzazione'
-            }
-            item={subClass}
-            data={this.getSubJobsData()}
-            onEdit={onEdit}
-            onChange={(e) => onChangeSubJob(e.target.value as SubJobsEnum)}
-            root={classes.infoDetailsItem}
-          />
-        )}
-        {multiclass && (
-          <React.Fragment>
-            <div
-              className={clsx(
-                classes.multiLevelContainer,
-                multiclass ? classes.multiLevelContainerOnEdit : undefined
-              )}
-            >
-              <SimpleSelect<JobsEnum>
-                label={'Classe Secondaria'}
-                item={pgClass2}
-                data={this.getSecondaryJobsData()}
-                onEdit={onEdit}
-                onChange={(e) => onChangeJob(e.target.value as JobsEnum, true)}
-                root={multiclass ? classes.infoDetailsItem : undefined}
-              />
-              {pgClass2 && (
-                <Typography
-                  variant="body1"
-                  className={classes.secondClassLevel}
-                >{`LV. ${
-                  StatsUtils.getPgLevel(this.props.pg.pe) -
-                  (this.props.pg.levelFirstClass ||
-                    StatsUtils.getPgLevel(this.props.pg.pe) - 1)
-                }`}</Typography>
-              )}
-            </div>
-            {pgClass2 && (
-              <SimpleSelect<SubJobsEnum>
-                label={'Specializzazione Secondaria'}
-                item={subClass2}
-                data={this.getSecondarySubJobsData()}
-                onEdit={onEdit}
-                onChange={(e) =>
-                  onChangeSubJob(e.target.value as SubJobsEnum, true)
-                }
-                root={classes.infoDetailsItem}
-              />
-            )}
-          </React.Fragment>
-        )}
-        <SimpleSelect<string>
-          label={'Background'}
-          item={backgroundFromState}
-          data={this.backgroundData}
-          onEdit={onEdit}
-          onChange={(event) => {
-            this.setState({ showBackgroundItems: true })
-            onChangeBackground(event)
-          }}
-          root={classes.infoDetailsItem}
-        />{' '}
-      </React.Fragment>
-    )
 
     const currentRace = races.find((r) => r.type === race.toString())
     return (
       <div className={classes.container}>
         <div className={classes.inputContainer}>
-          {width === 'xs' || width === 'sm' ? (
-            <ExpansionPanel
-              square
-              expanded={infoExpanded}
-              onChange={() => this.setState({ infoExpanded: !infoExpanded })}
-            >
-              <ExpansionPanelSummary expandIcon={<ExpandMore />}>
-                {summary}
-              </ExpansionPanelSummary>
-              <ExpansionPanelDetails className={classes.infoDetails}>
-                {panelDetail}
-              </ExpansionPanelDetails>
-            </ExpansionPanel>
-          ) : (
-            <div>
-              {infoReadOnly}
-              <div className={classes.infoBigScreen}>
-                {summary}
-                <div className={classes.infoBigPanelDetail}>{panelDetail}</div>
-              </div>
-            </div>
-          )}
-
+          <ResumeComponent
+            width={width}
+            pg={this.props.pg}
+            races={races}
+            jobs={jobs}
+            subraces={this.state.subraces}
+            onEdit={onEdit}
+            subjobs={this.state.subjobs}
+            backgroundFromState={backgroundFromState}
+            backgroundData={this.backgroundData}
+            onChangeJob={onChangeJob}
+            onChangeSubJob={onChangeSubJob}
+            onChangeBackground={(e) => {
+              this.setState({ showBackgroundItems: true })
+              this.props.onChangeBackground(e)
+            }}
+            onChangeRace={onChangeRace}
+            onChangeSubRace={onChangeSubRace}
+            onChangeMulticlass={onChangeMulticlass}
+            onEditName={onEditName}
+            onChangeImage={onChangeImage}
+            onUpdateFirstClassLevel={onUpdateFirstClassLevel}
+          />
           <div className={classes.generalInfo}>
             <Typography variant="subtitle1" color="textPrimary">
               Info generali
