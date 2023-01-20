@@ -10,7 +10,6 @@ import {
   ExpansionPanel,
   ExpansionPanelSummary,
   ExpansionPanelDetails,
-  Avatar,
   FormControlLabel,
   LinearProgress,
   Dialog,
@@ -24,7 +23,6 @@ import {
   WithWidth,
 } from '@material-ui/core'
 import StatsViewStyles from './StatsView.styles'
-import TextFieldString from 'components/text-field-string/TextFieldString'
 import TextFieldNumber from 'components/text-field-number/TextFieldNumber'
 import PG from './models/PG'
 import MixedInput, { InputPosition } from 'components/mixed-input/MixedInput'
@@ -32,16 +30,12 @@ import StatsType from 'data/types/StatsEnum'
 import TextUtils from 'utils/TextUtils'
 import { default as abilitiesJSON } from 'data/json/AbilitiesJSON'
 import { default as backgroundJSON } from 'data/json/BackgroundJSON'
-import { RacesEnum, SubRacesEnum } from 'data/types/RacesEnum'
 import DataUtils from 'data/DataUtils'
-import SimpleSelect from 'components/simple-select/SimpleSelect'
 import { JobsEnum, SubJobsEnum } from 'data/types/JobsEnum'
 import AbilitiesEnum from 'data/types/AbilitiesEnum'
 import {
-  ExpandMore,
   ErrorOutline,
   Edit,
-  AccountCircle,
   FitnessCenter,
   Height,
   Mood,
@@ -59,7 +53,6 @@ import GeneralInfoDialog from 'components/general-info-dialog/GeneralInfoDialog'
 import PgGeneralInfo from 'data/types/PgGeneralInfo'
 import ConfirmDialog from 'components/confirm-dialog/ConfirmDialog'
 import Job from 'data/types/Job'
-import ClassLevel from './components/ClassLevel'
 import { firebaseApp } from 'App'
 import Race from 'data/types/Race'
 import ResumeComponent from 'components/blocks/stats/resume'
@@ -406,21 +399,7 @@ class StatsView extends Component<
   }
 
   render() {
-    const {
-      name,
-      race,
-      pgClass,
-      stats,
-      subRace,
-      ispiration,
-      image,
-      subClass,
-      generalInfo,
-      multiclass,
-      pgClass2,
-      subClass2,
-      levelFirstClass,
-    } = this.props.pg
+    const { race, pgClass, stats, ispiration, generalInfo } = this.props.pg
     const {
       classes,
       onEdit,
@@ -431,7 +410,6 @@ class StatsView extends Component<
       onChangeSubJob,
       onChangeRace,
       onChangeSubRace,
-      onChangeBackground,
       onEditName,
       onEditStats,
       onChangePE,
@@ -446,7 +424,6 @@ class StatsView extends Component<
       dialogInfoAbilitiesOpen,
       tsExpanded,
       abilityExpanded,
-      infoExpanded,
       peFromState,
       backgroundFromState,
       showBackgroundItems,

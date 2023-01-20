@@ -1,7 +1,6 @@
 import PG from 'pages/stats/models/PG'
 import { RacesEnum } from 'data/types/RacesEnum'
 import StatsType from 'data/types/StatsEnum'
-import DataUtils from 'data/DataUtils'
 import SizeEnum from 'data/types/SizeEnum'
 import Stats from 'pages/stats/models/Stats'
 import { JobsEnum } from 'data/types/JobsEnum'
