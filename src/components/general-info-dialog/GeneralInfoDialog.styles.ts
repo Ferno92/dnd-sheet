@@ -41,7 +41,8 @@ const useStyles = makeStyles((theme: Theme) => ({
     marginLeft: 8
   },
   errorCaption: {
-    color: theme.palette.error.main
+    color: theme.palette.error.main,
+    display: 'block'
   }
 }))
 

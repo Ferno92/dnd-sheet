@@ -56,6 +56,7 @@ import Job from 'data/types/Job'
 import { firebaseApp } from 'App'
 import Race from 'data/types/Race'
 import ResumeComponent from 'components/blocks/stats/resume'
+import GeneralInfoComponent from 'components/blocks/stats/GeneralInfo'
 
 interface StatsViewProps {
   onEdit: boolean
@@ -467,60 +468,15 @@ class StatsView extends Component<
             onChangeImage={onChangeImage}
             onUpdateFirstClassLevel={onUpdateFirstClassLevel}
           />
-          <div className={classes.generalInfo}>
-            <Typography variant="subtitle1" color="textPrimary">
-              Info generali
-            </Typography>
-            {onEdit && (
-              <Tooltip title="Modifica info generali">
-                <IconButton
-                  className={classes.generalInfoIcon}
-                  onClick={() => this.setState({ generalInfoDialogOpen: true })}
-                >
-                  <Edit />
-                </IconButton>
-              </Tooltip>
-            )}
-          </div>
-          <div className={classes.moreInfos}>
-            <div className={classes.moreInfo}>
-              <FitnessCenter className={classes.infoIcon} />
-              <Typography variant="body1" color="textPrimary">{`${
-                generalInfo ? generalInfo.weight : '__'
-              } kg`}</Typography>
-            </div>
-            <div className={classes.moreInfo}>
-              <Height className={classes.infoIcon} />
-              <Typography variant="body1" color="textPrimary">{`${
-                generalInfo ? generalInfo.height : '__'
-              } m`}</Typography>
-            </div>
-            <div className={classes.moreInfo}>
-              <DateRange className={classes.infoIcon} />
-              <Typography variant="body1" color="textPrimary">{`${
-                generalInfo ? generalInfo.age : '__'
-              } anni`}</Typography>
-            </div>
-            <div className={classes.moreInfo}>
-              <Mood className={classes.infoIcon} />
-              <Typography variant="body1" color="textPrimary">{`${
-                generalInfo ? generalInfo.alignment : 'Allineamento'
-              }`}</Typography>
-            </div>
-            <div className={classes.moreInfo}>
-              <Translate className={classes.infoIcon} />
-              <Typography variant="body1" color="textPrimary">
-                {this.getLanguages().length !== 0
-                  ? this.getLanguages().map(
-                      (item, i) =>
-                        `${item}${
-                          i !== this.getLanguages().length - 1 ? ', ' : ''
-                        }`
-                    )
-                  : 'Linguaggi'}
-              </Typography>
-            </div>
-          </div>
+          <GeneralInfoComponent
+            onEdit={onEdit}
+            generalInfo={generalInfo}
+            getLanguages={this.getLanguages}
+            onEditGeneralInfo={() => {
+              console.log('open general info')
+              this.setState({ generalInfoDialogOpen: true })
+            }}
+          />
           <Divider className={classes.divider} />
           <div className={classes.gridContainer}>
             <Grid container spacing={3}>

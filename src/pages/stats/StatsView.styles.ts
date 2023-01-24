@@ -127,29 +127,9 @@ const StatsViewStyles = (theme: Theme) =>
     bgContent: {
       padding: '0 24px'
     },
-    moreInfos: {
-      display: 'flex',
-      alignItems: 'center',
-      flexWrap: 'wrap',
-      justifyContent: 'space-between'
-    },
-    moreInfo: {
-      display: 'flex',
-      alignItems: 'center',
-      marginTop: 8
-    },
     infoIcon: {
       marginRight: 8,
       color: theme.palette.text.primary
-    },
-    generalInfo: {
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      marginTop: 8
-    },
-    generalInfoIcon: {
-      padding: 8
     },
     tempIcon: {
       '&.active': {
