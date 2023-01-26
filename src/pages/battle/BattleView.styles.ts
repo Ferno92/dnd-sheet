@@ -1,5 +1,6 @@
 import Theme from 'assets/styles/Theme'
 import { makeStyles } from '@material-ui/styles'
+import ColorUtils from 'utils/ColorUtils'
 
 const BattleViewStyles = makeStyles((theme: Theme) => ({
   container: {
@@ -209,10 +210,12 @@ const BattleViewStyles = makeStyles((theme: Theme) => ({
   },
   divider: {
     margin: '20px 0 10px 0',
-    width: '100%'
+    width: '100%',
+    background: ColorUtils.hexToNegative(theme.palette.background.paper)
   },
   specialAbilityTitle: {
-    marginBottom: 8
+    marginBottom: 8,
+    textTransform: 'uppercase'
   },
   counterButton: {
     padding: '2px 8px',

@@ -23,7 +23,6 @@ import { Close, Check, Add, Edit, Delete } from '@material-ui/icons'
 import TextFieldNumber from 'components/text-field-number/TextFieldNumber'
 import TextFieldString from 'components/text-field-string/TextFieldString'
 import PG from 'pages/stats/models/PG'
-import SizeEnum from 'data/types/SizeEnum'
 import StatsUtils, { Proficiency } from 'utils/StatsUtils'
 import clsx from 'clsx'
 import BattleUtils from 'utils/BattleUtils'
@@ -44,6 +43,8 @@ import Job from 'data/types/Job'
 import { JobsEnum, SubJobsEnum } from 'data/types/JobsEnum'
 import { firebaseApp } from 'App'
 import Race from 'data/types/Race'
+import CustomAbilities from 'components/blocks/battle/CustomAbilities'
+import CustomAbility from 'pages/stats/models/CustomAbility'
 
 export interface Modifier {
   type: string
@@ -72,6 +73,7 @@ interface BattleViewProps {
   onRemoveArmor: (index: number) => void
   onSelectArmor: (index: number) => void
   onChangeTemp: (type: string, value: any, rest?: RestType) => void
+  onChangeCustomAbilities: (ability: CustomAbility, onDelete: boolean) => void
 }
 
 function BattleView(props: BattleViewProps) {
@@ -89,6 +91,7 @@ function BattleView(props: BattleViewProps) {
     onRemoveArmor,
     onSelectArmor,
     onChangeTemp,
+    onChangeCustomAbilities,
     readOnly,
   } = props
   const classes = BattleViewStyles()
@@ -1084,6 +1087,16 @@ function BattleView(props: BattleViewProps) {
             {privileges.length === 0 && (
               <Typography variant="body2">Nessun privilegio</Typography>
             )}
+            <Divider className={classes.divider} />
+            {/* ________________ Abilità custom aggiuntive _____________ */}
+            <CustomAbilities
+              customAbilities={pg.customAbilities}
+              fullScreen={fullScreen}
+              onEdit={onEdit}
+              onSave={(a) => onChangeCustomAbilities(a, false)}
+              onDelete={(a) => onChangeCustomAbilities(a, true)}
+            />
+
             <Divider className={classes.divider} />
           </React.Fragment>
         )}

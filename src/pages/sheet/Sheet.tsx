@@ -73,6 +73,7 @@ import ConfirmDialog from 'components/confirm-dialog/ConfirmDialog'
 import DataUtils from 'data/DataUtils'
 import Race from 'data/types/Race'
 import { SpeedDial, SpeedDialAction, SpeedDialIcon } from '@material-ui/lab'
+import CustomAbility from 'pages/stats/models/CustomAbility'
 
 interface SheetProps {
   id: number
@@ -269,8 +270,8 @@ class Sheet extends Component<
       this.updateDB()
     }
     if (
-      snackMessage == undefined &&
-      prevState.snackMessage != snackMessage &&
+      snackMessage === undefined &&
+      prevState.snackMessage !== snackMessage &&
       backup
     ) {
       this.props.history.push(`/`)
@@ -394,6 +395,7 @@ class Sheet extends Component<
       subClass2,
       multiclass,
       levelFirstClass,
+      customAbilities,
     } = this.state.pg
 
     var newPgJson = JSON.stringify(this.state.pg)
@@ -427,6 +429,7 @@ class Sheet extends Component<
             subClass2,
             multiclass,
             levelFirstClass,
+            customAbilities,
           })
           .then(() => {
             //console.log('update done')
@@ -462,6 +465,7 @@ class Sheet extends Component<
             subClass2,
             multiclass,
             levelFirstClass,
+            customAbilities,
           })
           .then(() => {
             //console.log('create done')
@@ -658,6 +662,20 @@ class Sheet extends Component<
     const { pg } = this.state
     this.setState({
       pg: { ...pg, pfTot: parseInt(event.currentTarget.value) },
+    })
+  }
+
+  onChangeCustomAbilities = (ability: CustomAbility, onDelete: boolean) => {
+    const { pg } = this.state
+    const tempAbilities = this.state.pg.customAbilities || []
+    const index = tempAbilities.findIndex((a, i) => a.id === ability.id)
+    if (onDelete) {
+      tempAbilities.splice(index, 1)
+    } else {
+      tempAbilities.splice(index, 0, ability)
+    }
+    this.setState({
+      pg: { ...pg, customAbilities: tempAbilities },
     })
   }
 
@@ -1310,7 +1328,7 @@ class Sheet extends Component<
           onEdit={onEdit}
           id={sheetId}
           pg={pg}
-          readOnly={backup != undefined}
+          readOnly={backup !== undefined}
           onChangeSpeed={this.onChangeSpeed}
           onChangePF={this.onChangePF}
           onChangeTsMorte={this.onChangeTsMorte}
@@ -1322,6 +1340,7 @@ class Sheet extends Component<
           onSelectArmor={this.onSelectArmor}
           onChangeTemp={this.onChangeTemp}
           proficiency={proficiency}
+          onChangeCustomAbilities={this.onChangeCustomAbilities}
         />
       </div>,
       <div key={'slide3'}>

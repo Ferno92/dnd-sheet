@@ -33,16 +33,7 @@ import { default as backgroundJSON } from 'data/json/BackgroundJSON'
 import DataUtils from 'data/DataUtils'
 import { JobsEnum, SubJobsEnum } from 'data/types/JobsEnum'
 import AbilitiesEnum from 'data/types/AbilitiesEnum'
-import {
-  ErrorOutline,
-  Edit,
-  FitnessCenter,
-  Height,
-  Mood,
-  Translate,
-  DateRange,
-  AccessTime,
-} from '@material-ui/icons'
+import { ErrorOutline, AccessTime } from '@material-ui/icons'
 import InfoDialog from 'components/info-dialog/InfoDialog'
 import StatsUtils, { Proficiency } from 'utils/StatsUtils'
 import Ability from 'data/types/Ability'

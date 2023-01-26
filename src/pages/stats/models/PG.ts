@@ -7,6 +7,7 @@ import Equipment from 'pages/equipment/Equipment'
 import ArmorInfo from 'data/types/ArmorInfo'
 import SpellsByLevel from 'data/types/SpellsByLevel'
 import PgGeneralInfo from 'data/types/PgGeneralInfo'
+import CustomAbility from './CustomAbility'
 
 interface PG {
   id: number
@@ -36,6 +37,7 @@ interface PG {
   multiclass?: boolean
   levelFirstClass?: number
   deleted?: boolean
+  customAbilities?: CustomAbility[]
 }
 
 export default PG
