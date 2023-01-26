@@ -88,7 +88,10 @@ const CustomAbilitiesDialog: React.FC<CustomAbilitiesDialogProps> = (
               variant="outlined"
               className={styles.dialogActionButton}
               color="secondary"
-              onClick={() => onDelete(selected.id)}
+              onClick={() => {
+                onDelete(selected.id)
+                clearDataAndClose()
+              }}
             >
               Elimina
             </Button>

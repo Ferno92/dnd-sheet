@@ -95,6 +95,12 @@ const CustomAbilities: React.FC<CustomAbilitiesProps> = (
           )
         })}
       </Grid>
+      {(customAbilities?.length === 0 ||
+        customAbilities?.length === undefined) && (
+        <Typography variant="body2" color="textPrimary">
+          Nessuna abilità aggiuntiva
+        </Typography>
+      )}
       {selected && (
         <CustomAbilitiesDialog
           fullScreen={fullScreen}
