@@ -79,6 +79,7 @@ const CustomAbilitiesDialog: React.FC<CustomAbilitiesDialogProps> = (
             onChange={(value: string) => setDescription(value)}
             disabled={false}
             value={description}
+            multiline
           />
         </DialogContent>
         <DialogActions>

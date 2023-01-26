@@ -372,7 +372,6 @@ class StatsView extends Component<
         data.abilities.forEach((item) => {
           if (item.extra) {
             const splitted = item.extra.split('|')
-            console.log('getLanguages', races, race)
             if (splitted[0] === 'languages') {
               const obj = JSON.parse(splitted[1])
               if (obj.list) {

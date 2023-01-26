@@ -30,7 +30,7 @@ const CustomAbilities: React.FC<CustomAbilitiesProps> = (
   const styles = useStyles()
 
   return (
-    <div>
+    <div className={styles.root}>
       <div className={styles.titleContainer}>
         <Typography
           variant="subtitle1"
