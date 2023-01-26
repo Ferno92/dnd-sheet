@@ -4,6 +4,7 @@ import {
   Typography,
   ExpansionPanelDetails,
   IconButton,
+  Grid,
 } from '@material-ui/core'
 import { Add, Edit } from '@material-ui/icons'
 import CustomAbilitiesDialog from 'components/dialogs/custom-abilities-dialog/CustomAbilitiesDialog'
@@ -52,38 +53,48 @@ const CustomAbilities: React.FC<CustomAbilitiesProps> = (
           </IconButton>
         )}
       </div>
-      {customAbilities?.map((a) => {
-        return (
-          <div key={a.id} className={styles.item}>
-            <ExpansionPanel
-              square
-              expanded={customAbilityExpanded === a.id}
-              onChange={() =>
-                customAbilityExpanded === a.id
-                  ? setCustomAbilityExpanded(undefined)
-                  : setCustomAbilityExpanded(a.id)
-              }
-              className={styles.expandedItem}
+      <Grid container>
+        {customAbilities?.map((a) => {
+          return (
+            <Grid
+              item
+              xs={12}
+              sm={6}
+              md={4}
+              lg={3}
+              key={a.id}
+              className={styles.item}
             >
-              <ExpansionPanelSummary>
-                <Typography variant="subtitle2" itemType="span">
-                  {a.title}:
-                </Typography>
-              </ExpansionPanelSummary>
-              <ExpansionPanelDetails>
-                <Typography variant="body2" itemType="span">
-                  {a.description}
-                </Typography>
-              </ExpansionPanelDetails>
-            </ExpansionPanel>
-            {onEdit && (
-              <IconButton onClick={() => setSelected(a)}>
-                <Edit />
-              </IconButton>
-            )}
-          </div>
-        )
-      })}
+              <ExpansionPanel
+                square
+                expanded={customAbilityExpanded === a.id}
+                onChange={() =>
+                  customAbilityExpanded === a.id
+                    ? setCustomAbilityExpanded(undefined)
+                    : setCustomAbilityExpanded(a.id)
+                }
+                className={styles.expandedItem}
+              >
+                <ExpansionPanelSummary>
+                  <Typography variant="subtitle2" itemType="span">
+                    {a.title}:
+                  </Typography>
+                </ExpansionPanelSummary>
+                <ExpansionPanelDetails>
+                  <Typography variant="body2" itemType="span">
+                    {a.description}
+                  </Typography>
+                </ExpansionPanelDetails>
+              </ExpansionPanel>
+              {onEdit && (
+                <IconButton onClick={() => setSelected(a)}>
+                  <Edit />
+                </IconButton>
+              )}
+            </Grid>
+          )
+        })}
+      </Grid>
       {selected && (
         <CustomAbilitiesDialog
           fullScreen={fullScreen}

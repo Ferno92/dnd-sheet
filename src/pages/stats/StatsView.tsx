@@ -706,75 +706,76 @@ class StatsView extends Component<
           >
             Tiri Salvezza
           </Typography>
-          <div className={classes.gridContainer}>
+          <Grid container className={classes.gridContainer}>
             {stats.map((stat, index) => {
               return (
-                <ExpansionPanel
-                  key={stat.type}
-                  square
-                  expanded={tsExpanded === stat.type}
-                  onChange={() =>
-                    stat.type === tsExpanded
-                      ? this.setState({ tsExpanded: undefined })
-                      : this.setState({ tsExpanded: stat.type })
-                  }
-                  elevation={3}
-                >
-                  <ExpansionPanelSummary>
-                    <div className={classes.tsPanelTitle}>
-                      <Typography variant={'subtitle1'}>
-                        {TextUtils.getFullStatsType(stat.type)}
-                      </Typography>
-                      <Typography
-                        variant={'subtitle1'}
-                        className={
-                          stat.tsTemp !== undefined
-                            ? stat.tsTemp > 0
-                              ? classes.tsPositive
-                              : stat.tsTemp < 0
-                              ? classes.tsNegative
+                <Grid item xs={12} sm={6} md={4} key={stat.type}>
+                  <ExpansionPanel
+                    square
+                    expanded={tsExpanded === stat.type}
+                    onChange={() =>
+                      stat.type === tsExpanded
+                        ? this.setState({ tsExpanded: undefined })
+                        : this.setState({ tsExpanded: stat.type })
+                    }
+                    elevation={3}
+                  >
+                    <ExpansionPanelSummary>
+                      <div className={classes.tsPanelTitle}>
+                        <Typography variant={'subtitle1'}>
+                          {TextUtils.getFullStatsType(stat.type)}
+                        </Typography>
+                        <Typography
+                          variant={'subtitle1'}
+                          className={
+                            stat.tsTemp !== undefined
+                              ? stat.tsTemp > 0
+                                ? classes.tsPositive
+                                : stat.tsTemp < 0
+                                ? classes.tsNegative
+                                : undefined
                               : undefined
-                            : undefined
+                          }
+                        >
+                          {TextUtils.getValueWithSign(
+                            StatsUtils.getStatModifier(stat) +
+                              this.getTSProficiency(stat.type) +
+                              (stat.tsTemp ? stat.tsTemp : 0)
+                          )}
+                        </Typography>
+                      </div>
+                    </ExpansionPanelSummary>
+                    <ExpansionPanelDetails>
+                      <MixedInput
+                        inputInfo={{
+                          type: 'Temp',
+                          value: stat.tsTemp,
+                          min: -20,
+                          max: 20,
+                        }}
+                        inputPos={InputPosition.End}
+                        modifiers={[
+                          {
+                            type: 'Comp',
+                            value: this.getTSProficiency(stat.type),
+                          },
+                          {
+                            type: 'Mod',
+                            value: StatsUtils.getStatModifier(stat),
+                          },
+                        ]}
+                        onChange={(value) =>
+                          onEditStats(index, value.toString(), false, true)
                         }
-                      >
-                        {TextUtils.getValueWithSign(
-                          StatsUtils.getStatModifier(stat) +
-                            this.getTSProficiency(stat.type) +
-                            (stat.tsTemp ? stat.tsTemp : 0)
-                        )}
-                      </Typography>
-                    </div>
-                  </ExpansionPanelSummary>
-                  <ExpansionPanelDetails>
-                    <MixedInput
-                      inputInfo={{
-                        type: 'Temp',
-                        value: stat.tsTemp,
-                        min: -20,
-                        max: 20,
-                      }}
-                      inputPos={InputPosition.End}
-                      modifiers={[
-                        {
-                          type: 'Comp',
-                          value: this.getTSProficiency(stat.type),
-                        },
-                        {
-                          type: 'Mod',
-                          value: StatsUtils.getStatModifier(stat),
-                        },
-                      ]}
-                      onChange={(value) =>
-                        onEditStats(index, value.toString(), false, true)
-                      }
-                      onEdit={onEdit}
-                      label={TextUtils.getSmallStatsType(stat.type)}
-                    />
-                  </ExpansionPanelDetails>
-                </ExpansionPanel>
+                        onEdit={onEdit}
+                        label={TextUtils.getSmallStatsType(stat.type)}
+                      />
+                    </ExpansionPanelDetails>
+                  </ExpansionPanel>
+                </Grid>
               )
             })}
-          </div>
+          </Grid>
           <Divider className={classes.divider} />
           <div className={classes.abilitiesHeader}>
             <Typography
@@ -802,7 +803,7 @@ class StatsView extends Component<
               {`Ancora ${this.missingAbilitiesToSelect()} da selezionare`}
             </Typography>
           )}
-          <div className={classes.gridContainer}>
+          <Grid container className={classes.gridContainer}>
             {this.abilitiesData.map((ability, index) => {
               const totValue =
                 StatsUtils.getStatModifierFromName(
@@ -818,80 +819,81 @@ class StatsView extends Component<
                   : 0) +
                 this.getAbilityPoints(ability.type)
               return (
-                <ExpansionPanelItem
-                  key={ability.type}
-                  expanded={abilityExpanded === ability.type}
-                  id={ability.type}
-                  name={
-                    ability.type +
-                    (ability.type === AbilitiesEnum.Furtivita &&
-                    this.isArmorHeavy()
-                      ? ' (Svantaggio)'
-                      : '')
-                  }
-                  checked={this.hasProficiency(ability.type)}
-                  onChangeCheckbox={(id: string, checked: boolean) =>
-                    onChangeAbilityCheck(id as AbilitiesEnum, checked)
-                  }
-                  checkbox={this.isAbilityEnabled(ability)}
-                  extra={TextUtils.getValueWithSign(totValue).toString()}
-                  checkboxDisabled={
-                    this.missingAbilitiesToSelect() === 0 &&
-                    !this.hasProficiency(ability.type)
-                  }
-                  onEdit={onEdit}
-                  onExpand={() =>
-                    ability.type === abilityExpanded
-                      ? this.setState({ abilityExpanded: undefined })
-                      : this.setState({ abilityExpanded: ability.type })
-                  }
-                  classes={{
-                    extra:
-                      this.getAbilityPoints(ability.type) > 0
-                        ? classes.tsPositive
-                        : this.getAbilityPoints(ability.type) < 0
-                        ? classes.tsNegative
-                        : '',
-                  }}
-                >
-                  <MixedInput
-                    inputInfo={{
-                      type: 'Extra',
-                      value: this.getAbilityPoints(ability.type),
-                      min: -20,
-                      max: 20,
-                    }}
-                    inputPos={InputPosition.End}
-                    modifiers={[
-                      {
-                        type: `${TextUtils.getSmallStatsType(ability.stat)}${
-                          this.hasProficiency(ability.type) ? '+ Comp' : ''
-                        }`,
-                        value:
-                          StatsUtils.getStatModifierFromName(
-                            ability.stat,
-                            this.props.pg
-                          ) +
-                          (this.hasProficiency(ability.type)
-                            ? StatsUtils.getProficiency(
-                                StatsUtils.getPgLevel(this.props.pg.pe),
-                                proficiency,
-                                pgClass
-                              )
-                            : 0),
-                      },
-                    ]}
-                    onChange={(value: number) => {
-                      onChangeAbilityPoints(ability.type, value)
-                    }}
+                <Grid item xs={12} sm={6} md={4} lg={3} key={ability.type}>
+                  <ExpansionPanelItem
+                    expanded={abilityExpanded === ability.type}
+                    id={ability.type}
+                    name={
+                      ability.type +
+                      (ability.type === AbilitiesEnum.Furtivita &&
+                      this.isArmorHeavy()
+                        ? ' (Svantaggio)'
+                        : '')
+                    }
+                    checked={this.hasProficiency(ability.type)}
+                    onChangeCheckbox={(id: string, checked: boolean) =>
+                      onChangeAbilityCheck(id as AbilitiesEnum, checked)
+                    }
+                    checkbox={this.isAbilityEnabled(ability)}
+                    extra={TextUtils.getValueWithSign(totValue).toString()}
+                    checkboxDisabled={
+                      this.missingAbilitiesToSelect() === 0 &&
+                      !this.hasProficiency(ability.type)
+                    }
                     onEdit={onEdit}
-                    // label={ability.type}
-                    labelOnTop
-                  />
-                </ExpansionPanelItem>
+                    onExpand={() =>
+                      ability.type === abilityExpanded
+                        ? this.setState({ abilityExpanded: undefined })
+                        : this.setState({ abilityExpanded: ability.type })
+                    }
+                    classes={{
+                      extra:
+                        this.getAbilityPoints(ability.type) > 0
+                          ? classes.tsPositive
+                          : this.getAbilityPoints(ability.type) < 0
+                          ? classes.tsNegative
+                          : '',
+                    }}
+                  >
+                    <MixedInput
+                      inputInfo={{
+                        type: 'Extra',
+                        value: this.getAbilityPoints(ability.type),
+                        min: -20,
+                        max: 20,
+                      }}
+                      inputPos={InputPosition.End}
+                      modifiers={[
+                        {
+                          type: `${TextUtils.getSmallStatsType(ability.stat)}${
+                            this.hasProficiency(ability.type) ? '+ Comp' : ''
+                          }`,
+                          value:
+                            StatsUtils.getStatModifierFromName(
+                              ability.stat,
+                              this.props.pg
+                            ) +
+                            (this.hasProficiency(ability.type)
+                              ? StatsUtils.getProficiency(
+                                  StatsUtils.getPgLevel(this.props.pg.pe),
+                                  proficiency,
+                                  pgClass
+                                )
+                              : 0),
+                        },
+                      ]}
+                      onChange={(value: number) => {
+                        onChangeAbilityPoints(ability.type, value)
+                      }}
+                      onEdit={onEdit}
+                      // label={ability.type}
+                      labelOnTop
+                    />
+                  </ExpansionPanelItem>
+                </Grid>
               )
             })}
-          </div>
+          </Grid>
           <Divider className={classes.divider} />
           {readOnly && <div className={classes.readOnly}></div>}
         </div>

@@ -4,10 +4,11 @@ import {
   ExpansionPanelSummary,
   Typography,
   ExpansionPanelDetails,
-  Checkbox
+  Checkbox,
 } from '@material-ui/core'
 import useStyles from './ExpansionPanelItem.styles'
 import { ExpandMore } from '@material-ui/icons'
+import clsx from 'clsx'
 
 interface ExpansionPanelItemProps {
   id: string
@@ -45,16 +46,19 @@ const ExpansionPanelItem: React.FC<ExpansionPanelItemProps> = (
     extra,
     children,
     RightIconButtons,
-    classes
+    classes,
   } = props
 
   const styles = useStyles()
 
   return (
     <div
-      className={styles.root}
+      className={clsx(
+        styles.root,
+        RightIconButtons !== undefined ? styles.withButtons : ''
+      )}
       style={{
-        alignItems: expanded ? 'flex-start' : 'center'
+        alignItems: expanded ? 'flex-start' : 'center',
       }}
     >
       <ExpansionPanel
@@ -78,8 +82,8 @@ const ExpansionPanelItem: React.FC<ExpansionPanelItemProps> = (
                       checked: boolean
                     ) => onChangeCheckbox(id, checked)}
                     disabled={!onEdit || checkboxDisabled}
-                    onClick={e => e.stopPropagation()}
-                    color='primary'
+                    onClick={(e) => e.stopPropagation()}
+                    color="primary"
                   />
                 ) : !checkboxHidden ? (
                   <div className={styles.noCheckbox} />
@@ -98,7 +102,7 @@ const ExpansionPanelItem: React.FC<ExpansionPanelItemProps> = (
           {children}
         </ExpansionPanelDetails>
       </ExpansionPanel>
-      {RightIconButtons && RightIconButtons.map(Button => Button)}
+      {RightIconButtons && RightIconButtons.map((Button) => Button)}
     </div>
   )
 }

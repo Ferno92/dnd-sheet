@@ -967,31 +967,34 @@ function BattleView(props: BattleViewProps) {
             Nessuna abilità
           </Typography>
         )}
-        {raceAbilities.map((raceAbility) => {
-          return (
-            <ExpansionPanel
-              key={raceAbility.name}
-              square
-              expanded={abilityExpanded === raceAbility.name}
-              onChange={() =>
-                abilityExpanded === raceAbility.name
-                  ? setAbilityExpanded(undefined)
-                  : setAbilityExpanded(raceAbility.name)
-              }
-            >
-              <ExpansionPanelSummary>
-                <Typography variant="subtitle2" itemType="span">
-                  {raceAbility.name}:
-                </Typography>
-              </ExpansionPanelSummary>
-              <ExpansionPanelDetails>
-                <Typography variant="body2" itemType="span">
-                  {raceAbility.description}
-                </Typography>
-              </ExpansionPanelDetails>
-            </ExpansionPanel>
-          )
-        })}
+        <Grid container>
+          {raceAbilities.map((raceAbility) => {
+            return (
+              <Grid item xs={12} sm={6} md={4} lg={3} key={raceAbility.name}>
+                <ExpansionPanel
+                  square
+                  expanded={abilityExpanded === raceAbility.name}
+                  onChange={() =>
+                    abilityExpanded === raceAbility.name
+                      ? setAbilityExpanded(undefined)
+                      : setAbilityExpanded(raceAbility.name)
+                  }
+                >
+                  <ExpansionPanelSummary>
+                    <Typography variant="subtitle2" itemType="span">
+                      {raceAbility.name}:
+                    </Typography>
+                  </ExpansionPanelSummary>
+                  <ExpansionPanelDetails>
+                    <Typography variant="body2" itemType="span">
+                      {raceAbility.description}
+                    </Typography>
+                  </ExpansionPanelDetails>
+                </ExpansionPanel>
+              </Grid>
+            )
+          })}
+        </Grid>
 
         <Divider className={classes.divider} />
         {/* ________________ Privilegi di classe _____________ */}
@@ -1005,85 +1008,91 @@ function BattleView(props: BattleViewProps) {
               Privilegi di classe
             </Typography>
 
-            {privileges.map((privilege) => {
-              console.log('privilege', privilege.counterType, privilege)
-              return (
-                <ExpansionPanel
-                  key={privilege.type}
-                  square
-                  expanded={privilegeExpanded === privilege.type}
-                  onChange={() =>
-                    privilegeExpanded === privilege.type
-                      ? setPrivilegeExpanded(undefined)
-                      : setPrivilegeExpanded(privilege.type)
-                  }
-                >
-                  <ExpansionPanelSummary className={classes.privilegeSummary}>
-                    <Typography variant="subtitle2" itemType="span">
-                      {privilege.name}:
-                    </Typography>
-                    <div className={classes.counterContainer}>
-                      <Typography variant="subtitle2" itemType="span">
-                        {privilege.counter !== undefined ||
-                        privilege.counterType !== undefined
-                          ? `${
-                              privilege.counter
-                                ? `${
-                                    pg.temp && pg.temp[privilege.type]
-                                      ? privilege.counter -
-                                        pg.temp[privilege.type].value
-                                      : privilege.counter
-                                  }/${privilege.counter}`
-                                : ''
-                            } ${
-                              privilege.counterType ? privilege.counterType : ''
-                            }`
-                          : undefined}
-                      </Typography>
-                      {privilege.counter &&
-                        (pg.temp === undefined ||
-                          pg.temp[privilege.type] === undefined ||
-                          pg.temp[privilege.type].value <
-                            privilege.counter) && (
-                          <Button
-                            variant="text"
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              console.log('TODO ')
-                            }}
-                            className={classes.counterButton}
-                          >
-                            <Typography
-                              variant="subtitle2"
-                              onClick={() =>
-                                onChangeTemp(
-                                  privilege.type,
-                                  pg.temp &&
-                                    pg.temp[privilege.type] !== undefined
-                                    ? pg.temp[privilege.type].value + 1
-                                    : 1,
-                                  privilege.rest
-                                )
-                              }
-                            >
-                              Attiva
-                            </Typography>
-                          </Button>
-                        )}
-                    </div>
-                  </ExpansionPanelSummary>
-                  <ExpansionPanelDetails>
-                    <Typography
-                      variant="body2"
-                      itemType="span"
-                      dangerouslySetInnerHTML={{
-                        __html: privilege.description,
-                      }}
-                    />
-                  </ExpansionPanelDetails>
-                </ExpansionPanel>
-              )
-            })}
+            <Grid container>
+              {privileges.map((privilege) => {
+                return (
+                  <Grid item xs={12} sm={6} md={4} lg={3} key={privilege.type}>
+                    <ExpansionPanel
+                      square
+                      expanded={privilegeExpanded === privilege.type}
+                      onChange={() =>
+                        privilegeExpanded === privilege.type
+                          ? setPrivilegeExpanded(undefined)
+                          : setPrivilegeExpanded(privilege.type)
+                      }
+                    >
+                      <ExpansionPanelSummary
+                        className={classes.privilegeSummary}
+                      >
+                        <Typography variant="subtitle2" itemType="span">
+                          {privilege.name}:
+                        </Typography>
+                        <div className={classes.counterContainer}>
+                          <Typography variant="subtitle2" itemType="span">
+                            {privilege.counter !== undefined ||
+                            privilege.counterType !== undefined
+                              ? `${
+                                  privilege.counter
+                                    ? `${
+                                        pg.temp && pg.temp[privilege.type]
+                                          ? privilege.counter -
+                                            pg.temp[privilege.type].value
+                                          : privilege.counter
+                                      }/${privilege.counter}`
+                                    : ''
+                                } ${
+                                  privilege.counterType
+                                    ? privilege.counterType
+                                    : ''
+                                }`
+                              : undefined}
+                          </Typography>
+                          {privilege.counter &&
+                            (pg.temp === undefined ||
+                              pg.temp[privilege.type] === undefined ||
+                              pg.temp[privilege.type].value <
+                                privilege.counter) && (
+                              <Button
+                                variant="text"
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  console.log('TODO ')
+                                }}
+                                className={classes.counterButton}
+                              >
+                                <Typography
+                                  variant="subtitle2"
+                                  onClick={() =>
+                                    onChangeTemp(
+                                      privilege.type,
+                                      pg.temp &&
+                                        pg.temp[privilege.type] !== undefined
+                                        ? pg.temp[privilege.type].value + 1
+                                        : 1,
+                                      privilege.rest
+                                    )
+                                  }
+                                >
+                                  Attiva
+                                </Typography>
+                              </Button>
+                            )}
+                        </div>
+                      </ExpansionPanelSummary>
+                      <ExpansionPanelDetails>
+                        <Typography
+                          variant="body2"
+                          itemType="span"
+                          dangerouslySetInnerHTML={{
+                            __html: privilege.description,
+                          }}
+                        />
+                      </ExpansionPanelDetails>
+                    </ExpansionPanel>
+                  </Grid>
+                )
+              })}
+            </Grid>
             {privileges.length === 0 && (
               <Typography variant="body2">Nessun privilegio</Typography>
             )}
