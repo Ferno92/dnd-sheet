@@ -9,7 +9,7 @@ import {
   List,
   ListItem,
   Typography
-} from '@material-ui/core'
+} from '@mui/material'
 
 interface InfoDialogProps<T> {
   open: boolean

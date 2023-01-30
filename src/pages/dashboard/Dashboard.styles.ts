@@ -1,4 +1,7 @@
-import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
+import { Theme } from '@mui/material/styles';
+
+import makeStyles from '@mui/styles/makeStyles';
+import createStyles from '@mui/styles/createStyles';
 
 const DashboardStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -11,7 +14,7 @@ const DashboardStyles = makeStyles((theme: Theme) =>
       flex: 1
     },
     loginButton: {
-      color: theme.palette.text.hint,
+      color: theme.palette.backgroundSecondary.paper,
       padding: 8,
       margin: 8
     },
@@ -23,7 +26,7 @@ const DashboardStyles = makeStyles((theme: Theme) =>
     title: {
       textAlign: 'center',
       padding: '16px 0',
-      color: theme.palette.text.hint,
+      color: theme.palette.backgroundSecondary.paper,
       flex: 2
     },
     avatar: {

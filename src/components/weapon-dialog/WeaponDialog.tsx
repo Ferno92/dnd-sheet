@@ -8,9 +8,10 @@ import {
   Grid,
   Button,
   DialogActions,
-  TextField
-} from '@material-ui/core'
-import { Close } from '@material-ui/icons'
+  TextField,
+  SelectChangeEvent,
+} from '@mui/material'
+import { Close } from '@mui/icons-material'
 import useWeaponDialogStyles from './WeaponDialog.styles'
 import SimpleSelect from 'components/simple-select/SimpleSelect'
 import { default as weaponsJSON } from 'data/json/WeaponsJSON'
@@ -58,7 +59,7 @@ const WeaponDialog: React.FC<WeaponDialogProps> = (
           damage: '',
           damageType: '',
           property: [],
-          weight: 0
+          weight: 0,
         })
       }
       weaponsDataTemp.push(item)
@@ -67,14 +68,9 @@ const WeaponDialog: React.FC<WeaponDialogProps> = (
   }, [weaponsData])
 
   const onChangeWeapon = useCallback(
-    (
-      event: React.ChangeEvent<{
-        name?: string | undefined
-        value: unknown
-      }>
-    ) => {
+    (event: SelectChangeEvent, child: React.ReactNode) => {
       const id = event.target.value
-      const found = weaponsData.find(weaponData => weaponData.id === id)
+      const found = weaponsData.find((weaponData) => weaponData.id === id)
       if (weaponSelected === undefined) {
         setBonus(0)
         setNotes('')
@@ -125,6 +121,7 @@ const WeaponDialog: React.FC<WeaponDialogProps> = (
         <IconButton
           className={styles.closeDialog}
           onClick={() => clearDataAndClose()}
+          size="large"
         >
           <Close />
         </IconButton>
@@ -162,7 +159,7 @@ const WeaponDialog: React.FC<WeaponDialogProps> = (
                 <Typography variant="body1">{weapon.damage}</Typography>
               </Grid>
               <Grid item xs={6} className={styles.gridItem}>
-                {weapon.property.map(property => {
+                {weapon.property.map((property) => {
                   return (
                     <Typography variant="body1" key={property}>
                       {property}

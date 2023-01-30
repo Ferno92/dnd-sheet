@@ -12,15 +12,16 @@ import {
   FormControlLabel,
   Checkbox,
   TextField,
-  Snackbar
-} from '@material-ui/core'
+  Snackbar,
+  SelectChangeEvent,
+} from '@mui/material'
 import useStyles from './SpellDialog.styles'
-import { Close } from '@material-ui/icons'
+import { Close } from '@mui/icons-material'
 import TextFieldString from 'components/text-field-string/TextFieldString'
 import SimpleSelect from 'components/simple-select/SimpleSelect'
 import SpellType from 'data/types/SpellType'
 import SimpleSelectItem from 'data/types/SimpleSelectItem'
-import MuiAlert from '@material-ui/lab/Alert'
+import MuiAlert from '@mui/material/Alert'
 
 interface SpellDialogProps {
   open: boolean
@@ -43,12 +44,14 @@ const SpellDialog: React.FC<SpellDialogProps> = (props: SpellDialogProps) => {
   const [showErrorMessage, setShowErrorMessage] = useState(false)
   const styles = useStyles()
 
-  const spellTypeList: SimpleSelectItem[] = Object.keys(SpellType).map(key => {
-    return {
-      type: key as SpellType,
-      value: key
+  const spellTypeList: SimpleSelectItem[] = Object.keys(SpellType).map(
+    (key) => {
+      return {
+        type: key as SpellType,
+        value: key,
+      }
     }
-  })
+  )
 
   const clearDataAndClose = useCallback(() => {
     onClose()
@@ -81,7 +84,7 @@ const SpellDialog: React.FC<SpellDialogProps> = (props: SpellDialogProps) => {
           level: level!,
           prepared: false,
           tempoDiLancio: tempoDiLancio,
-          type: spellType
+          type: spellType,
         },
         spellSelected ? spellSelected.id : undefined
       )
@@ -100,16 +103,11 @@ const SpellDialog: React.FC<SpellDialogProps> = (props: SpellDialogProps) => {
     materials,
     onAddSpell,
     clearDataAndClose,
-    spellSelected
+    spellSelected,
   ])
 
   const onChangeSpellType = useCallback(
-    (
-      event: React.ChangeEvent<{
-        name?: string | undefined
-        value: unknown
-      }>
-    ) => {
+    (event: SelectChangeEvent, child: React.ReactNode) => {
       setSpellType(event.target.value as SpellType)
     },
     []
@@ -119,7 +117,7 @@ const SpellDialog: React.FC<SpellDialogProps> = (props: SpellDialogProps) => {
     (material: string) => {
       if (materials) {
         const materialsCopy = [...materials]
-        const index = materialsCopy.findIndex(item => item === material)
+        const index = materialsCopy.findIndex((item) => item === material)
         if (index >= 0) {
           materialsCopy.splice(index, 1)
         } else {
@@ -157,6 +155,7 @@ const SpellDialog: React.FC<SpellDialogProps> = (props: SpellDialogProps) => {
         <IconButton
           className={styles.closeDialog}
           onClick={() => clearDataAndClose()}
+          size="large"
         >
           <Close />
         </IconButton>
@@ -196,7 +195,7 @@ const SpellDialog: React.FC<SpellDialogProps> = (props: SpellDialogProps) => {
         <div className={styles.levelInfo}>
           <Typography variant="subtitle1">Componenti:</Typography>
           <FormGroup row className={styles.materials}>
-            {['v', 's', 'm'].map(item => {
+            {['v', 's', 'm'].map((item) => {
               return (
                 <FormControlLabel
                   key={item}
@@ -204,12 +203,12 @@ const SpellDialog: React.FC<SpellDialogProps> = (props: SpellDialogProps) => {
                     <Checkbox
                       checked={
                         materials &&
-                        materials.find(material => material === item) !==
+                        materials.find((material) => material === item) !==
                           undefined
                       }
                       onChange={() => handleMaterials(item)}
                       value={item}
-                      color='primary'
+                      color="primary"
                     />
                   }
                   label={item.toUpperCase()}
@@ -226,7 +225,7 @@ const SpellDialog: React.FC<SpellDialogProps> = (props: SpellDialogProps) => {
         />
         <TextField
           label="Descrizione"
-          onChange={e => setDescription(e.target.value)}
+          onChange={(e) => setDescription(e.target.value)}
           value={description}
           multiline
           fullWidth

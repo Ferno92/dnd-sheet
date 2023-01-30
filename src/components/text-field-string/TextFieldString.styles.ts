@@ -1,4 +1,4 @@
-import { createStyles } from "@material-ui/core";
+import createStyles from '@mui/styles/createStyles';
 import Theme from "assets/styles/Theme";
 
 const TextFieldStringStyles = (theme: Theme) => createStyles({

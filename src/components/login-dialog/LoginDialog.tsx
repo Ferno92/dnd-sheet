@@ -7,9 +7,9 @@ import {
   DialogContent,
   DialogActions,
   Button,
-} from '@material-ui/core'
+} from '@mui/material'
 import useStyles from './LoginDialog.styles'
-import { Close } from '@material-ui/icons'
+import { Close } from '@mui/icons-material'
 import { BasicProfile, GoogleUser } from 'pages/dashboard/Dashboard'
 import GoogleLogin, {
   GoogleLoginResponse,
@@ -52,7 +52,7 @@ const LoginDialog: React.FC<LoginDialogProps> = (props: LoginDialogProps) => {
         <IconButton
           className={styles.closeDialog}
           onClick={() => onClose(false)}
-        >
+          size="large">
           <Close />
         </IconButton>
       </DialogTitle>
@@ -90,6 +90,6 @@ const LoginDialog: React.FC<LoginDialogProps> = (props: LoginDialogProps) => {
         )}
       </DialogActions>
     </Dialog>
-  )
+  );
 }
 export default LoginDialog

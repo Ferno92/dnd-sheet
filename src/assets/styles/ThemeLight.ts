@@ -1,6 +1,6 @@
-import createMuiTheme from '@material-ui/core/styles/createMuiTheme'
-import createPalette, { Palette } from '@material-ui/core/styles/createPalette'
-import createTypography from '@material-ui/core/styles/createTypography'
+import { adaptV4Theme, createTheme, Palette, PaletteColor, responsiveFontSizes } from '@mui/material/styles';
+import createPalette from '@mui/material/styles/createPalette';
+import createTypography, { Typography } from '@mui/material/styles/createTypography';
 import ColorUtils from 'utils/ColorUtils'
 
 export enum Colors {
@@ -26,76 +26,80 @@ export enum Colors {
   DirtyBlack = '#303030'
 }
 
-export const palette: Palette = createPalette({
-  type: 'light',
-  background: {
-    default: Colors.DndRed,
-    paper: Colors.DirtyWhite
-  },
-  backgroundSecondary: {
-    default: Colors.DirtyWhite,
-    paper: Colors.BrightWhite
-  },
-  text: {
-    primary: Colors.Black,
-    secondary: Colors.Black50,
-    hint: Colors.BrightWhite
-  },
-  primary: {
-    light: Colors.DndRedLight,
-    main: Colors.DndRed,
-    dark: Colors.DndRedDark,
-    contrastText: Colors.BrightWhite
-  },
-  secondary: {
-    light: Colors.DndBlackLight,
-    main: Colors.DndBlack,
-    dark: Colors.DndBlackDark,
-    contrastText: Colors.BrightWhite
-  },
-  success: {
-    main: Colors.Fern,
-    light: Colors.Fern,
-    dark: Colors.Fern,
-    contrastText: Colors.BrightWhite
-  },
-  info: {
-    main: Colors.BrightWhite,
-    light: Colors.BrightWhite,
-    dark: Colors.BrightWhite,
-    contrastText: Colors.Black
-  },
-  warning: {
-    main: Colors.SunYellow,
-    light: Colors.SunYellow,
-    dark: Colors.SunYellow,
-    contrastText: Colors.BrightWhite
-  },
-  error: {
-    main: Colors.Cherry,
-    light: Colors.Cherry,
-    dark: Colors.Cherry,
-    contrastText: Colors.BrightWhite
-  },
-  picture: {
-    dark: Colors.SilverGrey50,
-    main: Colors.SilverGrey50,
-    light: Colors.SilverGrey50,
-    contrastText: Colors.Black
-  },
-  divider: Colors.SilverGrey50,
-  border: {
-    main: Colors.SilverGrey,
-    light: Colors.SilverGrey50,
-    dark: Colors.Black30,
-    contrastText: Colors.BrightWhite
-  },
-  highlight: Colors.DndRedLight,
-  hover: Colors.DndRedLight
-})
+export const lightTheme = responsiveFontSizes(createTheme({
+  palette: {
+    mode: 'light',
+    background: {
+      default: Colors.DndRed,
+      paper: Colors.DirtyWhite
+    },
+    backgroundSecondary: {
+      default: Colors.DirtyWhite,
+      paper: Colors.BrightWhite
+    },
+    text: {
+      primary: Colors.Black,
+      secondary: Colors.Black50
+    },
+    primary: {
+      light: Colors.DndRedLight,
+      main: Colors.DndRed,
+      dark: Colors.DndRedDark,
+      contrastText: Colors.BrightWhite
+    },
+    secondary: {
+      light: Colors.DndBlackLight,
+      main: Colors.DndBlack,
+      dark: Colors.DndBlackDark,
+      contrastText: Colors.BrightWhite
+    },
+    success: {
+      main: Colors.Fern,
+      light: Colors.Fern,
+      dark: Colors.Fern,
+      contrastText: Colors.BrightWhite
+    },
+    info: {
+      main: Colors.BrightWhite,
+      light: Colors.BrightWhite,
+      dark: Colors.BrightWhite,
+      contrastText: Colors.Black
+    },
+    warning: {
+      main: Colors.SunYellow,
+      light: Colors.SunYellow,
+      dark: Colors.SunYellow,
+      contrastText: Colors.BrightWhite
+    },
+    error: {
+      main: Colors.Cherry,
+      light: Colors.Cherry,
+      dark: Colors.Cherry,
+      contrastText: Colors.BrightWhite
+    },
+    picture: {
+      dark: Colors.SilverGrey50,
+      main: Colors.SilverGrey50,
+      light: Colors.SilverGrey50,
+      contrastText: Colors.Black
+    },
+    divider: Colors.SilverGrey50,
+    border: {
+      main: Colors.SilverGrey,
+      light: Colors.SilverGrey50,
+      dark: Colors.Black30,
+      contrastText: Colors.BrightWhite
+    },
+    highlight: Colors.DndRedLight,
+    hover: Colors.DndRedLight
 
-export const darkPalette: Palette = createPalette({
-  type: 'dark',
+  }
+}))
+
+export const darkTheme = responsiveFontSizes(createTheme({
+  palette: {
+
+  mode: 'dark',
   background: {
     default: Colors.DndRed,
     paper: Colors.DirtyBlack
@@ -106,8 +110,7 @@ export const darkPalette: Palette = createPalette({
   },
   text: {
     primary: Colors.DirtyWhite,
-    secondary: Colors.DirtyWhite,
-    hint: Colors.DirtyWhite
+    secondary: Colors.DirtyWhite
   },
   primary: {
     light: Colors.DndRed,
@@ -160,9 +163,10 @@ export const darkPalette: Palette = createPalette({
   },
   highlight: Colors.DndRedLight,
   hover: Colors.DndRedLight
-})
+  }
+}))
 
-const typography = createTypography(palette, {
+const typography = createTypography(lightTheme.palette, {
   fontFamily: [
     '-apple-system',
     'BlinkMacSystemFont',
@@ -244,7 +248,7 @@ const typography = createTypography(palette, {
   }
 })
 
-export const Theme = (palette: Palette) => createMuiTheme({
+export const Theme = (palette: Palette) => createTheme({
   palette: palette,
   typography: typography,
   shape: {
@@ -286,48 +290,56 @@ export const Theme = (palette: Palette) => createMuiTheme({
     '0px 11px 14px -7px rgba(0,0,0,0.2),0px 23px 36px 3px rgba(0,0,0,0.14),0px 9px 44px 8px rgba(0,0,0,0.12)',
     '0px 11px 15px -7px rgba(0,0,0,0.2),0px 24px 38px 3px rgba(0,0,0,0.14),0px 9px 46px 8px rgba(0,0,0,0.12)'
   ],
-  overrides: {
+  components: {
     MuiInputBase: {
-      input: {
-        height: '2.2rem'
-      }
-    },
+      styleOverrides: {
+        input: {
+          height: '2.2rem'
+        }
+      },
+      },
     MuiOutlinedInput: {
+      styleOverrides: {
       input: {
         height: 'unset'
       }
+    }
     },
     MuiInputLabel: {
+      styleOverrides: {
       root: {
         fontSize: typography.body2.fontSize,
         color: ColorUtils.hexToRgbString(Colors.Black, 0.5)
       }
+    }
     },
     MuiLink: {
+      styleOverrides: {
       root: {
         color: palette.action.active
       }
+    }
     },
     MuiMenuItem: {
+      styleOverrides: {
       root: {
         fontSize: typography.body1.fontSize,
         fontWeight: typography.body1.fontWeight
       }
+    }
     },
     MuiListItem: {
+      styleOverrides: {
       root: {
         paddingTop: 12,
         paddingBottom: 12,
         paddingLeft: 16,
         paddingRight: 16
       }
-    },
-    MuiExpansionPanelSummary: {
-      root: {
-        padding: '0 16px'
-      }
+    }
     },
     MuiButton: {
+      styleOverrides: {
       root: {
         minWidth: 100,
         minHeight: 40,
@@ -402,39 +414,52 @@ export const Theme = (palette: Palette) => createMuiTheme({
           backgroundColor: ColorUtils.hexToRgbString(Colors.Black, 0.1)
         }
       }
+    }
     },
     MuiDialogTitle: {
+      styleOverrides: {
       root: {
         padding: '44px 64px 24px 64px'
       }
+    }
     },
     MuiDialogContent: {
+    
+      styleOverrides: {
       root: {
         padding: '0 64px'
       }
+    }
     },
     MuiDialogActions: {
+      styleOverrides: {
       spacing: {
         padding: 24,
         '& > * + *': {
           marginLeft: 16
         }
       }
+    }
     },
     MuiSelect: {
-      root: {
+      styleOverrides: {
+      select: {
         height: 36
       }
+    }
     },
     MuiTabs: {
+      styleOverrides: {
       root: {
         minHeight: 28
       },
       indicator: {
         height: 1
       }
+    }
     },
     MuiTab: {
+      styleOverrides: {
       root: {
         minHeight: 28,
         ...typography.body1,
@@ -446,22 +471,6 @@ export const Theme = (palette: Palette) => createMuiTheme({
         }
       }
     }
-  },
-  props: {
-    MuiLink: {
-      underline: 'always'
-    },
-    MuiCircularProgress: {
-      size: 32
-    },
-    MuiTabs: {
-      textColor: 'primary',
-      indicatorColor: 'primary'
     }
-  },
-  highlightSearchWords: {
-    fontWeight: 700,
-    backgroundColor: 'transparent',
-    color: palette.text.primary
   }
 })

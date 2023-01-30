@@ -3,18 +3,18 @@ import {
   AppBar,
   CircularProgress,
   Dialog,
-  ExpansionPanel,
-  ExpansionPanelDetails,
-  ExpansionPanelSummary,
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   IconButton,
   List,
   ListItem,
   ListItemText,
   Toolbar,
   Typography,
-} from '@material-ui/core'
+} from '@mui/material'
 import { GoogleUser, UsersDocName } from 'pages/dashboard/Dashboard'
-import { ExpandMore, Close } from '@material-ui/icons'
+import { ExpandMore, Close } from '@mui/icons-material'
 import {
   Firestore,
   getDocs,
@@ -94,7 +94,7 @@ const BackupDialog: React.FC<BackupDialogProps & RouteComponentProps> = (
               onClose()
             }}
             aria-label="close"
-          >
+            size="large">
             <Close />
           </IconButton>
           <Typography variant="h6" component="div">
@@ -103,7 +103,7 @@ const BackupDialog: React.FC<BackupDialogProps & RouteComponentProps> = (
         </Toolbar>
       </AppBar>
       {remotePgs.map((pg) => (
-        <ExpansionPanel
+        <Accordion
           key={pg.id}
           onChange={(event, expanded) => {
             if (expanded) {
@@ -111,14 +111,14 @@ const BackupDialog: React.FC<BackupDialogProps & RouteComponentProps> = (
             }
           }}
         >
-          <ExpansionPanelSummary expandIcon={<ExpandMore />}>
+          <AccordionSummary expandIcon={<ExpandMore />}>
             <Typography variant="body1">
               {`${pg.name} (${pg.pgClass} LV. ${StatsUtils.getLevelPgFromPE(
                 pg.pe
               )})`}
             </Typography>
-          </ExpansionPanelSummary>
-          <ExpansionPanelDetails className={styles.panelDetails}>
+          </AccordionSummary>
+          <AccordionDetails className={styles.panelDetails}>
             <List className={styles.list}>
               {backup.get(pg.id.toString())?.length == 0 ? (
                 <Typography variant="body1">
@@ -145,11 +145,11 @@ const BackupDialog: React.FC<BackupDialogProps & RouteComponentProps> = (
                 )) || <CircularProgress />
               )}
             </List>
-          </ExpansionPanelDetails>
-        </ExpansionPanel>
+          </AccordionDetails>
+        </Accordion>
       ))}
     </Dialog>
-  )
+  );
 }
 
 export default BackupDialog

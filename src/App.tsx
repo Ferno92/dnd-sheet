@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react'
 import { BrowserRouter, Route, Switch } from 'react-router-dom'
 import Sheet from './pages/sheet/Sheet'
 import Dashboard from 'pages/dashboard/Dashboard'
-import { Typography, Button, IconButton } from '@material-ui/core'
-import { HighlightOff } from '@material-ui/icons'
+import { Typography, Button, IconButton } from '@mui/material'
+import { HighlightOff } from '@mui/icons-material'
 import useStyles from 'App.styles'
 import DownloadPG from 'pages/download/DownloadPG'
 import PrivacyPolicy from 'pages/privacy/PrivacyPolicy'
@@ -58,47 +58,45 @@ const App: React.FC = () => {
       window.removeEventListener('sw-installed', onNewServiceWorkerInstalled)
     }
   }, [])
-  return (
-    <>
-      {/* <BottomAppBar
-              logged={this.state.logged}
-              logout={this.logout}
-              navigationMenuOpen={false}
-              logoutDialogOpen={false}
-              hideAppBar={false}
-            /> */}
-      {showNewVersionBanner && (
-        <div className={styles.newVersionBannerContainer}>
-          <Typography variant="body1">
-            E' disponibile una nuova versione dell'app.
-          </Typography>
-          <Button
-            variant="text"
-            size="small"
-            className={styles.updateNewVersionButton}
-            onClick={onRefreshToInstallNewVersion}
-          >
-            Aggiorna
-          </Button>
-          <IconButton
-            className={styles.closeNewVersionBannerButton}
-            onClick={onCloseInstallNewVersionBanner}
-          >
-            <HighlightOff className={styles.closeNewVersionBannerButtonIcon} />
-          </IconButton>
-        </div>
-      )}
-      <BrowserRouter>
-        <Switch>
-          <Route exact path="/" component={Dashboard} />
-          <Route exact path="/sheet/:id/:page" component={Sheet} />
-          <Route exact path="/sheet/:id/:page/:backup" component={Sheet} />
-          <Route exact path="/download/:id" component={DownloadPG} />
-          <Route exact path="/privacy" component={PrivacyPolicy} />
-        </Switch>
-      </BrowserRouter>
-    </>
-  )
+  return <>
+    {/* <BottomAppBar
+            logged={this.state.logged}
+            logout={this.logout}
+            navigationMenuOpen={false}
+            logoutDialogOpen={false}
+            hideAppBar={false}
+          /> */}
+    {showNewVersionBanner && (
+      <div className={styles.newVersionBannerContainer}>
+        <Typography variant="body1">
+          E' disponibile una nuova versione dell'app.
+        </Typography>
+        <Button
+          variant="text"
+          size="small"
+          className={styles.updateNewVersionButton}
+          onClick={onRefreshToInstallNewVersion}
+        >
+          Aggiorna
+        </Button>
+        <IconButton
+          className={styles.closeNewVersionBannerButton}
+          onClick={onCloseInstallNewVersionBanner}
+          size="large">
+          <HighlightOff className={styles.closeNewVersionBannerButtonIcon} />
+        </IconButton>
+      </div>
+    )}
+    <BrowserRouter>
+      <Switch>
+        <Route exact path="/" component={Dashboard} />
+        <Route exact path="/sheet/:id/:page" component={Sheet} />
+        <Route exact path="/sheet/:id/:page/:backup" component={Sheet} />
+        <Route exact path="/download/:id" component={DownloadPG} />
+        <Route exact path="/privacy" component={PrivacyPolicy} />
+      </Switch>
+    </BrowserRouter>
+  </>;
 }
 
 export default App

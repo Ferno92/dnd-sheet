@@ -10,16 +10,16 @@ import {
   IconButton,
   Grid,
   Checkbox,
-  ExpansionPanel,
-  ExpansionPanelSummary,
-  ExpansionPanelDetails,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
   Tooltip,
   Divider,
   TextField,
-} from '@material-ui/core'
+} from '@mui/material'
 import StatsType from 'data/types/StatsEnum'
-import { useTheme } from '@material-ui/core/styles'
-import { Close, Check, Add, Edit, Delete } from '@material-ui/icons'
+import { useTheme } from '@mui/material/styles'
+import { Close, Check, Add, Edit, Delete } from '@mui/icons-material'
 import TextFieldNumber from 'components/text-field-number/TextFieldNumber'
 import TextFieldString from 'components/text-field-string/TextFieldString'
 import PG from 'pages/stats/models/PG'
@@ -36,7 +36,6 @@ import { RacesEnum, SubRacesEnum } from 'data/types/RacesEnum'
 import DataUtils from 'data/DataUtils'
 import RaceAbility from 'data/types/RaceAbility'
 import Privileges from 'data/types/Privileges'
-import ExpansionPanelItem from 'components/expansion-panel-item/ExpansionPanelItem'
 import ConfirmDialog from 'components/confirm-dialog/ConfirmDialog'
 import RestType from 'data/types/RestType'
 import Job from 'data/types/Job'
@@ -45,6 +44,7 @@ import { firebaseApp } from 'App'
 import Race from 'data/types/Race'
 import CustomAbilities from 'components/blocks/battle/CustomAbilities'
 import CustomAbility from 'pages/stats/models/CustomAbility'
+import AccordionItem from 'components/expansion-panel-item/ExpansionPanelItem'
 
 export interface Modifier {
   type: string
@@ -111,7 +111,7 @@ function BattleView(props: BattleViewProps) {
   const [races, setRaces] = useState<Race[]>([])
   const [subRaces, setSubRaces] = useState<Race[]>([])
   const theme = useTheme()
-  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
+  const fullScreen = useMediaQuery(theme.breakpoints.down('lg'))
 
   const getCA = useCallback(() => {
     let count = 0
@@ -587,6 +587,7 @@ function BattleView(props: BattleViewProps) {
                       disabled={onEdit}
                       onClick={() => onChangeCurrentPf(-value)}
                       className={classes.pfModifier}
+                      size="large"
                     >
                       <Typography variant="subtitle1">-{value}</Typography>
                     </IconButton>
@@ -621,6 +622,7 @@ function BattleView(props: BattleViewProps) {
                       disabled={onEdit}
                       onClick={() => onChangeCurrentPf(value)}
                       className={classes.pfModifier}
+                      size="large"
                     >
                       <Typography variant="subtitle1">+{value}</Typography>
                     </IconButton>
@@ -638,7 +640,10 @@ function BattleView(props: BattleViewProps) {
             Armature e scudi
           </Typography>
           <Tooltip title="Aggiungi armatura o scudo">
-            <IconButton onClick={() => setArmorDialogOpen(!armorDialogOpen)}>
+            <IconButton
+              onClick={() => setArmorDialogOpen(!armorDialogOpen)}
+              size="large"
+            >
               <Add />
             </IconButton>
           </Tooltip>
@@ -646,7 +651,7 @@ function BattleView(props: BattleViewProps) {
 
         {pg.armors.map((armorInfo: ArmorInfo, index: number) => {
           return (
-            <ExpansionPanelItem
+            <AccordionItem
               key={`${armorInfo.armor.id}_${index}`}
               id={armorInfo.armor.id}
               name={`${armorInfo.armor.name}${
@@ -668,6 +673,7 @@ function BattleView(props: BattleViewProps) {
                             setArmorDialogOpen(!armorDialogOpen)
                           }}
                           className={classes.expansionPanelIcon}
+                          size="large"
                         >
                           <Edit />
                         </IconButton>
@@ -680,6 +686,7 @@ function BattleView(props: BattleViewProps) {
                             setAskDeleteArmorOrWeapon(true)
                           }}
                           className={classes.expansionPanelIcon}
+                          size="large"
                         >
                           <Delete />
                         </IconButton>
@@ -771,7 +778,7 @@ function BattleView(props: BattleViewProps) {
                   </React.Fragment>
                 )}
               </React.Fragment>
-            </ExpansionPanelItem>
+            </AccordionItem>
           )
         })}
         {pg.armors.length === 0 && (
@@ -799,7 +806,10 @@ function BattleView(props: BattleViewProps) {
             Armi
           </Typography>
           <Tooltip title="Aggiungi armi">
-            <IconButton onClick={() => setWeaponDialogOpen(!weaponDialogOpen)}>
+            <IconButton
+              onClick={() => setWeaponDialogOpen(!weaponDialogOpen)}
+              size="large"
+            >
               <Add />
             </IconButton>
           </Tooltip>
@@ -809,7 +819,7 @@ function BattleView(props: BattleViewProps) {
           const weaponDamageBonus = getWeaponDamageBonus(weaponInfo)
           const id = `${weaponInfo.weapon.id}_${index}`
           return (
-            <ExpansionPanelItem
+            <AccordionItem
               key={id}
               id={id}
               name={`${weaponInfo.weapon.name}${
@@ -832,6 +842,7 @@ function BattleView(props: BattleViewProps) {
                             setWeaponDialogOpen(!weaponDialogOpen)
                           }}
                           className={classes.expansionPanelIcon}
+                          size="large"
                         >
                           <Edit />
                         </IconButton>
@@ -843,6 +854,7 @@ function BattleView(props: BattleViewProps) {
                             setWeaponSelected(weaponInfo)
                             setAskDeleteArmorOrWeapon(true)
                           }}
+                          size="large"
                         >
                           <Delete />
                         </IconButton>
@@ -917,7 +929,7 @@ function BattleView(props: BattleViewProps) {
                   </React.Fragment>
                 )}
               </React.Fragment>
-            </ExpansionPanelItem>
+            </AccordionItem>
           )
         })}
         {pg.weapons.length === 0 && (
@@ -971,7 +983,7 @@ function BattleView(props: BattleViewProps) {
           {raceAbilities.map((raceAbility) => {
             return (
               <Grid item xs={12} sm={6} md={4} lg={3} key={raceAbility.name}>
-                <ExpansionPanel
+                <Accordion
                   square
                   expanded={abilityExpanded === raceAbility.name}
                   onChange={() =>
@@ -980,17 +992,17 @@ function BattleView(props: BattleViewProps) {
                       : setAbilityExpanded(raceAbility.name)
                   }
                 >
-                  <ExpansionPanelSummary>
+                  <AccordionSummary>
                     <Typography variant="subtitle2" itemType="span">
                       {raceAbility.name}:
                     </Typography>
-                  </ExpansionPanelSummary>
-                  <ExpansionPanelDetails>
+                  </AccordionSummary>
+                  <AccordionDetails>
                     <Typography variant="body2" itemType="span">
                       {raceAbility.description}
                     </Typography>
-                  </ExpansionPanelDetails>
-                </ExpansionPanel>
+                  </AccordionDetails>
+                </Accordion>
               </Grid>
             )
           })}
@@ -1012,7 +1024,7 @@ function BattleView(props: BattleViewProps) {
               {privileges.map((privilege) => {
                 return (
                   <Grid item xs={12} sm={6} md={4} lg={3} key={privilege.type}>
-                    <ExpansionPanel
+                    <Accordion
                       square
                       expanded={privilegeExpanded === privilege.type}
                       onChange={() =>
@@ -1021,9 +1033,7 @@ function BattleView(props: BattleViewProps) {
                           : setPrivilegeExpanded(privilege.type)
                       }
                     >
-                      <ExpansionPanelSummary
-                        className={classes.privilegeSummary}
-                      >
+                      <AccordionSummary className={classes.privilegeSummary}>
                         <Typography variant="subtitle2" itemType="span">
                           {privilege.name}:
                         </Typography>
@@ -1078,8 +1088,8 @@ function BattleView(props: BattleViewProps) {
                               </Button>
                             )}
                         </div>
-                      </ExpansionPanelSummary>
-                      <ExpansionPanelDetails>
+                      </AccordionSummary>
+                      <AccordionDetails>
                         <Typography
                           variant="body2"
                           itemType="span"
@@ -1087,8 +1097,8 @@ function BattleView(props: BattleViewProps) {
                             __html: privilege.description,
                           }}
                         />
-                      </ExpansionPanelDetails>
-                    </ExpansionPanel>
+                      </AccordionDetails>
+                    </Accordion>
                   </Grid>
                 )
               })}
@@ -1124,6 +1134,7 @@ function BattleView(props: BattleViewProps) {
               <IconButton
                 className={classes.closeDialog}
                 onClick={() => setCaModifiersOpen(false)}
+                size="large"
               >
                 <Close />
               </IconButton>

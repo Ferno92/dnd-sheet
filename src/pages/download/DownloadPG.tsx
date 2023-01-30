@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { CircularProgress } from '@material-ui/core'
+import { CircularProgress } from '@mui/material'
 import { RouteComponentProps } from 'react-router-dom'
 import { firebaseApp, firebaseConfig } from 'App'
 import Dexie from 'dexie'

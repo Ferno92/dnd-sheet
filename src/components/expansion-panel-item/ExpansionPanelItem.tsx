@@ -1,16 +1,16 @@
 import React from 'react'
 import {
-  ExpansionPanel,
-  ExpansionPanelSummary,
+  Accordion,
+  AccordionSummary,
   Typography,
-  ExpansionPanelDetails,
+  AccordionDetails,
   Checkbox,
-} from '@material-ui/core'
-import useStyles from './ExpansionPanelItem.styles'
-import { ExpandMore } from '@material-ui/icons'
+} from '@mui/material'
+import { ExpandMore } from '@mui/icons-material'
 import clsx from 'clsx'
+import useStyles from './ExpansionPanelItem.styles'
 
-interface ExpansionPanelItemProps {
+interface AccordionItemProps {
   id: string
   name: string
   extra?: string
@@ -29,8 +29,8 @@ interface ExpansionPanelItemProps {
   onChangeCheckbox: (id: string, checked: boolean) => void
 }
 
-const ExpansionPanelItem: React.FC<ExpansionPanelItemProps> = (
-  props: ExpansionPanelItemProps
+const AccordionItem: React.FC<AccordionItemProps> = (
+  props: AccordionItemProps
 ) => {
   const {
     expanded,
@@ -61,13 +61,13 @@ const ExpansionPanelItem: React.FC<ExpansionPanelItemProps> = (
         alignItems: expanded ? 'flex-start' : 'center',
       }}
     >
-      <ExpansionPanel
+      <Accordion
         square
         expanded={expanded}
         onChange={onExpand}
         className={styles.panel}
       >
-        <ExpansionPanelSummary
+        <AccordionSummary
           expandIcon={extra ? undefined : <ExpandMore />}
           className={checked ? styles.highlight : undefined}
         >
@@ -97,14 +97,14 @@ const ExpansionPanelItem: React.FC<ExpansionPanelItemProps> = (
               {extra}
             </Typography>
           </div>
-        </ExpansionPanelSummary>
-        <ExpansionPanelDetails className={styles.details}>
+        </AccordionSummary>
+        <AccordionDetails className={styles.details}>
           {children}
-        </ExpansionPanelDetails>
-      </ExpansionPanel>
+        </AccordionDetails>
+      </Accordion>
       {RightIconButtons && RightIconButtons.map((Button) => Button)}
     </div>
   )
 }
 
-export default ExpansionPanelItem
+export default AccordionItem

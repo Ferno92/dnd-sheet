@@ -1,6 +1,6 @@
 import React from 'react'
-import { IconButton, Typography } from '@material-ui/core'
-import { Remove, Add } from '@material-ui/icons'
+import { IconButton, Typography } from '@mui/material'
+import { Remove, Add } from '@mui/icons-material'
 import useStyles from './ClassLevel.styles'
 
 export interface ClassLevelProps {
@@ -22,7 +22,7 @@ const ClassLevel: React.FC<ClassLevelProps> = (props: ClassLevelProps) => {
           onClick={onRemove}
           className={styles.iconButton}
           disabled={level <= 1}
-        >
+          size="large">
           <Remove />
         </IconButton>
       )}
@@ -35,12 +35,12 @@ const ClassLevel: React.FC<ClassLevelProps> = (props: ClassLevelProps) => {
           onClick={onAdd}
           className={styles.iconButton}
           disabled={level >= max - 1}
-        >
+          size="large">
           <Add />
         </IconButton>
       )}
     </div>
-  )
+  );
 }
 
 export default ClassLevel

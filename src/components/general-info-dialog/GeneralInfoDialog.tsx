@@ -11,13 +11,13 @@ import {
   IconButton,
   TextField,
   Snackbar,
-} from '@material-ui/core'
+} from '@mui/material'
 import PG from 'pages/stats/models/PG'
 import TextFieldNumber from 'components/text-field-number/TextFieldNumber'
-import { Add, Close, Delete } from '@material-ui/icons'
+import { Add, Close, Delete } from '@mui/icons-material'
 import useStyles from './GeneralInfoDialog.styles'
 import PgGeneralInfo from 'data/types/PgGeneralInfo'
-import MuiAlert from '@material-ui/lab/Alert'
+import MuiAlert from '@mui/material/Alert'
 import { RacesEnum } from 'data/types/RacesEnum'
 import DataUtils from 'data/DataUtils'
 import TextFieldUpdateOnBlur from 'components/text-field-updateOnBlur/TextFieldUpdateOnBlur'
@@ -177,7 +177,7 @@ const GeneralInfoDialog: React.FC<GeneralInfoDialogProps> = (
     >
       <DialogTitle className={styles.dialogTitle}>
         <Typography>Modifica Info Generali</Typography>
-        <IconButton className={styles.closeDialog} onClick={() => onClose()}>
+        <IconButton className={styles.closeDialog} onClick={() => onClose()} size="large">
           <Close />
         </IconButton>
       </DialogTitle>
@@ -245,7 +245,7 @@ const GeneralInfoDialog: React.FC<GeneralInfoDialogProps> = (
         </div>
         <div className={styles.flexContainer}>
           <Typography variant="body1">Linguaggi</Typography>
-          <IconButton onClick={onAddLanguage}>
+          <IconButton onClick={onAddLanguage} size="large">
             <Add />
           </IconButton>
         </div>
@@ -264,7 +264,7 @@ const GeneralInfoDialog: React.FC<GeneralInfoDialogProps> = (
                 autoFocus={languages[index] === ''}
                 onBlur={(text) => onChangeLanguage(text, index)}
               />
-              <IconButton onClick={() => removeLanguage(index)}>
+              <IconButton onClick={() => removeLanguage(index)} size="large">
                 <Delete />
               </IconButton>
             </div>
@@ -291,7 +291,7 @@ const GeneralInfoDialog: React.FC<GeneralInfoDialogProps> = (
         </MuiAlert>
       </Snackbar>
     </Dialog>
-  )
+  );
 }
 
 export default GeneralInfoDialog

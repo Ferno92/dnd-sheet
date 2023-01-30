@@ -9,8 +9,8 @@ import {
   Button,
   DialogActions,
   TextField
-} from '@material-ui/core'
-import { Close } from '@material-ui/icons'
+} from '@mui/material'
+import { Close } from '@mui/icons-material'
 import useEquipmentDialogStyles from './EquipmentDialog.styles'
 import TextFieldNumber from 'components/text-field-number/TextFieldNumber'
 import EquipmentObject from 'pages/equipment/EquipmentObject'
@@ -48,7 +48,7 @@ const EquipmentDialog: React.FC<EquipmentDialogProps> = (
     >
       <DialogTitle className={styles.dialogTitle}>
         <Typography>Nuovo Oggetto:</Typography>
-        <IconButton className={styles.closeDialog} onClick={() => onClose()}>
+        <IconButton className={styles.closeDialog} onClick={() => onClose()} size="large">
           <Close />
         </IconButton>
       </DialogTitle>
@@ -112,7 +112,7 @@ const EquipmentDialog: React.FC<EquipmentDialogProps> = (
         </Button>
       </DialogActions>
     </Dialog>
-  )
+  );
 }
 
 export default EquipmentDialog

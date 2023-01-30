@@ -1,8 +1,8 @@
 import React from 'react'
 import MixedInputStyles from './MixedInput.styles'
-import { Add, DragHandle } from '@material-ui/icons'
+import { Add, DragHandle } from '@mui/icons-material'
 import TextFieldNumber from 'components/text-field-number/TextFieldNumber'
-import { Typography } from '@material-ui/core'
+import { Typography } from '@mui/material'
 
 interface Modifier {
   type: string

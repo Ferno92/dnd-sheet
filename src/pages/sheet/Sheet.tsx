@@ -1,18 +1,18 @@
 import React, { Component } from 'react'
 import SheetStyles from './Sheet.styles'
-import { WithStyles } from '@material-ui/styles'
+import { WithStyles, WithTheme } from '@mui/styles'
 import {
-  withStyles,
   BottomNavigation,
   BottomNavigationAction,
-  WithTheme,
   Fab,
   Tooltip,
   MenuItem,
   ListItemIcon,
   ListItemText,
   Snackbar,
-} from '@material-ui/core'
+  SelectChangeEvent,
+} from '@mui/material'
+import withStyles from '@mui/styles/withStyles'
 import { ReactComponent as FightIcon } from 'assets/images/swords.svg'
 import { ReactComponent as ProfileIcon } from 'assets/images/viking.svg'
 import { ReactComponent as BackpackIcon } from 'assets/images/backpack.svg'
@@ -26,7 +26,7 @@ import {
   Hotel,
   Restaurant,
   Restore,
-} from '@material-ui/icons'
+} from '@mui/icons-material'
 import SwipeableViews from 'react-swipeable-views'
 import StatsView from 'pages/stats/StatsView'
 import { RouteComponentProps, withRouter, Prompt } from 'react-router-dom'
@@ -51,7 +51,7 @@ import SpellsByLevel from 'data/types/SpellsByLevel'
 import _, { has } from 'lodash'
 import PgGeneralInfo from 'data/types/PgGeneralInfo'
 import RestType from 'data/types/RestType'
-import MuiAlert from '@material-ui/lab/Alert'
+import MuiAlert from '@mui/material/Alert'
 import BattleUtils from 'utils/BattleUtils'
 import { firebaseApp } from 'App'
 import {
@@ -72,7 +72,7 @@ import BackupPG from 'pages/stats/models/BackupPG'
 import ConfirmDialog from 'components/confirm-dialog/ConfirmDialog'
 import DataUtils from 'data/DataUtils'
 import Race from 'data/types/Race'
-import { SpeedDial, SpeedDialAction, SpeedDialIcon } from '@material-ui/lab'
+import { SpeedDial, SpeedDialAction, SpeedDialIcon } from '@mui/material'
 import CustomAbility from 'pages/stats/models/CustomAbility'
 
 interface SheetProps {
@@ -543,12 +543,7 @@ class Sheet extends Component<
     this.setState({ pg: { ...pg, stats: tempStats } })
   }
 
-  onChangeRace = (
-    event: React.ChangeEvent<{
-      name?: string | undefined
-      value: unknown
-    }>
-  ) => {
+  onChangeRace = (event: SelectChangeEvent<string>, child: React.ReactNode) => {
     let { pg, races, subRaces } = this.state
     const value = event.target.value as RacesEnum
     const race = races.find((r) => r.type === value.toString())
@@ -560,10 +555,8 @@ class Sheet extends Component<
   }
 
   onChangeSubRace = (
-    event: React.ChangeEvent<{
-      name?: string | undefined
-      value: unknown
-    }>
+    event: SelectChangeEvent<string>,
+    child: React.ReactNode
   ) => {
     let { pg, races, subRaces } = this.state
     const value = event.target.value as SubRacesEnum
@@ -1056,10 +1049,8 @@ class Sheet extends Component<
   }
 
   onChangeBackground = (
-    event: React.ChangeEvent<{
-      name?: string | undefined
-      value: unknown
-    }>
+    event: SelectChangeEvent<string>,
+    child: React.ReactNode
   ) => {
     const { pg } = this.state
     const background = event.target.value as string
@@ -1494,10 +1485,10 @@ class Sheet extends Component<
             </SpeedDial>
           ))}
         <SwipeableViews
-          axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
+          axis="x"
           index={pageIndex}
           onChangeIndex={this.onSwipePage}
-          disabled={backup != undefined}
+          disabled={backup !== undefined}
           className={classes.swipeableViews}
         >
           {swipeableViews.map((item) => item)}

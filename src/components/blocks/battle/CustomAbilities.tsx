@@ -1,12 +1,12 @@
 import {
-  ExpansionPanel,
-  ExpansionPanelSummary,
+  Accordion,
+  AccordionSummary,
   Typography,
-  ExpansionPanelDetails,
+  AccordionDetails,
   IconButton,
   Grid,
-} from '@material-ui/core'
-import { Add, Edit } from '@material-ui/icons'
+} from '@mui/material'
+import { Add, Edit } from '@mui/icons-material'
 import CustomAbilitiesDialog from 'components/dialogs/custom-abilities-dialog/CustomAbilitiesDialog'
 import CustomAbility from 'pages/stats/models/CustomAbility'
 import React, { useState } from 'react'
@@ -48,7 +48,7 @@ const CustomAbilities: React.FC<CustomAbilitiesProps> = (
                 description: '',
               })
             }}
-          >
+            size="large">
             <Add />
           </IconButton>
         )}
@@ -65,7 +65,7 @@ const CustomAbilities: React.FC<CustomAbilitiesProps> = (
               key={a.id}
               className={styles.item}
             >
-              <ExpansionPanel
+              <Accordion
                 square
                 expanded={customAbilityExpanded === a.id}
                 onChange={() =>
@@ -75,24 +75,24 @@ const CustomAbilities: React.FC<CustomAbilitiesProps> = (
                 }
                 className={styles.expandedItem}
               >
-                <ExpansionPanelSummary>
+                <AccordionSummary>
                   <Typography variant="subtitle2" itemType="span">
                     {a.title}:
                   </Typography>
-                </ExpansionPanelSummary>
-                <ExpansionPanelDetails>
+                </AccordionSummary>
+                <AccordionDetails>
                   <Typography variant="body2" itemType="span">
                     {a.description}
                   </Typography>
-                </ExpansionPanelDetails>
-              </ExpansionPanel>
+                </AccordionDetails>
+              </Accordion>
               {onEdit && (
-                <IconButton onClick={() => setSelected(a)}>
+                <IconButton onClick={() => setSelected(a)} size="large">
                   <Edit />
                 </IconButton>
               )}
             </Grid>
-          )
+          );
         })}
       </Grid>
       {(customAbilities?.length === 0 ||
@@ -117,6 +117,6 @@ const CustomAbilities: React.FC<CustomAbilitiesProps> = (
         />
       )}
     </div>
-  )
+  );
 }
 export default CustomAbilities

@@ -1,15 +1,16 @@
 import {
   Avatar,
   Checkbox,
-  ExpansionPanel,
-  ExpansionPanelDetails,
-  ExpansionPanelSummary,
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   FormControlLabel,
   IconButton,
   Typography,
-} from '@material-ui/core'
-import { Breakpoint } from '@material-ui/core/styles/createBreakpoints'
-import { AccountCircle, Edit, ExpandMore } from '@material-ui/icons'
+  SelectChangeEvent,
+} from '@mui/material'
+import { Breakpoint } from '@mui/material/styles'
+import { AccountCircle, Edit, ExpandMore } from '@mui/icons-material'
 import clsx from 'clsx'
 import SimpleSelect from 'components/simple-select/SimpleSelect'
 import TextFieldString from 'components/text-field-string/TextFieldString'
@@ -38,23 +39,17 @@ interface ResumeComponentProps {
   backgroundData: Background[]
   onChangeJob: (job: JobsEnum, secondary?: boolean) => void
   onChangeSubJob: (job: SubJobsEnum, secondary?: boolean) => void
-  onChangeBackground: (
-    event: React.ChangeEvent<{
-      name?: string | undefined
-      value: unknown
-    }>
+  onChangeBackground: <T extends string>(
+    event: SelectChangeEvent<T>,
+    child: React.ReactNode
   ) => void
-  onChangeRace: (
-    event: React.ChangeEvent<{
-      name?: string | undefined
-      value: unknown
-    }>
+  onChangeRace: <T extends string>(
+    event: SelectChangeEvent<T>,
+    child: React.ReactNode
   ) => void
-  onChangeSubRace: (
-    event: React.ChangeEvent<{
-      name?: string | undefined
-      value: unknown
-    }>
+  onChangeSubRace: <T extends string>(
+    event: SelectChangeEvent<T>,
+    child: React.ReactNode
   ) => void
   onChangeMulticlass: (multi: boolean) => void
   onEditName: (value: string) => void
@@ -372,7 +367,11 @@ const ResumeComponent: React.FC<ResumeComponentProps> = (
           onChange={inputImageCallback}
         />
         {onEdit && (
-          <IconButton className={styles.editAvatar} onClick={onEditAvatar}>
+          <IconButton
+            className={styles.editAvatar}
+            onClick={onEditAvatar}
+            size="large"
+          >
             <Edit />
           </IconButton>
         )}
@@ -501,9 +500,7 @@ const ResumeComponent: React.FC<ResumeComponentProps> = (
         item={backgroundFromState}
         data={backgroundData}
         onEdit={onEdit}
-        onChange={(event) => {
-          onChangeBackground(event)
-        }}
+        onChange={onChangeBackground}
         root={styles.infoDetailsItem}
       />{' '}
     </React.Fragment>
@@ -512,18 +509,18 @@ const ResumeComponent: React.FC<ResumeComponentProps> = (
   return (
     <>
       {width === 'xs' || width === 'sm' ? (
-        <ExpansionPanel
+        <Accordion
           square
           expanded={infoExpanded}
           onChange={() => setInfoExpanded(!infoExpanded)}
         >
-          <ExpansionPanelSummary expandIcon={<ExpandMore />}>
+          <AccordionSummary expandIcon={<ExpandMore />}>
             {summary}
-          </ExpansionPanelSummary>
-          <ExpansionPanelDetails className={styles.infoDetails}>
+          </AccordionSummary>
+          <AccordionDetails className={styles.infoDetails}>
             {panelDetail}
-          </ExpansionPanelDetails>
-        </ExpansionPanel>
+          </AccordionDetails>
+        </Accordion>
       ) : (
         <div>
           {infoReadOnly}

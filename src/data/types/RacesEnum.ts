@@ -1,9 +1,9 @@
 export enum RacesEnum {
-  Umano,
-  Nano,
-  Elfo,
-  Tiefling,
-  Mezzelfo
+  Umano = "Umano",
+  Nano = "Nano",
+  Elfo = "Elfo",
+  Tiefling = "Tiefling",
+  Mezzelfo = "Mezzelfo"
 }
 export enum SubRacesEnum {
   Colline = 'nano_colline',

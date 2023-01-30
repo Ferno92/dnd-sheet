@@ -1,27 +1,7 @@
-import { Theme } from '@material-ui/core/styles/createMuiTheme'
-import { Variant } from '@material-ui/core/styles/createTypography'
-import { Color } from '@material-ui/core'
+import { Theme } from '@mui/material/styles';
+import { Color } from '@mui/material'
 
-declare module '@material-ui/core/styles/createMuiTheme' {
-  interface Theme {
-    highlightSearchWords: {
-      fontWeight: React.CSSProperties['fontWeight']
-      color: string
-      backgroundColor: string
-    }
-  }
-
-  // Allow configuration using `createMuiTheme`
-  interface ThemeOptions {
-    highlightSearchWords?: {
-      fontWeight?: React.CSSProperties['fontWeight']
-      color?: string
-      backgroundColor?: string
-    }
-  }
-}
-
-declare module '@material-ui/core/styles/createPalette' {
+declare module '@mui/material/styles/createPalette' {
   interface Palette {
     backgroundSecondary: TypeBackground
     success: PaletteColor
@@ -48,7 +28,7 @@ declare module '@material-ui/core/styles/createPalette' {
   }
 }
 
-declare module '@material-ui/core/styles/createTypography' {
+declare module '@mui/material/styles/createTypography' {
   interface Typography
     extends Record<Variant, TypographyStyle>,
       FontStyle,

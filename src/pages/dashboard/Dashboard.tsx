@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useContext } from 'react'
 import Dexie from 'dexie'
 import PG from 'pages/stats/models/PG'
-import { Add, Delete } from '@material-ui/icons'
+import { Add, Delete } from '@mui/icons-material'
 import { ReactComponent as OrcIcon } from 'assets/images/orc.svg'
 import {
   Typography,
@@ -13,14 +13,14 @@ import {
   IconButton,
   ListItemSecondaryAction,
   Tooltip,
-} from '@material-ui/core'
+} from '@mui/material'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
 import DashboardStyles from './Dashboard.styles'
 import ConfirmDialog from 'components/confirm-dialog/ConfirmDialog'
-import Skeleton from '@material-ui/lab/Skeleton'
+import Skeleton from '@mui/material/Skeleton'
 import StatsUtils from 'utils/StatsUtils'
 import LoginDialog from 'components/login-dialog/LoginDialog'
-import BrightnessIcon from '@material-ui/icons/Brightness6'
+import BrightnessIcon from '@mui/icons-material/Brightness6'
 import { ThemeContext } from 'index'
 import { useGoogleOneTapLogin } from 'react-google-one-tap-login'
 import { firebaseApp } from 'App'
@@ -290,7 +290,7 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
     <div className={classes.root}>
       <div className={classes.header}>
         <div className={classes.loginButtonContainer}>
-          <IconButton onClick={toggleDarkMode}>
+          <IconButton onClick={toggleDarkMode} size="large">
             <BrightnessIcon />
           </IconButton>
         </div>
@@ -298,7 +298,7 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
           I tuoi personaggi
         </Typography>
         <div className={classes.rightAction}>
-          <IconButton onClick={() => setShowLoginDialog(true)}>
+          <IconButton onClick={() => setShowLoginDialog(true)} size="large">
             <Avatar alt="User" src={user?.picture} />
           </IconButton>
         </div>
@@ -309,18 +309,18 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
           ? [...Array(3).keys()].map((i) => {
               return (
                 <div className={classes.skeletonContainer} key={i}>
-                  <Skeleton variant="circle" height={50} width={50} />
+                  <Skeleton variant="circular" height={50} width={50} />
                   <div className={classes.skeletonInfo}>
                     <Skeleton
-                      variant="rect"
+                      variant="rectangular"
                       height={24}
                       width={200}
                       className={classes.skeleton}
                     />
-                    <Skeleton variant="rect" height={16} width={160} />
+                    <Skeleton variant="rectangular" height={16} width={160} />
                   </div>
                 </div>
-              )
+              );
             })
           : pgs.map((pg: PG, i: number) => (
               <ListItem
@@ -357,7 +357,7 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
                 />
                 <ListItemSecondaryAction>
                   <Tooltip title="Elimina personaggio">
-                    <IconButton onClick={() => setPgToDelete(pg)}>
+                    <IconButton onClick={() => setPgToDelete(pg)} size="large">
                       <Delete />
                     </IconButton>
                   </Tooltip>
@@ -415,7 +415,7 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
         match={props.match}
       />
     </div>
-  )
+  );
 }
 
 export default withRouter(Dashboard)

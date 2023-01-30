@@ -1,5 +1,5 @@
 import Theme from 'assets/styles/Theme'
-import { makeStyles } from '@material-ui/styles'
+import { makeStyles } from '@mui/styles'
 import { ClassLevelProps } from './ClassLevel'
 
 const useStyles = makeStyles((theme: Theme) => ({

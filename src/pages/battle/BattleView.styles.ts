@@ -1,5 +1,5 @@
 import Theme from 'assets/styles/Theme'
-import { makeStyles } from '@material-ui/styles'
+import { makeStyles } from '@mui/styles'
 import ColorUtils from 'utils/ColorUtils'
 
 const BattleViewStyles = makeStyles((theme: Theme) => ({

@@ -1,8 +1,8 @@
 import React from "react";
-import { Add, DragHandle } from "@material-ui/icons";
+import { Add, DragHandle } from "@mui/icons-material";
 import TextFieldNumber from "components/text-field-number/TextFieldNumber";
 import MixedInputGridStyles from "./MixedInputGrid.styles";
-import { Grid } from "@material-ui/core";
+import { Grid } from "@mui/material";
 
 interface Modifier {
   type: string;

@@ -6,7 +6,8 @@ import {
   OutlinedInput,
   MenuItem,
   ListSubheader,
-} from '@material-ui/core'
+  SelectChangeEvent,
+} from '@mui/material'
 import { createRef, useState, useEffect } from 'react'
 import SimpleSelectStyles from './SimpleSelect.styles'
 import SimpleSelectItem from 'data/types/SimpleSelectItem'
@@ -18,18 +19,14 @@ interface SimpleSelectProps<T> {
   label: string
   onEdit: boolean
   root?: string
-  onChange(
-    event: React.ChangeEvent<{
-      name?: string | undefined
-      value: unknown
-    }>
-  ): void
+  onChange(event: SelectChangeEvent<T>, child: React.ReactNode): void
 }
 
 function SimpleSelect<T>(props: SimpleSelectProps<T>) {
   const { item, data: dataList, onEdit, onChange, label, root } = props
   const inputLabelRef = createRef<any>()
   const classes = SimpleSelectStyles()
+  /*
   const [labelWidth, setLabelWidth] = useState(0)
   useEffect(() => {
     const current: any = inputLabelRef.current
@@ -37,7 +34,7 @@ function SimpleSelect<T>(props: SimpleSelectProps<T>) {
       setLabelWidth(current.offsetWidth)
     }
   }, [inputLabelRef])
-
+*/
   return (
     <FormControl
       variant="outlined"
@@ -56,7 +53,7 @@ function SimpleSelect<T>(props: SimpleSelectProps<T>) {
         onChange={onChange}
         input={
           <OutlinedInput
-            labelWidth={labelWidth}
+            //labelWidth={labelWidth}
             name="race"
             id="outlined-select-simple"
             disabled={!onEdit}
@@ -64,7 +61,7 @@ function SimpleSelect<T>(props: SimpleSelectProps<T>) {
         }
         disabled={!onEdit}
       >
-        {dataList.map(data => {
+        {dataList.map((data) => {
           return data.type.toString() === 'SubHeader' ? (
             <ListSubheader key={data.type + data.value}>
               {data.value}

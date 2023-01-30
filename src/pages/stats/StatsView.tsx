@@ -1,53 +1,42 @@
 import React, { Component, createRef } from 'react'
-import { WithStyles } from '@material-ui/styles'
+import { WithStyles } from '@mui/styles'
 import {
-  withStyles,
-  Grid,
   Typography,
   Divider,
-  Checkbox,
-  IconButton,
-  ExpansionPanel,
-  ExpansionPanelSummary,
-  ExpansionPanelDetails,
-  FormControlLabel,
-  LinearProgress,
   Dialog,
   Button,
   DialogActions,
   DialogTitle,
   DialogContent,
   DialogContentText,
-  Tooltip,
-  withWidth,
-  WithWidth,
-} from '@material-ui/core'
+  Breakpoint,
+  Theme,
+  useMediaQuery,
+  useTheme,
+  SelectChangeEvent,
+} from '@mui/material'
+import withStyles from '@mui/styles/withStyles'
 import StatsViewStyles from './StatsView.styles'
-import TextFieldNumber from 'components/text-field-number/TextFieldNumber'
 import PG from './models/PG'
-import MixedInput, { InputPosition } from 'components/mixed-input/MixedInput'
-import StatsType from 'data/types/StatsEnum'
-import TextUtils from 'utils/TextUtils'
 import { default as abilitiesJSON } from 'data/json/AbilitiesJSON'
 import { default as backgroundJSON } from 'data/json/BackgroundJSON'
 import DataUtils from 'data/DataUtils'
 import { JobsEnum, SubJobsEnum } from 'data/types/JobsEnum'
 import AbilitiesEnum from 'data/types/AbilitiesEnum'
-import { ErrorOutline, AccessTime } from '@material-ui/icons'
-import InfoDialog from 'components/info-dialog/InfoDialog'
-import StatsUtils, { Proficiency } from 'utils/StatsUtils'
-import Ability from 'data/types/Ability'
-import ExpansionPanelItem from 'components/expansion-panel-item/ExpansionPanelItem'
 import EquipmentObject from 'pages/equipment/EquipmentObject'
 import clsx from 'clsx'
 import GeneralInfoDialog from 'components/general-info-dialog/GeneralInfoDialog'
 import PgGeneralInfo from 'data/types/PgGeneralInfo'
-import ConfirmDialog from 'components/confirm-dialog/ConfirmDialog'
 import Job from 'data/types/Job'
 import { firebaseApp } from 'App'
 import Race from 'data/types/Race'
 import ResumeComponent from 'components/blocks/stats/resume'
 import GeneralInfoComponent from 'components/blocks/stats/GeneralInfo'
+import LevelComponent from 'components/blocks/stats/LevelComponent'
+import StatsComponent from 'components/blocks/stats/StatsComponent'
+import TsComponent from 'components/blocks/stats/TsComponent'
+import AbilitiesComponent from 'components/blocks/stats/AbilitiesComponent'
+import { Proficiency } from 'utils/StatsUtils'
 
 interface StatsViewProps {
   onEdit: boolean
@@ -64,25 +53,19 @@ interface StatsViewProps {
     temp?: boolean,
     tsTemp?: boolean
   ) => void
-  onChangeRace: (
-    event: React.ChangeEvent<{
-      name?: string | undefined
-      value: unknown
-    }>
+  onChangeRace: <T extends string>(
+    event: SelectChangeEvent<T>,
+    child: React.ReactNode
   ) => void
-  onChangeSubRace: (
-    event: React.ChangeEvent<{
-      name?: string | undefined
-      value: unknown
-    }>
+  onChangeSubRace: <T extends string>(
+    event: SelectChangeEvent<T>,
+    child: React.ReactNode
   ) => void
   onChangeJob: (job: JobsEnum, secondary?: boolean) => void
   onChangeSubJob: (job: SubJobsEnum, secondary?: boolean) => void
-  onChangeBackground: (
-    event: React.ChangeEvent<{
-      name?: string | undefined
-      value: unknown
-    }>
+  onChangeBackground: <T extends string>(
+    event: SelectChangeEvent<T>,
+    child: React.ReactNode
   ) => void
   onChangeAbilityCheck: (type: AbilitiesEnum, checked: boolean) => void
   onChangeAbilityPoints: (type: AbilitiesEnum, value: number) => void
@@ -96,17 +79,10 @@ interface StatsViewProps {
 }
 
 interface StatsViewState {
-  dialogInfoAbilitiesOpen: boolean
-  infoExpanded: boolean
-  tsExpanded?: string
-  abilityExpanded?: string
-  peFromState: number
-  tempPE?: number
   backgroundFromState: string
   showBackgroundItems: boolean
   generalInfoDialogOpen: boolean
   tempStatMode: boolean
-  askDeleteTempStat: boolean
   jobs: Job[]
   subjobs: Job[]
   races: Race[]
@@ -114,28 +90,22 @@ interface StatsViewState {
 }
 
 class StatsView extends Component<
-  StatsViewProps & WithWidth & WithStyles<typeof StatsViewStyles>,
+  StatsViewProps & WithStyles<typeof StatsViewStyles>,
   StatsViewState
 > {
   inputLabel = createRef<any>()
   backgroundData = DataUtils.BackgroundMapper(backgroundJSON as any)
   abilitiesData = DataUtils.AbilityMapper(abilitiesJSON as any)
 
-  constructor(
-    props: StatsViewProps & WithWidth & WithStyles<typeof StatsViewStyles>
-  ) {
+  constructor(props: StatsViewProps & WithStyles<typeof StatsViewStyles>) {
     super(props)
 
     this.state = {
-      dialogInfoAbilitiesOpen: false,
-      infoExpanded: false,
-      peFromState: props.pg.pe,
       backgroundFromState: props.pg.background,
       showBackgroundItems: false,
       generalInfoDialogOpen: false,
       tempStatMode:
         props.pg.stats.find((stat) => stat.temp !== undefined) !== undefined,
-      askDeleteTempStat: false,
       jobs: [],
       subjobs: [],
       races: [],
@@ -144,10 +114,7 @@ class StatsView extends Component<
   }
 
   componentWillReceiveProps(newProps: StatsViewProps) {
-    const { peFromState, backgroundFromState, tempStatMode } = this.state
-    if (newProps.pg.pe !== peFromState) {
-      this.setState({ peFromState: newProps.pg.pe })
-    }
+    const { backgroundFromState, tempStatMode } = this.state
     if (newProps.pg.background !== backgroundFromState) {
       this.setState({ backgroundFromState: newProps.pg.background })
     }
@@ -168,64 +135,6 @@ class StatsView extends Component<
     this.setState({ jobs, subjobs, races, subraces })
   }
 
-  getTSProficiency = (type: StatsType) => {
-    const { pgClass } = this.props.pg
-    const { proficiency } = this.props
-    const { jobs } = this.state
-    let hasProficiency = false
-    if (pgClass) {
-      jobs.forEach((job) => {
-        if (job.type === pgClass) {
-          hasProficiency = job.ts.filter((ts) => ts === type).length > 0
-        }
-      })
-    }
-    return hasProficiency
-      ? StatsUtils.getProficiency(
-          StatsUtils.getPgLevel(this.props.pg.pe),
-          proficiency,
-          pgClass
-        )
-      : 0
-  }
-
-  hasProficiency = (
-    type: AbilitiesEnum,
-    excludeBackground?: boolean
-  ): boolean => {
-    const { abilities } = this.props.pg
-    const filteredAbilities = abilities.filter(
-      (ability) => ability.type === type
-    )
-    const abilitiesFromBG = this.getAbilitiesListFromBackground()
-    let fromBG = false
-    if (abilitiesFromBG.find((ab) => ab === type) && !excludeBackground) {
-      fromBG = true
-    }
-    return fromBG || filteredAbilities.length > 0
-      ? fromBG || filteredAbilities[0].hasProficiency
-      : false
-  }
-
-  getAbilityPoints = (type: AbilitiesEnum): number => {
-    const { abilities } = this.props.pg
-    let points = 0
-    abilities.forEach((ability) => {
-      if (ability.type === type) {
-        points += ability.points
-      }
-    })
-    return points
-  }
-
-  showAbilityInfo = () => {
-    this.setState({ dialogInfoAbilitiesOpen: true })
-  }
-
-  closeInfoAbilitiesDialog = (): void => {
-    this.setState({ dialogInfoAbilitiesOpen: false })
-  }
-
   getAbilitiesListFromClass = (): AbilitiesEnum[] => {
     const { pgClass } = this.props.pg
     const { jobs } = this.state
@@ -234,19 +143,6 @@ class StatsView extends Component<
       jobs.forEach((job) => {
         if (job.type === pgClass) {
           abilitiesList = job.abilities
-        }
-      })
-    }
-    return abilitiesList
-  }
-
-  getAbilitiesListFromBackground = (): AbilitiesEnum[] => {
-    const { background } = this.props.pg
-    let abilitiesList: AbilitiesEnum[] = []
-    if (background) {
-      this.backgroundData.forEach((data) => {
-        if (data.type === background) {
-          abilitiesList = data.abilities
         }
       })
     }
@@ -272,95 +168,6 @@ class StatsView extends Component<
     onAddEquipment(items)
 
     this.setState({ showBackgroundItems: false })
-  }
-
-  getAbilitiesCountFromClass = (): number => {
-    const { pgClass, race, pgClass2, multiclass } = this.props.pg
-    const { jobs, races } = this.state
-    let count = 0
-    if (pgClass) {
-      jobs.forEach((job) => {
-        if (job.type === pgClass) {
-          count = job.abilitiesCount
-        } else if (job.type === pgClass2 && multiclass && job.multiclass) {
-          job.multiclass.forEach((privilege) => {
-            if (privilege.extra) {
-              const splitted = privilege.extra.split('|')
-              if (splitted[0] === 'abilities') {
-                const obj = JSON.parse(splitted[1])
-                if (obj.count !== undefined) {
-                  count += obj.count
-                }
-              }
-            }
-          })
-        }
-      })
-    }
-    races.forEach((data) => {
-      if (data.type === race.toString()) {
-        data.abilities.forEach((item) => {
-          if (item.extra) {
-            const splitted = item.extra.split('|')
-            if (splitted[0] === 'abilities') {
-              const obj = JSON.parse(splitted[1])
-              if (obj.count) {
-                count += obj.count
-              }
-            }
-          }
-        })
-      }
-    })
-    return count
-  }
-
-  missingAbilitiesToSelect = (): number => {
-    let count = 0
-    const abilities = this.getAbilitiesListFromClass()
-    abilities.forEach((ability) => {
-      if (this.hasProficiency(ability, true)) {
-        count++
-      }
-    })
-    return this.getAbilitiesCountFromClass() - count
-  }
-
-  isAbilityEnabled = (ability: Ability) => {
-    const abilities = this.getAbilitiesListFromClass()
-    const abilitiesFromBG = this.getAbilitiesListFromBackground()
-    let found = false
-    if (
-      !abilitiesFromBG.find((item) => item === ability.type) &&
-      abilities.find((item) => item === ability.type)
-    ) {
-      found = true
-    }
-    return found
-  }
-
-  getPePerc = () => {
-    const { pe } = this.props.pg
-    return StatsUtils.getPercLevelFromPE(pe)
-  }
-
-  isArmorHeavy = (): boolean => {
-    const { armors } = this.props.pg
-    return (
-      armors.find((armor) => armor.isWearing && armor.armor.noFurtivity) !==
-      undefined
-    )
-  }
-
-  onChangeTempStatMode = () => {
-    const { tempStatMode } = this.state
-    if (tempStatMode) {
-      this.props.pg.stats.forEach((stat, index) => {
-        this.props.onEditStats(index, undefined, true)
-      })
-    }
-
-    this.setState({ tempStatMode: !tempStatMode, askDeleteTempStat: false })
   }
 
   getLanguages = () => {
@@ -390,7 +197,7 @@ class StatsView extends Component<
   }
 
   render() {
-    const { race, pgClass, stats, ispiration, generalInfo } = this.props.pg
+    const { pgClass, stats, generalInfo } = this.props.pg
     const {
       classes,
       onEdit,
@@ -407,21 +214,13 @@ class StatsView extends Component<
       onChangeMulticlass,
       onChangeImage,
       onUpdateFirstClassLevel,
-      width,
       proficiency,
       readOnly,
     } = this.props
     const {
-      dialogInfoAbilitiesOpen,
-      tsExpanded,
-      abilityExpanded,
-      peFromState,
       backgroundFromState,
       showBackgroundItems,
       generalInfoDialogOpen,
-      tempStatMode,
-      askDeleteTempStat,
-      tempPE,
       jobs,
       races,
     } = this.state
@@ -431,7 +230,7 @@ class StatsView extends Component<
         navigator.userAgent
       )
 
-    const currentRace = races.find((r) => r.type === race.toString())
+    const width = useWidth()
     return (
       <div className={classes.container}>
         <div className={classes.inputContainer}>
@@ -447,9 +246,9 @@ class StatsView extends Component<
             backgroundData={this.backgroundData}
             onChangeJob={onChangeJob}
             onChangeSubJob={onChangeSubJob}
-            onChangeBackground={(e) => {
+            onChangeBackground={(e, child) => {
               this.setState({ showBackgroundItems: true })
-              this.props.onChangeBackground(e)
+              this.props.onChangeBackground(e, child)
             }}
             onChangeRace={onChangeRace}
             onChangeSubRace={onChangeSubRace}
@@ -468,443 +267,65 @@ class StatsView extends Component<
             }}
           />
           <Divider className={classes.divider} />
-          <div className={classes.gridContainer}>
-            <Grid container spacing={3}>
-              <Grid item xs={4} className={classes.gridItem}>
-                <TextFieldNumber
-                  label="Competenza"
-                  value={StatsUtils.getProficiency(
-                    StatsUtils.getPgLevel(this.props.pg.pe),
-                    proficiency,
-                    pgClass
-                  )}
-                  onChange={() => {}}
-                  disabled={true}
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={4} className={classes.gridItem}>
-                <TextFieldNumber
-                  label="Perc passiva"
-                  value={StatsUtils.getStatModifierFromName(
-                    StatsType.Saggezza,
-                    this.props.pg
-                  )}
-                  onChange={() => {}}
-                  disabled={true}
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={4} className={classes.gridItem}>
-                <div className={classes.taglia}>
-                  <Typography variant="body1" color="textPrimary">{`Taglia: ${
-                    currentRace
-                      ? StatsUtils.getRaceSize(this.props.pg, currentRace)
-                      : ''
-                  }`}</Typography>
-                </div>
-              </Grid>
-              <Grid item xs={6} className={classes.gridItem}>
-                <TextFieldNumber
-                  disabled={!onEdit}
-                  label={'PE'}
-                  step={'1'}
-                  min={0}
-                  max={355000}
-                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                    const newPE = parseInt(event.target.value)
-                    this.setState({ peFromState: newPE })
-                    onChangePE(newPE)
-                  }}
-                  value={peFromState}
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={6} className={classes.gridItem}>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={ispiration}
-                      onChange={(
-                        event: React.ChangeEvent<HTMLInputElement>,
-                        checked: boolean
-                      ) => onChangeIspiration(checked)}
-                      disabled={!onEdit}
-                      color="primary"
-                    />
-                  }
-                  label="Ispirazione"
-                  classes={{
-                    label: classes.infoIcon,
-                  }}
-                />
-              </Grid>
-              {onEdit && (
-                <React.Fragment>
-                  <Grid item xs={6} className={classes.gridItem}>
-                    <TextFieldNumber
-                      disabled={!onEdit}
-                      label={'Aggiungi nuovi PE'}
-                      step={'1'}
-                      min={0}
-                      max={355000 - peFromState}
-                      onChange={(
-                        event: React.ChangeEvent<HTMLInputElement>
-                      ) => {
-                        const newPE = parseInt(event.target.value)
-                        this.setState({ tempPE: newPE })
-                      }}
-                      value={tempPE}
-                      fullWidth
-                    />
-                  </Grid>
-                  <Grid item xs={6} className={classes.gridItem}>
-                    <Button
-                      onClick={() => {
-                        this.setState({
-                          peFromState: peFromState + (tempPE || 0),
-                          tempPE: undefined,
-                        })
-                        onChangePE(peFromState + (tempPE || 0))
-                      }}
-                    >
-                      Aggiungi PE
-                    </Button>
-                  </Grid>
-                </React.Fragment>
-              )}
-              <Grid item xs={12} className={classes.gridItem}>
-                <div className={classes.peContainer}>
-                  <Typography
-                    variant="body1"
-                    color="textPrimary"
-                  >{`Lv. ${StatsUtils.getPgLevel(
-                    this.props.pg.pe
-                  )}`}</Typography>
-                  <LinearProgress
-                    value={this.getPePerc()}
-                    variant="determinate"
-                    color="primary"
-                    className={classes.peProgress}
-                  />
-                  <Typography
-                    variant="body1"
-                    color="textPrimary"
-                  >{`Lv. ${StatsUtils.getPgLevel(
-                    this.props.pg.pe,
-                    true
-                  )}`}</Typography>
-                </div>
-              </Grid>
-            </Grid>
-          </div>
+          <LevelComponent
+            pg={this.props.pg}
+            rootCss={classes.gridContainer}
+            gridItemCss={classes.gridItem}
+            proficiency={proficiency}
+            pgClass={pgClass}
+            races={races}
+            onEdit={onEdit}
+            onChangePE={onChangePE}
+            onChangeIspiration={onChangeIspiration}
+          />
           <Divider className={classes.divider} />
-          <div className={classes.statTitleContainer}>
-            <Typography
-              variant="h6"
-              className={classes.title}
-              color="textPrimary"
-            >
-              Caratteristiche
-            </Typography>
-            {onEdit && (
-              <Tooltip title="Modifiche temporanee">
-                <IconButton
-                  onClick={() =>
-                    tempStatMode
-                      ? this.setState({ askDeleteTempStat: true })
-                      : this.onChangeTempStatMode()
-                  }
-                >
-                  <AccessTime
-                    className={clsx(
-                      classes.tempIcon,
-                      tempStatMode ? 'active' : undefined
-                    )}
-                  />
-                </IconButton>
-              </Tooltip>
-            )}
-            <ConfirmDialog
-              title={'Rimuovi modifiche temporanee'}
-              description={
-                'Sei sicuro di voler rimuovere le modifiche temporanee alle statistiche?'
-              }
-              noCallback={() => this.setState({ askDeleteTempStat: false })}
-              yesCallback={() => this.onChangeTempStatMode()}
-              open={askDeleteTempStat}
-            />
-          </div>
-          <div className={classes.gridContainer}>
-            <Grid container spacing={3}>
-              {stats.map((stat, index) => {
-                //TODO https://material-ui.com/components/text-fields/#customized-inputs for temp stat change
-                return (
-                  <Grid
-                    item
-                    xs={4}
-                    key={stat.type}
-                    className={classes.gridItem}
-                  >
-                    <div className={classes.stat}>
-                      <TextFieldNumber
-                        label={TextUtils.getSmallStatsType(stat.type)}
-                        value={
-                          tempStatMode && stat.temp !== undefined
-                            ? stat.temp
-                            : stat.value
-                        }
-                        onChange={(
-                          event: React.ChangeEvent<HTMLInputElement>
-                        ) => {
-                          onEditStats(index, event.target.value, tempStatMode)
-                        }}
-                        disabled={!onEdit}
-                        root={
-                          stat.temp
-                            ? stat.temp > stat.value
-                              ? classes.statPositive
-                              : stat.temp < stat.value
-                              ? classes.statNegative
-                              : undefined
-                            : undefined
-                        }
-                      />
-                      <Typography
-                        variant="caption"
-                        className={clsx(
-                          classes.modifier,
-                          stat.temp
-                            ? stat.temp > stat.value
-                              ? classes.statPositive
-                              : stat.temp < stat.value
-                              ? classes.statNegative
-                              : undefined
-                            : undefined
-                        )}
-                      >
-                        {`${
-                          StatsUtils.getStatModifier(stat) === 0
-                            ? ''
-                            : StatsUtils.getStatModifier(stat) > 0
-                            ? '+'
-                            : '-'
-                        }${Math.abs(StatsUtils.getStatModifier(stat))}`}
-                      </Typography>
-                    </div>
-                  </Grid>
-                )
-              })}
-            </Grid>
-          </div>
+
+          <StatsComponent
+            titleCss={classes.title}
+            gridContainerCss={classes.gridContainer}
+            gridItemCss={classes.gridItem}
+            onEdit={onEdit}
+            pg={this.props.pg}
+            onEditStats={onEditStats}
+          />
+
           <Divider className={classes.divider} />
-          <Typography
-            variant="h6"
-            className={classes.title}
-            color="textPrimary"
-          >
-            Tiri Salvezza
-          </Typography>
-          <Grid container className={classes.gridContainer}>
-            {stats.map((stat, index) => {
-              return (
-                <Grid item xs={12} sm={6} md={4} key={stat.type}>
-                  <ExpansionPanel
-                    square
-                    expanded={tsExpanded === stat.type}
-                    onChange={() =>
-                      stat.type === tsExpanded
-                        ? this.setState({ tsExpanded: undefined })
-                        : this.setState({ tsExpanded: stat.type })
-                    }
-                    elevation={3}
-                  >
-                    <ExpansionPanelSummary>
-                      <div className={classes.tsPanelTitle}>
-                        <Typography variant={'subtitle1'}>
-                          {TextUtils.getFullStatsType(stat.type)}
-                        </Typography>
-                        <Typography
-                          variant={'subtitle1'}
-                          className={
-                            stat.tsTemp !== undefined
-                              ? stat.tsTemp > 0
-                                ? classes.tsPositive
-                                : stat.tsTemp < 0
-                                ? classes.tsNegative
-                                : undefined
-                              : undefined
-                          }
-                        >
-                          {TextUtils.getValueWithSign(
-                            StatsUtils.getStatModifier(stat) +
-                              this.getTSProficiency(stat.type) +
-                              (stat.tsTemp ? stat.tsTemp : 0)
-                          )}
-                        </Typography>
-                      </div>
-                    </ExpansionPanelSummary>
-                    <ExpansionPanelDetails>
-                      <MixedInput
-                        inputInfo={{
-                          type: 'Temp',
-                          value: stat.tsTemp,
-                          min: -20,
-                          max: 20,
-                        }}
-                        inputPos={InputPosition.End}
-                        modifiers={[
-                          {
-                            type: 'Comp',
-                            value: this.getTSProficiency(stat.type),
-                          },
-                          {
-                            type: 'Mod',
-                            value: StatsUtils.getStatModifier(stat),
-                          },
-                        ]}
-                        onChange={(value) =>
-                          onEditStats(index, value.toString(), false, true)
-                        }
-                        onEdit={onEdit}
-                        label={TextUtils.getSmallStatsType(stat.type)}
-                      />
-                    </ExpansionPanelDetails>
-                  </ExpansionPanel>
-                </Grid>
-              )
-            })}
-          </Grid>
+
+          <TsComponent
+            titleCss={classes.title}
+            gridContainerCss={classes.gridContainer}
+            tsPositiveCss={classes.tsPositive}
+            tsNegativeCss={classes.tsNegative}
+            onEdit={onEdit}
+            stats={stats}
+            pg={this.props.pg}
+            proficiency={proficiency}
+            jobs={jobs}
+            onEditStats={onEditStats}
+          />
+
           <Divider className={classes.divider} />
-          <div className={classes.abilitiesHeader}>
-            <Typography
-              variant="h6"
-              className={classes.title}
-              color="textPrimary"
-            >
-              Abilità
-            </Typography>
-            {pgClass && this.missingAbilitiesToSelect() !== 0 && (
-              <IconButton
-                className={classes.abilityInfo}
-                onClick={this.showAbilityInfo}
-              >
-                <ErrorOutline color="primary" />
-              </IconButton>
-            )}
-          </div>
-          {this.missingAbilitiesToSelect() !== 0 && (
-            <Typography
-              variant="body2"
-              className={classes.title}
-              color="textPrimary"
-            >
-              {`Ancora ${this.missingAbilitiesToSelect()} da selezionare`}
-            </Typography>
-          )}
-          <Grid container className={classes.gridContainer}>
-            {this.abilitiesData.map((ability, index) => {
-              const totValue =
-                StatsUtils.getStatModifierFromName(
-                  ability.stat,
-                  this.props.pg
-                ) +
-                (this.hasProficiency(ability.type)
-                  ? StatsUtils.getProficiency(
-                      StatsUtils.getPgLevel(this.props.pg.pe),
-                      proficiency,
-                      pgClass
-                    )
-                  : 0) +
-                this.getAbilityPoints(ability.type)
-              return (
-                <Grid item xs={12} sm={6} md={4} lg={3} key={ability.type}>
-                  <ExpansionPanelItem
-                    expanded={abilityExpanded === ability.type}
-                    id={ability.type}
-                    name={
-                      ability.type +
-                      (ability.type === AbilitiesEnum.Furtivita &&
-                      this.isArmorHeavy()
-                        ? ' (Svantaggio)'
-                        : '')
-                    }
-                    checked={this.hasProficiency(ability.type)}
-                    onChangeCheckbox={(id: string, checked: boolean) =>
-                      onChangeAbilityCheck(id as AbilitiesEnum, checked)
-                    }
-                    checkbox={this.isAbilityEnabled(ability)}
-                    extra={TextUtils.getValueWithSign(totValue).toString()}
-                    checkboxDisabled={
-                      this.missingAbilitiesToSelect() === 0 &&
-                      !this.hasProficiency(ability.type)
-                    }
-                    onEdit={onEdit}
-                    onExpand={() =>
-                      ability.type === abilityExpanded
-                        ? this.setState({ abilityExpanded: undefined })
-                        : this.setState({ abilityExpanded: ability.type })
-                    }
-                    classes={{
-                      extra:
-                        this.getAbilityPoints(ability.type) > 0
-                          ? classes.tsPositive
-                          : this.getAbilityPoints(ability.type) < 0
-                          ? classes.tsNegative
-                          : '',
-                    }}
-                  >
-                    <MixedInput
-                      inputInfo={{
-                        type: 'Extra',
-                        value: this.getAbilityPoints(ability.type),
-                        min: -20,
-                        max: 20,
-                      }}
-                      inputPos={InputPosition.End}
-                      modifiers={[
-                        {
-                          type: `${TextUtils.getSmallStatsType(ability.stat)}${
-                            this.hasProficiency(ability.type) ? '+ Comp' : ''
-                          }`,
-                          value:
-                            StatsUtils.getStatModifierFromName(
-                              ability.stat,
-                              this.props.pg
-                            ) +
-                            (this.hasProficiency(ability.type)
-                              ? StatsUtils.getProficiency(
-                                  StatsUtils.getPgLevel(this.props.pg.pe),
-                                  proficiency,
-                                  pgClass
-                                )
-                              : 0),
-                        },
-                      ]}
-                      onChange={(value: number) => {
-                        onChangeAbilityPoints(ability.type, value)
-                      }}
-                      onEdit={onEdit}
-                      // label={ability.type}
-                      labelOnTop
-                    />
-                  </ExpansionPanelItem>
-                </Grid>
-              )
-            })}
-          </Grid>
+
+          <AbilitiesComponent
+            onEdit={onEdit}
+            pg={this.props.pg}
+            jobs={jobs}
+            races={races}
+            backgroundData={this.backgroundData}
+            abilitiesData={this.abilitiesData}
+            proficiency={proficiency}
+            titleCss={classes.title}
+            gridContainerCss={classes.gridContainer}
+            tsPositiveCss={classes.tsPositive}
+            tsNegativeCss={classes.tsNegative}
+            getAbilitiesListFromClass={this.getAbilitiesListFromClass}
+            onChangeAbilityCheck={onChangeAbilityCheck}
+            onChangeAbilityPoints={onChangeAbilityPoints}
+          />
+
           <Divider className={classes.divider} />
           {readOnly && <div className={classes.readOnly}></div>}
         </div>
-        {pgClass && (
-          <InfoDialog
-            open={dialogInfoAbilitiesOpen}
-            title={'Abilità disponibili'}
-            description={`Questa è la lista delle abilità disponibili dalla tua classe, puoi sceglierne un massimo di ${this.getAbilitiesCountFromClass()}`}
-            items={this.getAbilitiesListFromClass()}
-            onClose={this.closeInfoAbilitiesDialog}
-          />
-        )}
         <Dialog
           open={showBackgroundItems}
           onClose={() => {
@@ -966,4 +387,23 @@ class StatsView extends Component<
   }
 }
 
-export default withWidth()(withStyles(StatsViewStyles)(StatsView))
+export default withStyles(StatsViewStyles)(StatsView)
+
+type BreakpointOrNull = Breakpoint | null
+
+/**
+ * Be careful using this hook. It only works because the number of
+ * breakpoints in theme is static. It will break once you change the number of
+ * breakpoints. See https://reactjs.org/docs/hooks-rules.html#only-call-hooks-at-the-top-level
+ */
+function useWidth() {
+  const theme: Theme = useTheme()
+  const keys: readonly Breakpoint[] = [...theme.breakpoints.keys].reverse()
+  return (
+    keys.reduce((output: BreakpointOrNull, key: Breakpoint) => {
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      const matches = useMediaQuery(theme.breakpoints.up(key))
+      return !output && matches ? key : output
+    }, null) || 'xs'
+  )
+}

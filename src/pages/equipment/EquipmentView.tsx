@@ -8,11 +8,11 @@ import {
   IconButton,
   useMediaQuery,
   Divider,
-} from '@material-ui/core'
-import { useTheme } from '@material-ui/core/styles'
+} from '@mui/material'
+import { useTheme } from '@mui/material/styles'
 import PG from 'pages/stats/models/PG'
 import EquipmentObject from './EquipmentObject'
-import { Add, CloseOutlined } from '@material-ui/icons'
+import { Add, CloseOutlined } from '@mui/icons-material'
 import clsx from 'clsx'
 import EquipmentDialog from 'components/equipment-dialog/EquipmentDialog'
 import StatsUtils from 'utils/StatsUtils'
@@ -47,7 +47,7 @@ const EquipmentView: React.FC<EquipmentViewProps> = (
   const [races, setRaces] = useState<Race[]>([])
   const [subRaces, setSubRaces] = useState<Race[]>([])
   const theme = useTheme()
-  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
+  const fullScreen = useMediaQuery(theme.breakpoints.down('lg'))
 
   const onChangeItemQuantity = (value: number, item: EquipmentObject) => {
     item.quantity = value

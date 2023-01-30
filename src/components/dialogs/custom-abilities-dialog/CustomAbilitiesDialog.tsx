@@ -7,12 +7,12 @@ import {
   DialogActions,
   Button,
   Snackbar,
-} from '@material-ui/core'
-import { Close } from '@material-ui/icons'
+} from '@mui/material'
+import { Close } from '@mui/icons-material'
 import TextFieldString from 'components/text-field-string/TextFieldString'
 import React, { useCallback, useState } from 'react'
 import useStyles from './CustomAbilitiesDialog.styles'
-import MuiAlert from '@material-ui/lab/Alert'
+import MuiAlert from '@mui/material/Alert'
 import CustomAbility from 'pages/stats/models/CustomAbility'
 
 interface CustomAbilitiesDialogProps {
@@ -50,78 +50,76 @@ const CustomAbilitiesDialog: React.FC<CustomAbilitiesDialogProps> = (
     }
   }, [clearDataAndClose, description, name, onSave, selected.id])
 
-  return (
-    <>
-      <Dialog
-        fullScreen={fullScreen}
-        open={selected !== undefined}
-        onClose={() => clearDataAndClose()}
-        className={styles.dialogRoot}
-      >
-        <DialogTitle className={styles.dialogTitle}>
-          <Typography>Nuova Abilità</Typography>
-          <IconButton
-            className={styles.closeDialog}
-            onClick={() => clearDataAndClose()}
-          >
-            <Close />
-          </IconButton>
-        </DialogTitle>
-        <DialogContent>
-          <TextFieldString
-            label="Nome"
-            onChange={(value: string) => setName(value)}
-            disabled={false}
-            value={name}
-          />
-          <TextFieldString
-            label="Descrizione"
-            onChange={(value: string) => setDescription(value)}
-            disabled={false}
-            value={description}
-            multiline
-          />
-        </DialogContent>
-        <DialogActions>
-          {selected.title.length > 0 && (
-            <Button
-              variant="outlined"
-              className={styles.dialogActionButton}
-              color="secondary"
-              onClick={() => {
-                onDelete(selected.id)
-                clearDataAndClose()
-              }}
-            >
-              Elimina
-            </Button>
-          )}
+  return <>
+    <Dialog
+      fullScreen={fullScreen}
+      open={selected !== undefined}
+      onClose={() => clearDataAndClose()}
+      className={styles.dialogRoot}
+    >
+      <DialogTitle className={styles.dialogTitle}>
+        <Typography>Nuova Abilità</Typography>
+        <IconButton
+          className={styles.closeDialog}
+          onClick={() => clearDataAndClose()}
+          size="large">
+          <Close />
+        </IconButton>
+      </DialogTitle>
+      <DialogContent>
+        <TextFieldString
+          label="Nome"
+          onChange={(value: string) => setName(value)}
+          disabled={false}
+          value={name}
+        />
+        <TextFieldString
+          label="Descrizione"
+          onChange={(value: string) => setDescription(value)}
+          disabled={false}
+          value={description}
+          multiline
+        />
+      </DialogContent>
+      <DialogActions>
+        {selected.title.length > 0 && (
           <Button
             variant="outlined"
             className={styles.dialogActionButton}
-            color="primary"
-            onClick={save}
+            color="secondary"
+            onClick={() => {
+              onDelete(selected.id)
+              clearDataAndClose()
+            }}
           >
-            Salva
+            Elimina
           </Button>
-        </DialogActions>
-
-        <Snackbar
-          open={errorMessage !== undefined}
-          autoHideDuration={3000}
-          onClose={() => setErrorMessage(undefined)}
+        )}
+        <Button
+          variant="outlined"
+          className={styles.dialogActionButton}
+          color="primary"
+          onClick={save}
         >
-          <MuiAlert
-            variant="filled"
-            elevation={6}
-            onClose={() => setErrorMessage(undefined)}
-            severity="error"
-          >
-            {errorMessage}
-          </MuiAlert>
-        </Snackbar>
-      </Dialog>
-    </>
-  )
+          Salva
+        </Button>
+      </DialogActions>
+
+      <Snackbar
+        open={errorMessage !== undefined}
+        autoHideDuration={3000}
+        onClose={() => setErrorMessage(undefined)}
+      >
+        <MuiAlert
+          variant="filled"
+          elevation={6}
+          onClose={() => setErrorMessage(undefined)}
+          severity="error"
+        >
+          {errorMessage}
+        </MuiAlert>
+      </Snackbar>
+    </Dialog>
+  </>;
 }
 export default CustomAbilitiesDialog

@@ -1,4 +1,4 @@
-import { createStyles } from '@material-ui/core'
+import createStyles from '@mui/styles/createStyles';
 import Theme from 'assets/styles/Theme'
 
 const StatsViewStyles = (theme: Theme) =>
@@ -27,55 +27,19 @@ const StatsViewStyles = (theme: Theme) =>
       marginBottom: 10,
       flex: 1
     },
-    modifier: {
-      border: 'solid',
-      borderColor: theme.palette.border.main,
-      color: theme.palette.text.primary,
-      borderRadius: '50%',
-      borderWidth: 1,
-      height: 30,
-      width: 30,
-      marginLeft: -10,
-      textAlign: 'center',
-      lineHeight: '30px',
-      backgroundColor: theme.palette.background.paper,
-      zIndex: 1
-    },
-    stat: {
-      display: 'flex',
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center'
-    },
-    abilitiesHeader: {
-      display: 'flex',
-      alignItems: 'center'
-    },
     abilityContainer: {
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center'
     },
-    abilityInfo: {},
     subTitle: {
       flex: 1
-    },
-    taglia: {
-      height: '100%',
-      display: 'flex',
-      alignItems: 'center'
     },
     ispiration: {
       flex: 1,
       fontSize: 24,
       display: 'flex',
       flexDirection: 'row',
-      alignItems: 'center'
-    },
-    tsPanelTitle: {
-      width: '100%',
-      display: 'flex',
-      justifyContent: 'space-between',
       alignItems: 'center'
     },
     abilityCheckbox: {
@@ -100,15 +64,6 @@ const StatsViewStyles = (theme: Theme) =>
     abilityPanel: {
       marginBottom: 1
     },
-    peContainer: {
-      display: 'flex',
-      alignItems: 'center'
-    },
-    peProgress: {
-      flex: 1,
-      marginLeft: 16,
-      marginRight: 16
-    },
     quantity: {
       width: 16,
       textAlign: 'center',
@@ -126,36 +81,6 @@ const StatsViewStyles = (theme: Theme) =>
     },
     bgContent: {
       padding: '0 24px'
-    },
-    infoIcon: {
-      marginRight: 8,
-      color: theme.palette.text.primary
-    },
-    tempIcon: {
-      '&.active': {
-        color: theme.palette.primary.main
-      }
-    },
-    statTitleContainer: {
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between'
-    },
-    statPositive: {
-      borderColor: theme.palette.success.main,
-      borderWidth: 2,
-      '& .MuiOutlinedInput-notchedOutline': {
-        borderWidth: 2,
-        borderColor: `${theme.palette.success.main} !important`
-      }
-    },
-    statNegative: {
-      borderWidth: 2,
-      borderColor: theme.palette.warning.main,
-      '& .MuiOutlinedInput-notchedOutline': {
-        borderWidth: 2,
-        borderColor: `${theme.palette.warning.main} !important`
-      }
     },
     tsPositive: {
       color: theme.palette.success.main

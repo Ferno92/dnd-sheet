@@ -9,8 +9,9 @@ import {
   Button,
   DialogActions,
   TextField,
-} from '@material-ui/core'
-import { Close } from '@material-ui/icons'
+  SelectChangeEvent,
+} from '@mui/material'
+import { Close } from '@mui/icons-material'
 import useStyles from './ArmorDialog.styles'
 import SimpleSelect from 'components/simple-select/SimpleSelect'
 import Armor from 'data/types/Armor'
@@ -77,12 +78,7 @@ const ArmorDialog: React.FC<ArmorDialogProps> = (props: ArmorDialogProps) => {
   }, [])
 
   const onChangeArmor = useCallback(
-    (
-      event: React.ChangeEvent<{
-        name?: string | undefined
-        value: unknown
-      }>
-    ) => {
+    (event: SelectChangeEvent, child: React.ReactNode) => {
       const id = event.target.value
       const found = armors.find((armorData) => armorData.id === id)
       if (armorSelected === undefined) {
@@ -166,6 +162,7 @@ const ArmorDialog: React.FC<ArmorDialogProps> = (props: ArmorDialogProps) => {
         <IconButton
           className={styles.closeDialog}
           onClick={() => clearDataAndClose()}
+          size="large"
         >
           <Close />
         </IconButton>

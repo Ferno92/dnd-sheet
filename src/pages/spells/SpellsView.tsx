@@ -9,21 +9,21 @@ import {
   Tooltip,
   Button,
   Divider,
-} from '@material-ui/core'
+} from '@mui/material'
 import StatsUtils, { Proficiency } from 'utils/StatsUtils'
 import MixedInput, { InputPosition } from 'components/mixed-input/MixedInput'
 import TextUtils from 'utils/TextUtils'
 import SpellsByJobLevel from 'data/types/SpellsByJobLevel'
 import DataUtils from 'data/DataUtils'
 import { default as jobsJSON } from 'data/json/JobsJSON'
-import { Add, ErrorOutline, Delete, Edit } from '@material-ui/icons'
+import { Add, ErrorOutline, Delete, Edit } from '@mui/icons-material'
 import Spell from 'data/types/Spell'
 import SpellDialog from 'components/spell-dialog/SpellDialog'
-import { useTheme } from '@material-ui/styles'
+import { useTheme } from '@mui/styles'
 import { ReactComponent as MagicWand } from 'assets/images/magic-wand.svg'
 import { JobsEnum } from 'data/types/JobsEnum'
-import ExpansionPanelItem from 'components/expansion-panel-item/ExpansionPanelItem'
 import ConfirmDialog from 'components/confirm-dialog/ConfirmDialog'
+import AccordionItem from 'components/expansion-panel-item/ExpansionPanelItem'
 
 interface SpellsViewProps {
   onEdit: boolean
@@ -54,7 +54,7 @@ const SpellsView: React.FC<SpellsViewProps> = (props: SpellsViewProps) => {
   const [askDeleteSpell, setAskDeleteSpell] = useState(false)
   const styles = useStyles()
   const theme = useTheme<Theme>()
-  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
+  const fullScreen = useMediaQuery(theme.breakpoints.down('lg'))
 
   const getSpellSlotSpent = useCallback(
     (lv: number) => {
@@ -286,6 +286,7 @@ const SpellsView: React.FC<SpellsViewProps> = (props: SpellsViewProps) => {
                         onClick={() => setSpellDialogOpen(spellInfo.level)}
                         style={{ visibility: onEdit ? 'visible' : 'hidden' }}
                         className={styles.addSpell}
+                        size="large"
                       >
                         <Add />
                       </IconButton>
@@ -295,7 +296,7 @@ const SpellsView: React.FC<SpellsViewProps> = (props: SpellsViewProps) => {
                   spellByLevel.spells.map((spell, index) => {
                     const id = `${spell.id}_${index}_${spellInfo.level}`
                     return (
-                      <ExpansionPanelItem
+                      <AccordionItem
                         key={id}
                         id={id}
                         name={spell.name}
@@ -315,11 +316,12 @@ const SpellsView: React.FC<SpellsViewProps> = (props: SpellsViewProps) => {
                                 >
                                   <IconButton
                                     color="primary"
+                                    //className={classes.expansionPanelIcon}
                                     onClick={() => {
                                       setSpellSelected(spell)
                                       setSpellDialogOpen(spell.level)
                                     }}
-                                    //className={classes.expansionPanelIcon}
+                                    size="large"
                                   >
                                     <Edit />
                                   </IconButton>
@@ -332,6 +334,7 @@ const SpellsView: React.FC<SpellsViewProps> = (props: SpellsViewProps) => {
                                       setSpellSelected(spell)
                                       setAskDeleteSpell(true)
                                     }}
+                                    size="large"
                                   >
                                     <Delete />
                                   </IconButton>
@@ -360,6 +363,7 @@ const SpellsView: React.FC<SpellsViewProps> = (props: SpellsViewProps) => {
                                             ? 'hidden'
                                             : 'visible',
                                       }}
+                                      size="large"
                                     >
                                       <MagicWand />
                                     </IconButton>
@@ -427,7 +431,7 @@ const SpellsView: React.FC<SpellsViewProps> = (props: SpellsViewProps) => {
                         <Typography variant={'body2'} color="textPrimary">
                           {spell.description}
                         </Typography>
-                      </ExpansionPanelItem>
+                      </AccordionItem>
                     )
                   })}
               </div>
