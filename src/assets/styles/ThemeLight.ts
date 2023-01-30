@@ -1,6 +1,5 @@
-import { Components, createTheme, Palette, PaletteOptions, responsiveFontSizes } from '@mui/material/styles';
+import { Components, createTheme, PaletteOptions, responsiveFontSizes } from '@mui/material/styles';
 import createTypography from '@mui/material/styles/createTypography';
-import ColorUtils from 'utils/ColorUtils'
 
 export enum Colors {
   Black = '#0D0D0D',

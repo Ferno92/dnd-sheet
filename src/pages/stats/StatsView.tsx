@@ -1,11 +1,4 @@
-import React, {
-  Component,
-  createRef,
-  useCallback,
-  useEffect,
-  useState,
-} from 'react'
-import { WithStyles } from '@mui/styles'
+import React, { useCallback, useEffect, useState } from 'react'
 import {
   Typography,
   Divider,
@@ -21,8 +14,6 @@ import {
   useTheme,
   SelectChangeEvent,
 } from '@mui/material'
-import withStyles from '@mui/styles/withStyles'
-import StatsViewStyles from './StatsView.styles'
 import PG from './models/PG'
 import { default as abilitiesJSON } from 'data/json/AbilitiesJSON'
 import { default as backgroundJSON } from 'data/json/BackgroundJSON'
@@ -107,7 +98,6 @@ const StatsView: React.FC<StatsViewProps> = (props: StatsViewProps) => {
     pg,
     onAddEquipment,
   } = props
-  const inputLabel = createRef<any>()
   const backgroundData = DataUtils.BackgroundMapper(backgroundJSON as any)
   const abilitiesData = DataUtils.AbilityMapper(abilitiesJSON as any)
   const [backgroundFromState, setBackgroundFromState] = useState(pg.background)
