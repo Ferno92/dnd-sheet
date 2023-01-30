@@ -5,7 +5,7 @@ import App from './App'
 import * as serviceWorker from './serviceWorker'
 import { useMediaQuery } from '@mui/material'
 import { ThemeProvider, StyledEngineProvider } from '@mui/material/styles'
-import { lightTheme, darkTheme, Theme } from './assets/styles/ThemeLight'
+import { lightTheme, darkTheme } from './assets/styles/ThemeLight'
 
 export const ThemeContext = createContext({
   mode: 'light',

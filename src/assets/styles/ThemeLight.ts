@@ -1,6 +1,5 @@
-import { adaptV4Theme, createTheme, Palette, PaletteColor, responsiveFontSizes } from '@mui/material/styles';
-import createPalette from '@mui/material/styles/createPalette';
-import createTypography, { Typography } from '@mui/material/styles/createTypography';
+import { Components, createTheme, Palette, PaletteOptions, responsiveFontSizes } from '@mui/material/styles';
+import createTypography from '@mui/material/styles/createTypography';
 import ColorUtils from 'utils/ColorUtils'
 
 export enum Colors {
@@ -26,95 +25,23 @@ export enum Colors {
   DirtyBlack = '#303030'
 }
 
-export const lightTheme = responsiveFontSizes(createTheme({
-  palette: {
-    mode: 'light',
-    background: {
-      default: Colors.DndRed,
-      paper: Colors.DirtyWhite
-    },
-    backgroundSecondary: {
-      default: Colors.DirtyWhite,
-      paper: Colors.BrightWhite
-    },
-    text: {
-      primary: Colors.Black,
-      secondary: Colors.Black50
-    },
-    primary: {
-      light: Colors.DndRedLight,
-      main: Colors.DndRed,
-      dark: Colors.DndRedDark,
-      contrastText: Colors.BrightWhite
-    },
-    secondary: {
-      light: Colors.DndBlackLight,
-      main: Colors.DndBlack,
-      dark: Colors.DndBlackDark,
-      contrastText: Colors.BrightWhite
-    },
-    success: {
-      main: Colors.Fern,
-      light: Colors.Fern,
-      dark: Colors.Fern,
-      contrastText: Colors.BrightWhite
-    },
-    info: {
-      main: Colors.BrightWhite,
-      light: Colors.BrightWhite,
-      dark: Colors.BrightWhite,
-      contrastText: Colors.Black
-    },
-    warning: {
-      main: Colors.SunYellow,
-      light: Colors.SunYellow,
-      dark: Colors.SunYellow,
-      contrastText: Colors.BrightWhite
-    },
-    error: {
-      main: Colors.Cherry,
-      light: Colors.Cherry,
-      dark: Colors.Cherry,
-      contrastText: Colors.BrightWhite
-    },
-    picture: {
-      dark: Colors.SilverGrey50,
-      main: Colors.SilverGrey50,
-      light: Colors.SilverGrey50,
-      contrastText: Colors.Black
-    },
-    divider: Colors.SilverGrey50,
-    border: {
-      main: Colors.SilverGrey,
-      light: Colors.SilverGrey50,
-      dark: Colors.Black30,
-      contrastText: Colors.BrightWhite
-    },
-    highlight: Colors.DndRedLight,
-    hover: Colors.DndRedLight
-
-  }
-}))
-
-export const darkTheme = responsiveFontSizes(createTheme({
-  palette: {
-
-  mode: 'dark',
+const lightPalette: PaletteOptions = {
+  mode: 'light',
   background: {
     default: Colors.DndRed,
-    paper: Colors.DirtyBlack
+    paper: Colors.DirtyWhite
   },
   backgroundSecondary: {
-    default: Colors.DirtyBlack,
-    paper: Colors.DirtyBlack
+    default: Colors.DirtyWhite,
+    paper: Colors.BrightWhite
   },
   text: {
-    primary: Colors.DirtyWhite,
-    secondary: Colors.DirtyWhite
+    primary: Colors.Black,
+    secondary: Colors.Black50,
   },
   primary: {
-    light: Colors.DndRed,
-    main: Colors.DndRedLight,
+    light: Colors.DndRedLight,
+    main: Colors.DndRed,
     dark: Colors.DndRedDark,
     contrastText: Colors.BrightWhite
   },
@@ -163,10 +90,13 @@ export const darkTheme = responsiveFontSizes(createTheme({
   },
   highlight: Colors.DndRedLight,
   hover: Colors.DndRedLight
-  }
+}
+
+const defaultTheme = responsiveFontSizes(createTheme({
+  palette: lightPalette
 }))
 
-const typography = createTypography(lightTheme.palette, {
+const typography = createTypography(defaultTheme.palette, {
   fontFamily: [
     '-apple-system',
     'BlinkMacSystemFont',
@@ -181,73 +111,159 @@ const typography = createTypography(lightTheme.palette, {
     '"sans-serif"'
   ].join(','),
   // Tell Material-UI what's the font-size on the html element is.
-  htmlFontSize: 10,
+  htmlFontSize: 20,
   h1: {
     fontSize: '4.2rem',
     fontWeight: 700,
-    lineHeight: 'normal'
   },
   h2: {
     fontSize: '3.6rem',
     fontWeight: 600,
-    lineHeight: 'normal'
   },
   h3: {
     fontSize: '2.4rem',
     fontWeight: 700,
-    lineHeight: 'normal'
   },
   h4: {
     fontSize: '2.4rem',
     fontWeight: 600,
-    lineHeight: 'normal'
   },
   h5: {
     fontSize: '2.0rem',
     fontWeight: 700,
-    lineHeight: 'normal'
   },
   h6: {
     fontSize: '2.0rem',
     fontWeight: 600,
-    lineHeight: 'normal'
   },
   body1: {
     fontSize: '1.6rem',
-    lineHeight: 'normal'
   },
   body2: {
     fontSize: '1.4rem',
-    lineHeight: 'normal'
   },
   caption: {
     fontSize: '1.2rem',
-    lineHeight: 'normal'
   },
   button: {
     fontSize: '1.6rem',
     fontWeight: 700,
-    lineHeight: '2rem',
     textTransform: 'none'
   },
   overline: {
     fontSize: '1.2rem',
     fontWeight: 700,
     textTransform: 'none',
-    lineHeight: 'normal'
   },
   subtitle1: {
     fontSize: '1.4rem',
     fontWeight: 700,
-    lineHeight: 'normal'
   },
   subtitle2: {
     fontSize: '1.2rem',
     fontWeight: 700,
-    lineHeight: 'normal'
   }
 })
 
+const components: Components = {
+  MuiSvgIcon: {
+    styleOverrides: {
+      root: {
+        height: "2em",
+        width: "2em",
+      }
+    }
+  },
+  MuiBottomNavigationAction: {
+    styleOverrides: {
+      label: {
+        fontSize: '1.5rem',
+        '&.Mui-selected': {
+          fontSize: '1.5rem',
+        }
+      },
+    }
+  }
+}
+
+export const lightTheme = responsiveFontSizes(createTheme({
+  typography: typography,
+  palette: lightPalette,
+  components: components
+}))
+
+export const darkTheme = responsiveFontSizes(createTheme({
+  typography: typography,
+  palette: {
+    mode: 'dark',
+    background: {
+      default: Colors.DndRed,
+      paper: Colors.DirtyBlack
+    },
+    backgroundSecondary: {
+      default: Colors.DirtyBlack,
+      paper: Colors.DirtyBlack
+    },
+    text: {
+      primary: Colors.DirtyWhite,
+      secondary: Colors.DirtyWhite
+    },
+    primary: {
+      light: Colors.DndRed,
+      main: Colors.DndRedLight,
+      dark: Colors.DndRedDark,
+      contrastText: Colors.BrightWhite
+    },
+    secondary: {
+      light: Colors.DndBlackLight,
+      main: Colors.DndBlack,
+      dark: Colors.DndBlackDark,
+      contrastText: Colors.BrightWhite
+    },
+    success: {
+      main: Colors.Fern,
+      light: Colors.Fern,
+      dark: Colors.Fern,
+      contrastText: Colors.BrightWhite
+    },
+    info: {
+      main: Colors.BrightWhite,
+      light: Colors.BrightWhite,
+      dark: Colors.BrightWhite,
+      contrastText: Colors.Black
+    },
+    warning: {
+      main: Colors.SunYellow,
+      light: Colors.SunYellow,
+      dark: Colors.SunYellow,
+      contrastText: Colors.BrightWhite
+    },
+    error: {
+      main: Colors.Cherry,
+      light: Colors.Cherry,
+      dark: Colors.Cherry,
+      contrastText: Colors.BrightWhite
+    },
+    picture: {
+      dark: Colors.SilverGrey50,
+      main: Colors.SilverGrey50,
+      light: Colors.SilverGrey50,
+      contrastText: Colors.Black
+    },
+    divider: Colors.SilverGrey50,
+    border: {
+      main: Colors.SilverGrey,
+      light: Colors.SilverGrey50,
+      dark: Colors.Black30,
+      contrastText: Colors.BrightWhite
+    },
+    highlight: Colors.DndRedLight,
+    hover: Colors.DndRedLight
+  },
+  components: components
+}))
+
+/*
 export const Theme = (palette: Palette) => createTheme({
   palette: palette,
   typography: typography,
@@ -474,3 +490,4 @@ export const Theme = (palette: Palette) => createTheme({
     }
   }
 })
+*/

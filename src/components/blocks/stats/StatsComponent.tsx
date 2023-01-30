@@ -4,7 +4,7 @@ import clsx from 'clsx'
 import ConfirmDialog from 'components/confirm-dialog/ConfirmDialog'
 import TextFieldNumber from 'components/text-field-number/TextFieldNumber'
 import PG from 'pages/stats/models/PG'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import StatsUtils from 'utils/StatsUtils'
 import TextUtils from 'utils/TextUtils'
 import useStyles from './StatsComponent.styles'
@@ -29,9 +29,7 @@ const StatsComponent: React.FC<StatsComponentProps> = (
   const { onEdit, pg, titleCss, gridContainerCss, gridItemCss, onEditStats } =
     props
   const styles = useStyles()
-  const [tempStatMode, setTempStatMode] = useState(
-    pg.stats.find((stat) => stat.temp !== undefined) !== undefined
-  )
+  const [tempStatMode, setTempStatMode] = useState(false)
   const [askDeleteTempStat, setAskDeleteTempStat] = useState(false)
 
   const onChangeTempStatMode = useCallback(() => {
@@ -42,7 +40,13 @@ const StatsComponent: React.FC<StatsComponentProps> = (
     }
     setTempStatMode(false)
     setAskDeleteTempStat(false)
-  }, [])
+  }, [onEditStats, pg.stats, tempStatMode])
+
+  useEffect(() => {
+    setTempStatMode(
+      pg.stats.find((stat) => stat.temp !== undefined) !== undefined
+    )
+  }, [pg.stats])
 
   return (
     <>
@@ -56,7 +60,7 @@ const StatsComponent: React.FC<StatsComponentProps> = (
               onClick={() =>
                 tempStatMode
                   ? setAskDeleteTempStat(true)
-                  : onChangeTempStatMode()
+                  : setTempStatMode(true)
               }
               size="large"
             >

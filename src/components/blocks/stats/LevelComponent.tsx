@@ -11,7 +11,7 @@ import { JobsEnum } from 'data/types/JobsEnum'
 import Race from 'data/types/Race'
 import StatsType from 'data/types/StatsEnum'
 import PG from 'pages/stats/models/PG'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import StatsUtils, { Proficiency } from 'utils/StatsUtils'
 import useStyles from './LevelComponent.styles'
 
@@ -42,10 +42,14 @@ const LevelComponent: React.FC<LevelComponentProps> = (
     onChangeIspiration,
   } = props
   const styles = useStyles()
-  const [pe, setPe] = useState(pg.pe)
+  const [pe, setPe] = useState(0)
   const [tempPE, setTempPE] = useState(0)
 
   const currentRace = races.find((r) => r.type === pg.race.toString())
+
+  useEffect(() => {
+    setPe(pg.pe)
+  }, [pg.pe])
   return (
     <div className={rootCss}>
       <Grid container spacing={3}>
