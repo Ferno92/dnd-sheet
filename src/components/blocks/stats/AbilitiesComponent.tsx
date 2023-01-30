@@ -26,7 +26,6 @@ interface AbilitiesComponentProps {
   gridContainerCss: string
   tsPositiveCss: string
   tsNegativeCss: string
-  getAbilitiesListFromClass: () => AbilitiesEnum[]
   onChangeAbilityCheck: (type: AbilitiesEnum, checked: boolean) => void
   onChangeAbilityPoints: (type: AbilitiesEnum, value: number) => void
 }
@@ -35,7 +34,6 @@ const AbilitiesComponent: React.FC<AbilitiesComponentProps> = (
   props: AbilitiesComponentProps
 ) => {
   const {
-    getAbilitiesListFromClass,
     onChangeAbilityCheck,
     onChangeAbilityPoints,
     onEdit,
@@ -124,6 +122,19 @@ const AbilitiesComponent: React.FC<AbilitiesComponentProps> = (
     },
     [getAbilitiesListFromBackground, pg]
   )
+
+  const getAbilitiesListFromClass = useCallback((): AbilitiesEnum[] => {
+    const { pgClass } = pg
+    let abilitiesList: AbilitiesEnum[] = []
+    if (pgClass) {
+      jobs.forEach((job) => {
+        if (job.type === pgClass) {
+          abilitiesList = job.abilities
+        }
+      })
+    }
+    return abilitiesList
+  }, [jobs, pg])
 
   const missingAbilitiesToSelect = useCallback((): number => {
     let count = 0

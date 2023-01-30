@@ -1,4 +1,10 @@
-import React, { Component, createRef } from 'react'
+import React, {
+  Component,
+  createRef,
+  useCallback,
+  useEffect,
+  useState,
+} from 'react'
 import { WithStyles } from '@mui/styles'
 import {
   Typography,
@@ -37,6 +43,7 @@ import StatsComponent from 'components/blocks/stats/StatsComponent'
 import TsComponent from 'components/blocks/stats/TsComponent'
 import AbilitiesComponent from 'components/blocks/stats/AbilitiesComponent'
 import { Proficiency } from 'utils/StatsUtils'
+import useStyles from './StatsView.styles'
 
 interface StatsViewProps {
   onEdit: boolean
@@ -78,101 +85,64 @@ interface StatsViewProps {
   onUpdateFirstClassLevel: (level: number) => void
 }
 
-interface StatsViewState {
-  backgroundFromState: string
-  showBackgroundItems: boolean
-  generalInfoDialogOpen: boolean
-  tempStatMode: boolean
-  jobs: Job[]
-  subjobs: Job[]
-  races: Race[]
-  subraces: Race[]
-}
+const StatsView: React.FC<StatsViewProps> = (props: StatsViewProps) => {
+  const { pgClass, stats, generalInfo } = props.pg
+  const {
+    onEdit,
+    onChangeAbilityCheck,
+    onChangeAbilityPoints,
+    onChangeIspiration,
+    onChangeJob,
+    onChangeSubJob,
+    onChangeRace,
+    onChangeSubRace,
+    onEditName,
+    onEditStats,
+    onChangePE,
+    onChangeMulticlass,
+    onChangeImage,
+    onUpdateFirstClassLevel,
+    proficiency,
+    readOnly,
+    pg,
+    onAddEquipment,
+  } = props
+  const inputLabel = createRef<any>()
+  const backgroundData = DataUtils.BackgroundMapper(backgroundJSON as any)
+  const abilitiesData = DataUtils.AbilityMapper(abilitiesJSON as any)
+  const [backgroundFromState, setBackgroundFromState] = useState(pg.background)
+  const [showBackgroundItems, setShowBackgroundItems] = useState(false)
+  const [generalInfoDialogOpen, setGeneralInfoDialogOpen] = useState(false)
+  const [tempStatMode, setTempStatMode] = useState(
+    props.pg.stats.find((stat) => stat.temp !== undefined) !== undefined
+  )
+  const [jobs, setJobs] = useState<Job[]>([])
+  const [subjobs, setSubJobs] = useState<Job[]>([])
+  const [races, setRaces] = useState<Race[]>([])
+  const [subraces, setSubRaces] = useState<Race[]>([])
+  const styles = useStyles()
 
-class StatsView extends Component<
-  StatsViewProps & WithStyles<typeof StatsViewStyles>,
-  StatsViewState
-> {
-  inputLabel = createRef<any>()
-  backgroundData = DataUtils.BackgroundMapper(backgroundJSON as any)
-  abilitiesData = DataUtils.AbilityMapper(abilitiesJSON as any)
-
-  constructor(props: StatsViewProps & WithStyles<typeof StatsViewStyles>) {
-    super(props)
-
-    this.state = {
-      backgroundFromState: props.pg.background,
-      showBackgroundItems: false,
-      generalInfoDialogOpen: false,
-      tempStatMode:
-        props.pg.stats.find((stat) => stat.temp !== undefined) !== undefined,
-      jobs: [],
-      subjobs: [],
-      races: [],
-      subraces: [],
-    }
-  }
-
-  componentWillReceiveProps(newProps: StatsViewProps) {
-    const { backgroundFromState, tempStatMode } = this.state
-    if (newProps.pg.background !== backgroundFromState) {
-      this.setState({ backgroundFromState: newProps.pg.background })
-    }
-    if (
-      newProps.pg.stats.filter((stat) => stat.temp === undefined).length !==
-        6 &&
-      !tempStatMode
-    ) {
-      this.setState({ tempStatMode: true })
-    }
-  }
-
-  async componentDidMount() {
-    const jobs = await DataUtils.getJobs(firebaseApp)
-    const subjobs = await DataUtils.getSubJobs(firebaseApp)
-    const races = await DataUtils.getRaces(firebaseApp)
-    const subraces = await DataUtils.getSubRaces(firebaseApp)
-    this.setState({ jobs, subjobs, races, subraces })
-  }
-
-  getAbilitiesListFromClass = (): AbilitiesEnum[] => {
-    const { pgClass } = this.props.pg
-    const { jobs } = this.state
-    let abilitiesList: AbilitiesEnum[] = []
-    if (pgClass) {
-      jobs.forEach((job) => {
-        if (job.type === pgClass) {
-          abilitiesList = job.abilities
-        }
-      })
-    }
-    return abilitiesList
-  }
-
-  getEquipListFromBackground = (): EquipmentObject[] => {
-    const { background } = this.props.pg
+  const getEquipListFromBackground = useCallback((): EquipmentObject[] => {
+    const { background } = pg
     let eqList: EquipmentObject[] = []
     if (background) {
-      this.backgroundData.forEach((data) => {
+      backgroundData.forEach((data) => {
         if (data.type === background) {
           eqList = data.equip
         }
       })
     }
     return eqList
-  }
+  }, [backgroundData, pg])
 
-  addItemFromBG = () => {
-    const { onAddEquipment } = this.props
-    const items = this.getEquipListFromBackground()
+  const addItemFromBG = useCallback(() => {
+    const items = getEquipListFromBackground()
     onAddEquipment(items)
+    setShowBackgroundItems(false)
+  }, [getEquipListFromBackground, onAddEquipment])
 
-    this.setState({ showBackgroundItems: false })
-  }
-
-  getLanguages = () => {
-    const { generalInfo, race } = this.props.pg
-    const { races } = this.state
+  const getLanguages = useCallback(() => {
+    const { generalInfo, race } = pg
     let languages: string[] = []
     races.forEach((data) => {
       if (data.type === race.toString()) {
@@ -194,200 +164,191 @@ class StatsView extends Component<
       languages = languages.concat(generalInfo.languages || [])
     }
     return languages
-  }
+  }, [pg, races])
 
-  render() {
-    const { pgClass, stats, generalInfo } = this.props.pg
-    const {
-      classes,
-      onEdit,
-      onChangeAbilityCheck,
-      onChangeAbilityPoints,
-      onChangeIspiration,
-      onChangeJob,
-      onChangeSubJob,
-      onChangeRace,
-      onChangeSubRace,
-      onEditName,
-      onEditStats,
-      onChangePE,
-      onChangeMulticlass,
-      onChangeImage,
-      onUpdateFirstClassLevel,
-      proficiency,
-      readOnly,
-    } = this.props
-    const {
-      backgroundFromState,
-      showBackgroundItems,
-      generalInfoDialogOpen,
-      jobs,
-      races,
-    } = this.state
+  useEffect(() => {
+    const fetchData = async () => {
+      setJobs(await DataUtils.getJobs(firebaseApp))
+      setSubJobs(await DataUtils.getSubJobs(firebaseApp))
+      setRaces(await DataUtils.getRaces(firebaseApp))
+      setSubRaces(await DataUtils.getSubRaces(firebaseApp))
+    }
+    fetchData()
+  }, [])
 
-    const isMobile =
-      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-        navigator.userAgent
-      )
+  useEffect(() => {
+    if (pg.background !== backgroundFromState) {
+      setBackgroundFromState(pg.background)
+    }
+    if (
+      pg.stats.filter((stat) => stat.temp === undefined).length !== 6 &&
+      !tempStatMode
+    ) {
+      setTempStatMode(true)
+    }
+  }, [backgroundFromState, pg.background, pg.stats, tempStatMode])
 
-    const width = useWidth()
-    return (
-      <div className={classes.container}>
-        <div className={classes.inputContainer}>
-          <ResumeComponent
-            width={width}
-            pg={this.props.pg}
-            races={races}
-            jobs={jobs}
-            subraces={this.state.subraces}
-            onEdit={onEdit}
-            subjobs={this.state.subjobs}
-            backgroundFromState={backgroundFromState}
-            backgroundData={this.backgroundData}
-            onChangeJob={onChangeJob}
-            onChangeSubJob={onChangeSubJob}
-            onChangeBackground={(e, child) => {
-              this.setState({ showBackgroundItems: true })
-              this.props.onChangeBackground(e, child)
-            }}
-            onChangeRace={onChangeRace}
-            onChangeSubRace={onChangeSubRace}
-            onChangeMulticlass={onChangeMulticlass}
-            onEditName={onEditName}
-            onChangeImage={onChangeImage}
-            onUpdateFirstClassLevel={onUpdateFirstClassLevel}
-          />
-          <GeneralInfoComponent
-            onEdit={onEdit}
-            generalInfo={generalInfo}
-            getLanguages={this.getLanguages}
-            onEditGeneralInfo={() => {
-              console.log('open general info')
-              this.setState({ generalInfoDialogOpen: true })
-            }}
-          />
-          <Divider className={classes.divider} />
-          <LevelComponent
-            pg={this.props.pg}
-            rootCss={classes.gridContainer}
-            gridItemCss={classes.gridItem}
-            proficiency={proficiency}
-            pgClass={pgClass}
-            races={races}
-            onEdit={onEdit}
-            onChangePE={onChangePE}
-            onChangeIspiration={onChangeIspiration}
-          />
-          <Divider className={classes.divider} />
-
-          <StatsComponent
-            titleCss={classes.title}
-            gridContainerCss={classes.gridContainer}
-            gridItemCss={classes.gridItem}
-            onEdit={onEdit}
-            pg={this.props.pg}
-            onEditStats={onEditStats}
-          />
-
-          <Divider className={classes.divider} />
-
-          <TsComponent
-            titleCss={classes.title}
-            gridContainerCss={classes.gridContainer}
-            tsPositiveCss={classes.tsPositive}
-            tsNegativeCss={classes.tsNegative}
-            onEdit={onEdit}
-            stats={stats}
-            pg={this.props.pg}
-            proficiency={proficiency}
-            jobs={jobs}
-            onEditStats={onEditStats}
-          />
-
-          <Divider className={classes.divider} />
-
-          <AbilitiesComponent
-            onEdit={onEdit}
-            pg={this.props.pg}
-            jobs={jobs}
-            races={races}
-            backgroundData={this.backgroundData}
-            abilitiesData={this.abilitiesData}
-            proficiency={proficiency}
-            titleCss={classes.title}
-            gridContainerCss={classes.gridContainer}
-            tsPositiveCss={classes.tsPositive}
-            tsNegativeCss={classes.tsNegative}
-            getAbilitiesListFromClass={this.getAbilitiesListFromClass}
-            onChangeAbilityCheck={onChangeAbilityCheck}
-            onChangeAbilityPoints={onChangeAbilityPoints}
-          />
-
-          <Divider className={classes.divider} />
-          {readOnly && <div className={classes.readOnly}></div>}
-        </div>
-        <Dialog
-          open={showBackgroundItems}
-          onClose={() => {
-            this.setState({ showBackgroundItems: false })
-          }}
-          fullScreen={isMobile}
-        >
-          <DialogTitle className={classes.bgTitle}>
-            Oggetti di background
-          </DialogTitle>
-          <DialogContent className={classes.bgContent}>
-            <DialogContentText>
-              Il background che hai selezionato comprende questi oggetti per
-              partire. Vuoi aggiungerli al tuo zaino?
-            </DialogContentText>
-            {this.getEquipListFromBackground().map((eq, index) => {
-              return (
-                <div className={classes.backgroundEqListItem} key={index}>
-                  <Typography
-                    variant="body2"
-                    className={clsx(
-                      classes.quantity,
-                      eq.quantity === 1 || eq.name.indexOf('{0}') !== -1
-                        ? classes.invisibleQuantity
-                        : undefined
-                    )}
-                  >
-                    {eq.quantity}
-                  </Typography>
-                  <Typography variant={'body2'}>
-                    {eq.name
-                      .replace('{0}', eq.quantity.toString())
-                      .replace('{1}', eq.id)}
-                  </Typography>
-                </div>
-              )
-            })}
-          </DialogContent>
-          <DialogActions>
-            <Button
-              onClick={() => {
-                this.setState({ showBackgroundItems: false })
-              }}
-            >
-              No
-            </Button>
-            <Button onClick={this.addItemFromBG}>Aggiungi</Button>
-          </DialogActions>
-        </Dialog>
-        <GeneralInfoDialog
-          pg={this.props.pg}
-          open={generalInfoDialogOpen}
-          onClose={() => this.setState({ generalInfoDialogOpen: false })}
-          fullscreen={true}
-          onSave={this.props.onChangeGeneralInfo}
-        />
-      </div>
+  const isMobile =
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent
     )
-  }
-}
 
-export default withStyles(StatsViewStyles)(StatsView)
+  const width = useWidth()
+
+  return (
+    <div className={styles.container}>
+      <div className={styles.inputContainer}>
+        <ResumeComponent
+          width={width}
+          pg={pg}
+          races={races}
+          jobs={jobs}
+          subraces={subraces}
+          onEdit={onEdit}
+          subjobs={subjobs}
+          backgroundFromState={backgroundFromState}
+          backgroundData={backgroundData}
+          onChangeJob={onChangeJob}
+          onChangeSubJob={onChangeSubJob}
+          onChangeBackground={(e, child) => {
+            setShowBackgroundItems(true)
+            props.onChangeBackground(e, child)
+          }}
+          onChangeRace={onChangeRace}
+          onChangeSubRace={onChangeSubRace}
+          onChangeMulticlass={onChangeMulticlass}
+          onEditName={onEditName}
+          onChangeImage={onChangeImage}
+          onUpdateFirstClassLevel={onUpdateFirstClassLevel}
+        />
+        <GeneralInfoComponent
+          onEdit={onEdit}
+          generalInfo={generalInfo}
+          getLanguages={getLanguages}
+          onEditGeneralInfo={() => {
+            console.log('open general info')
+            setGeneralInfoDialogOpen(true)
+          }}
+        />
+        <Divider className={styles.divider} />
+        <LevelComponent
+          pg={props.pg}
+          rootCss={styles.gridContainer}
+          gridItemCss={styles.gridItem}
+          proficiency={proficiency}
+          pgClass={pgClass}
+          races={races}
+          onEdit={onEdit}
+          onChangePE={onChangePE}
+          onChangeIspiration={onChangeIspiration}
+        />
+        <Divider className={styles.divider} />
+
+        <StatsComponent
+          titleCss={styles.title}
+          gridContainerCss={styles.gridContainer}
+          gridItemCss={styles.gridItem}
+          onEdit={onEdit}
+          pg={props.pg}
+          onEditStats={onEditStats}
+        />
+
+        <Divider className={styles.divider} />
+
+        <TsComponent
+          titleCss={styles.title}
+          gridContainerCss={styles.gridContainer}
+          tsPositiveCss={styles.tsPositive}
+          tsNegativeCss={styles.tsNegative}
+          onEdit={onEdit}
+          stats={stats}
+          pg={props.pg}
+          proficiency={proficiency}
+          jobs={jobs}
+          onEditStats={onEditStats}
+        />
+
+        <Divider className={styles.divider} />
+
+        <AbilitiesComponent
+          onEdit={onEdit}
+          pg={props.pg}
+          jobs={jobs}
+          races={races}
+          backgroundData={backgroundData}
+          abilitiesData={abilitiesData}
+          proficiency={proficiency}
+          titleCss={styles.title}
+          gridContainerCss={styles.gridContainer}
+          tsPositiveCss={styles.tsPositive}
+          tsNegativeCss={styles.tsNegative}
+          onChangeAbilityCheck={onChangeAbilityCheck}
+          onChangeAbilityPoints={onChangeAbilityPoints}
+        />
+
+        <Divider className={styles.divider} />
+        {readOnly && <div className={styles.readOnly}></div>}
+      </div>
+      <Dialog
+        open={showBackgroundItems}
+        onClose={() => {
+          setShowBackgroundItems(false)
+        }}
+        fullScreen={isMobile}
+      >
+        <DialogTitle className={styles.bgTitle}>
+          Oggetti di background
+        </DialogTitle>
+        <DialogContent className={styles.bgContent}>
+          <DialogContentText>
+            Il background che hai selezionato comprende questi oggetti per
+            partire. Vuoi aggiungerli al tuo zaino?
+          </DialogContentText>
+          {getEquipListFromBackground().map((eq, index) => {
+            return (
+              <div className={styles.backgroundEqListItem} key={index}>
+                <Typography
+                  variant="body2"
+                  className={clsx(
+                    styles.quantity,
+                    eq.quantity === 1 || eq.name.indexOf('{0}') !== -1
+                      ? styles.invisibleQuantity
+                      : undefined
+                  )}
+                >
+                  {eq.quantity}
+                </Typography>
+                <Typography variant={'body2'}>
+                  {eq.name
+                    .replace('{0}', eq.quantity.toString())
+                    .replace('{1}', eq.id)}
+                </Typography>
+              </div>
+            )
+          })}
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              setShowBackgroundItems(false)
+            }}
+          >
+            No
+          </Button>
+          <Button onClick={addItemFromBG}>Aggiungi</Button>
+        </DialogActions>
+      </Dialog>
+      <GeneralInfoDialog
+        pg={props.pg}
+        open={generalInfoDialogOpen}
+        onClose={() => setGeneralInfoDialogOpen(false)}
+        fullscreen={true}
+        onSave={props.onChangeGeneralInfo}
+      />
+    </div>
+  )
+}
+export default StatsView
 
 type BreakpointOrNull = Breakpoint | null
 
