@@ -55,6 +55,7 @@ const DexiePgTable = 'pg'
 export const DexieUserTable = 'user'
 export const UsersDocName =
   window.location.hostname.includes('schedadnd-test') ||
+  window.location.hostname.includes('dnd-sheet-test') ||
   window.location.hostname.includes('localhost')
     ? 'users-dev'
     : 'users'
@@ -320,7 +321,7 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
                     <Skeleton variant="rectangular" height={16} width={160} />
                   </div>
                 </div>
-              );
+              )
             })
           : pgs.map((pg: PG, i: number) => (
               <ListItem
@@ -415,7 +416,7 @@ function Dashboard(props: DashboardProps & RouteComponentProps) {
         match={props.match}
       />
     </div>
-  );
+  )
 }
 
 export default withRouter(Dashboard)
